@@ -14,7 +14,7 @@ export default function Home() {
     setLoading(true);
     setPlan("");
     try {
-      const res = await fetch("/api/generate", {
+      const res = await fetch("/api/summarise", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ tasksText: tasks }),
