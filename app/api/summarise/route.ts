@@ -1,5 +1,5 @@
-// app/api/summarise/route.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
+// app/api/summarise/route.ts
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -21,10 +21,9 @@ export async function POST(req: Request) {
       );
     }
 
-    // ---- ECHO MODE (use while testing, then remove) ----
+    // --- ECHO MODE (uncomment while testing without OpenAI) ---
     // return NextResponse.json({ plan: `Echo: ${notes}` });
 
-    // ---- REAL OPENAI CALL ----
     const key = process.env.OPENAI_API_KEY;
     if (!key) {
       return NextResponse.json(
