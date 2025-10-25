@@ -1,4 +1,5 @@
 // app/api/email/route.ts
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 
 type Mode = "summary" | "followups" | "report";

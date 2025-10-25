@@ -1,5 +1,6 @@
 "use client";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Nav from "@/components/Nav";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
