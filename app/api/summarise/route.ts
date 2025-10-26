@@ -34,13 +34,13 @@ export async function POST(req: Request) {
       ],
     });
 
-    const aiPlan = completion.choices[0]?.message?.content || "No plan generated.";
+    const aiPlan = completion.choices?.[0]?.message?.content || "No plan generated.";
 
     return NextResponse.json({ plan: aiPlan });
-  } catch (e: any) {
+  } catch (e) {
     console.error("Error in /api/summarise:", e);
     return NextResponse.json(
-      { error: e.message || String(e) },
+      { error: (e as Error)?.message || String(e) },
       { status: 500 }
     );
   }
