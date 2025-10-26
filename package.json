@@ -2,6 +2,7 @@
   "name": "flowai",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
@@ -9,6 +10,7 @@
   },
   "dependencies": {
     "next": "^15.1.6",
+    "openai": "^6.7.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-markdown": "^9.0.3"
