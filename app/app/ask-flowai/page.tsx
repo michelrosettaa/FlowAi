@@ -12,7 +12,10 @@ export default function AskFlowAIPage() {
 
   const handleAskFlowAI = async () => {
     if (!input.trim()) return;
-    const userMsg = { role: "user", content: input };
+    const userMsg: { role: "user"; content: string } = {
+  role: "user",
+  content: input,
+};
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setLoading(true);
