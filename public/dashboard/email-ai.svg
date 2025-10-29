@@ -1,0 +1,10 @@
+<svg width="420" height="280" xmlns="http://www.w3.org/2000/svg">
+  <rect width="420" height="280" rx="16" fill="#FEF2F2"/>
+  <rect x="24" y="40" width="360" height="50" rx="8" fill="#FFF" stroke="#FCA5A5"/>
+  <rect x="40" y="55" width="150" height="10" rx="4" fill="#F87171"/>
+  <rect x="40" y="80" width="200" height="10" rx="4" fill="#FCA5A5"/>
+  <rect x="24" y="120" width="360" height="50" rx="8" fill="#FFF" stroke="#FCA5A5"/>
+  <rect x="40" y="135" width="120" height="10" rx="4" fill="#EF4444"/>
+  <rect x="40" y="160" width="240" height="10" rx="4" fill="#F87171"/>
+  <text x="24" y="250" fill="#B91C1C" font-size="14" font-family="Inter">✉️ AI Email Drafts</text>
+</svg>

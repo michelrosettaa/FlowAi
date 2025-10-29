@@ -1,0 +1,10 @@
+<svg width="420" height="280" xmlns="http://www.w3.org/2000/svg">
+  <rect width="420" height="280" rx="16" fill="#EEF2FF"/>
+  <rect x="20" y="30" width="380" height="220" rx="12" fill="#FFF" stroke="#E0E7FF"/>
+  <rect x="40" y="60" width="80" height="20" rx="4" fill="#A5B4FC"/>
+  <rect x="130" y="60" width="80" height="20" rx="4" fill="#818CF8"/>
+  <rect x="220" y="60" width="80" height="20" rx="4" fill="#6366F1"/>
+  <rect x="40" y="100" width="80" height="20" rx="4" fill="#A5B4FC"/>
+  <rect x="40" y="140" width="120" height="20" rx="4" fill="#818CF8"/>
+  <text x="24" y="260" fill="#3730A3" font-size="14" font-family="Inter">📅 Calendar Sync in action</text>
+</svg>

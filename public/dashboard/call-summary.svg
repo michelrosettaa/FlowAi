@@ -1,0 +1,8 @@
+<svg width="420" height="280" xmlns="http://www.w3.org/2000/svg">
+  <rect width="420" height="280" rx="16" fill="#FFFBEB"/>
+  <rect x="24" y="50" width="360" height="180" rx="10" fill="#FFF" stroke="#FCD34D"/>
+  <text x="40" y="100" fill="#B45309" font-size="14" font-family="Inter">Transcript:</text>
+  <rect x="40" y="110" width="300" height="12" rx="4" fill="#FBBF24" opacity="0.4"/>
+  <rect x="40" y="130" width="220" height="12" rx="4" fill="#F59E0B" opacity="0.4"/>
+  <text x="24" y="250" fill="#B45309" font-size="14" font-family="Inter">📞 Call Summariser</text>
+</svg>
