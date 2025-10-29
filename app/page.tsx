@@ -242,20 +242,20 @@ export default function LandingPage() {
   }}
 >
   <iframe
-    src="https://www.loom.com/embed/20891e56c3ce4003aa054a5c47a450c9"
-    frameBorder="0"
-    allowFullScreen
-    webkitallowfullscreen="true"
-    mozallowfullscreen="true"
-    style={{
-      position: "absolute",
-      top: 0,
-      left: 0,
-      width: "100%",
-      height: "100%",
-      borderRadius: "12px",
-    }}
-  ></iframe>
+  src="https://app.govideolink.com/embed/I8YKF7jV1NwhUoDl1Fpc"
+  allow="autoplay; fullscreen"
+  allowFullScreen
+  frameBorder={0}
+  style={{
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    border: "none",
+    borderRadius: "12px",
+  }}
+></iframe>
 </div>
 
             <p className="text-slate-600 text-sm leading-relaxed mb-4">
