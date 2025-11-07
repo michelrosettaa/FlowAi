@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
+import { NotificationProvider } from "../context/NotificationContext"; // ✅ added
+import NotificationBell from "../components/NotificationBell"; // ✅ added
 import {
   LayoutDashboard,
   Mail,
@@ -20,7 +22,7 @@ import {
 
 /*
   AppLayout:
-  - wraps children in ThemeProvider
+  - wraps children in ThemeProvider + NotificationProvider
   - renders InnerLayout (which can safely use useTheme)
 */
 export default function AppLayout({
@@ -29,9 +31,11 @@ export default function AppLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ThemeProvider>
-      <InnerLayout>{children}</InnerLayout>
-    </ThemeProvider>
+    <NotificationProvider>
+      <ThemeProvider>
+        <InnerLayout>{children}</InnerLayout>
+      </ThemeProvider>
+    </NotificationProvider>
   );
 }
 
@@ -50,10 +54,11 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 
   const navItems = [
     { name: "Dashboard", path: "/app", icon: <LayoutDashboard size={18} /> },
-    { name: "Mentor", path: "/app/mentor", icon: <Settings size={18} /> },
+    { name: "FlowAI Motivator", path: "/app/motivator", icon: <Settings size={18} /> },
     { name: "Email", path: "/app/email", icon: <Mail size={18} /> },
     { name: "Stats", path: "/app/stats", icon: <LineChart size={18} /> },
     { name: "Calendar", path: "/app/calendar", icon: <Calendar size={18} /> },
+    { name: "Ask FlowAI", path: "/app/ask", icon: <BrainCircuit size={18} /> },
     {
       name: "AI Daily Planner",
       path: "/app/planner",
@@ -97,6 +102,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
             )}
           </div>
 
+        {/* collapse */}
           <button
             onClick={() => setCollapsed(!collapsed)}
             className="text-slate-400 hover:text-slate-100 transition"
@@ -126,8 +132,15 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
         {/* spacer to push bottom section down */}
         <div className="flex-1" />
 
-        {/* THEME PICKER / SETTINGS / HELP / SIGN OUT */}
+        {/* NOTIFICATIONS + THEME PICKER / SETTINGS / HELP / SIGN OUT */}
         <div className="flex flex-col gap-1 mt-4">
+          {/* ✅ Notification Bell */}
+          {!collapsed && (
+            <div className="mb-3 flex justify-center">
+              <NotificationBell />
+            </div>
+          )}
+
           {/* THEME SELECTOR */}
           {!collapsed && (
             <div className="text-[12px] text-slate-400 mb-3">
@@ -210,7 +223,11 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 
         {!collapsed && (
           <div className="text-[11px] text-slate-500 border-t border-white/10 pt-4 mt-3">
-            © {new Date().getFullYear()} FlowAI
+            <div>© {new Date().getFullYear()} FlowAI</div>
+            <div>
+              <a href="/privacy" className="underline">Privacy</a> ·{" "}
+              <a href="/terms" className="underline">Terms</a>
+            </div>
           </div>
         )}
       </aside>

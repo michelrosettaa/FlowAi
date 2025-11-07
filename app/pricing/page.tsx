@@ -1,85 +1,221 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { useState } from "react";
+
 export default function PricingPage() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  // 🧠 Stripe checkout handler
+  async function handleCheckout(plan: string) {
+    const email = prompt("Enter your email to start your free trial:");
+    if (!email) return;
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan, email }),
+      });
+
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url; // redirect to Stripe
+      } else {
+        alert("Error starting checkout. Please try again.");
+      }
+    } catch (err) {
+      console.error("Checkout error:", err);
+      alert("Failed to start checkout.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const plans = [
+    {
+      name: "Free",
+      price: "£0",
+      description: "Perfect for getting started with FlowAI.",
+      features: [
+        "Basic AI Mentor",
+        "Simple Task Planner",
+        "Focus Mode (Limited)",
+        "Community Support",
+        "7 day trial of Professional features",
+      ],
+      button: "Get Started",
+      color: "from-slate-400 to-slate-600",
+      path: "/onboarding", // ✅ ensures no looping back to signup
+      highlight: false,
+    },
+    {
+      name: "Student",
+      price: "£6.99",
+      description: "Verified student plan with all core features.",
+      features: [
+        "Full AI Motivator Access",
+        "Smart Task Scheduler",
+        "Focus Mode + Reminders",
+        "Email Productivity Tools",
+        "Student Verification Required",
+      ],
+      button: "Verify Student Email",
+      color: "from-blue-500 to-indigo-500",
+      path: "/verify",
+      highlight: false,
+    },
+    {
+      name: "Professional",
+      price: "£8.99",
+      description: "For working professionals who want to stay in flow.",
+      features: [
+        "Advanced AI Motivator",
+        "Smart Planner + Calendar Sync",
+        "Focus Analytics Dashboard",
+        "Email + Meeting Summaries",
+      ],
+      button: "Start Free Trial",
+      color: "from-sky-500 to-blue-600",
+      path: "pro",
+      highlight: true,
+      badge: "Most Popular",
+    },
+    {
+      name: "Teams (Up to 5)",
+      price: "£18.99",
+      description: "Collaborate with your small team or project group.",
+      features: [
+        "All Professional Features",
+        "Shared Calendar + Goals",
+        "Team Progress Analytics",
+        "Priority Support",
+        "Up to 5 users included — one flat price",
+      ],
+      button: "Start for Teams",
+      color: "from-indigo-500 to-blue-700",
+      path: "team",
+      highlight: true,
+      badge: "Team Favourite",
+    },
+  ];
+
   return (
-    <main className="min-h-screen bg-gradient-to-b from-indigo-50 to-white text-slate-900">
-      {/* HEADER */}
-      <header className="w-full py-6 border-b border-slate-200 bg-white/70 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto flex justify-between items-center px-6">
-          <div className="text-xl font-bold text-slate-900">FlowAI</div>
-          <nav className="flex gap-6 text-sm font-medium text-slate-700">
-            <a href="/" className="hover:text-slate-900 transition">Home</a>
-            <a href="/pricing" className="text-blue-600 font-semibold">Pricing</a>
-            <a href="/signup" className="hover:text-slate-900 transition">Get Started</a>
-          </nav>
+    <main className="relative min-h-screen flex flex-col items-center text-gray-900 bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      {/* === NAVBAR === */}
+      <nav className="w-full z-50 bg-white/60 backdrop-blur-md shadow-sm flex justify-between items-center px-8 py-4 border-b border-slate-200/60">
+        <div
+          onClick={() => router.push("/")}
+          className="text-xl font-semibold text-slate-900 cursor-pointer tracking-tight"
+        >
+          FlowAI
         </div>
-      </header>
 
-      {/* PRICING SECTION */}
-      <section className="py-24">
-        <div className="max-w-6xl mx-auto px-6 text-center">
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-indigo-500 text-transparent bg-clip-text">
-            Choose your FlowAI plan
-          </h1>
-          <p className="text-slate-500 mb-16 text-lg">
-            Start for free — upgrade anytime to unlock your full productivity.
-          </p>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* FREE PLAN */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-lg">
-              <h2 className="text-xl font-semibold mb-2">Free</h2>
-              <p className="text-slate-500 mb-4">For getting started.</p>
-              <p className="text-4xl font-bold mb-6">£0<span className="text-base text-slate-500">/month</span></p>
-              <ul className="text-left text-slate-600 text-sm mb-8 space-y-2">
-                <li>✅ 3 AI plans per day</li>
-                <li>✅ Limited mentor messages</li>
-                <li>✅ 2 email summaries/day</li>
-              </ul>
-              <a href="/signup" className="inline-block w-full bg-slate-900 text-white rounded-lg py-2 font-medium hover:bg-slate-800 transition">
-                Get Started
-              </a>
-            </div>
-
-            {/* PRO PLAN */}
-            <div className="bg-gradient-to-b from-blue-600 to-indigo-600 text-white rounded-2xl p-8 shadow-xl transform scale-105 border border-indigo-500">
-              <h2 className="text-xl font-semibold mb-2">Pro</h2>
-              <p className="text-slate-200 mb-4">For individuals & professionals.</p>
-              <p className="text-4xl font-bold mb-6">£8.99<span className="text-base text-slate-200">/month</span></p>
-              <ul className="text-left text-white/90 text-sm mb-8 space-y-2">
-                <li>✅ Unlimited AI planning</li>
-                <li>✅ Full AI Mentor & streaks</li>
-                <li>✅ Calendar sync</li>
-                <li>✅ Unlimited email drafts</li>
-              </ul>
-              <a href="/signup" className="inline-block w-full bg-white text-blue-700 rounded-lg py-2 font-semibold hover:bg-slate-100 transition">
-                Upgrade to Pro
-              </a>
-              <p className="text-xs text-slate-200 mt-2">£79/year (save 27%)</p>
-            </div>
-
-            {/* TEAM PLAN */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-lg">
-              <h2 className="text-xl font-semibold mb-2">Team</h2>
-              <p className="text-slate-500 mb-4">For small teams & startups.</p>
-              <p className="text-4xl font-bold mb-6">£18.99<span className="text-base text-slate-500">/user</span></p>
-              <ul className="text-left text-slate-600 text-sm mb-8 space-y-2">
-                <li>✅ Shared team planner</li>
-                <li>✅ AI meeting summaries</li>
-                <li>✅ Team focus analytics</li>
-                <li>✅ Slack + Gmail integration</li>
-              </ul>
-              <a href="/signup" className="inline-block w-full bg-blue-600 text-white rounded-lg py-2 font-medium hover:bg-blue-700 transition">
-                Contact Sales
-              </a>
-            </div>
-          </div>
+        <div className="flex gap-6 text-slate-600 text-sm font-medium">
+          <button
+            className="hover:text-slate-900 transition"
+            onClick={() => router.push("/")}
+          >
+            Home
+          </button>
+          <button
+            className="hover:text-slate-900 transition"
+            onClick={() => router.push("/#why")}
+          >
+            Why FlowAI
+          </button>
+          <button
+            className="hover:text-slate-900 transition"
+            onClick={() => router.push("/signup")}
+          >
+            Sign Up
+          </button>
         </div>
+      </nav>
+
+      {/* === HEADER === */}
+      <section className="text-center mt-20 px-6">
+        <h1 className="text-4xl md:text-5xl font-extrabold leading-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          Choose your FlowAI plan
+        </h1>
+        <p className="text-slate-600 text-base md:text-lg mt-4 max-w-2xl mx-auto">
+          Whether you’re studying, freelancing, or managing a team — FlowAI helps
+          you stay focused and in control.
+        </p>
       </section>
 
-      {/* FOOTER */}
-      <footer className="py-8 text-center text-slate-400 text-sm border-t border-slate-200">
-        © {new Date().getFullYear()} FlowAI — Focus, clarity, momentum.
+      {/* === PRICING CARDS === */}
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-16 px-8 max-w-6xl">
+        {plans.map((plan, index) => (
+          <motion.div
+            key={index}
+            whileHover={{ scale: 1.05 }}
+            className={`relative bg-white/90 backdrop-blur-xl border rounded-2xl shadow-lg p-8 text-center flex flex-col transition-all duration-300 
+              ${
+                plan.highlight
+                  ? "border-blue-400/70 shadow-blue-200 hover:shadow-blue-300"
+                  : "border-slate-200 hover:shadow-blue-100"
+              }`}
+          >
+            {plan.badge && (
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-600 to-indigo-500 text-white text-[10px] px-3 py-1 rounded-full shadow-md uppercase font-semibold tracking-wide">
+                {plan.badge}
+              </div>
+            )}
+
+            <h2
+              className={`text-2xl font-bold mb-2 ${
+                plan.highlight ? "text-blue-700" : "text-slate-900"
+              }`}
+            >
+              {plan.name}
+            </h2>
+            <p className="text-slate-500 text-sm mb-4">{plan.description}</p>
+            <div
+              className={`text-4xl font-extrabold mb-6 ${
+                plan.highlight ? "text-blue-600" : "text-slate-900"
+              }`}
+            >
+              {plan.price}
+              <span className="text-sm text-slate-500 font-medium"> /month</span>
+            </div>
+
+            <ul className="text-sm text-slate-600 flex-1 mb-6 text-left list-disc list-inside space-y-2">
+              {plan.features.map((f, i) => (
+                <li key={i}>{f}</li>
+              ))}
+            </ul>
+
+            {/* ✅ Added fix for remembering selected plan and preventing loops */}
+            <button
+              onClick={() => {
+                localStorage.setItem("selectedPlan", plan.name.toLowerCase());
+
+                if (plan.name === "Professional" || plan.name.startsWith("Teams")) {
+                  router.push(`/checkout?plan=${plan.path}`);
+                } else {
+                  router.push(plan.path);
+                }
+              }}
+              disabled={loading}
+              className={`bg-gradient-to-r ${plan.color} text-white px-5 py-2 rounded-xl text-sm font-semibold shadow-lg hover:scale-[1.03] transition ${
+                loading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
+            >
+              {loading ? "Loading..." : plan.button}
+            </button>
+          </motion.div>
+        ))}
+      </section>
+
+      {/* === FOOTER === */}
+      <footer className="relative z-10 text-slate-500 text-[12px] mt-16 mb-20 text-center">
+        © {new Date().getFullYear()} FlowAI — Focus, clarity, momentum. ·{" "}
+        <a href="/privacy" className="underline">Privacy Policy</a> ·{" "}
+        <a href="/terms" className="underline">Terms of Service</a>
       </footer>
     </main>
   );

@@ -121,3 +121,17 @@ export default function DashboardPage() {
     </>
   );
 }
+import { useNotifications } from ".././context/NotificationContext";
+
+function DebugNotif() {
+  const { addNotification } = useNotifications();
+  return (
+    <button
+      onClick={() => addNotification("Test notification from dashboard", "mentor")}
+      className="mt-4 text-xs bg-white/10 border border-white/15 px-3 py-1.5 rounded"
+    >
+      Send test notification
+    </button>
+  );
+}
+

@@ -132,12 +132,11 @@ export default function LandingPage() {
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 mt-8">
           <button
-            onClick={() => router.push("/signup")}
-            className="inline-flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-500 text-white px-6 py-3 rounded-xl text-sm font-semibold shadow-lg hover:shadow-xl hover:scale-[1.03] active:scale-[0.99] transition"
-          >
-            Start Free Trial →
-          </button>
-
+  onClick={() => router.push("/onboarding")}
+  className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:scale-[1.03] transition"
+>
+  Start Free Trial
+</button>
           <button
             onClick={() => setShowDemoModal(true)}
             className="inline-flex items-center justify-center border border-indigo-500/60 text-indigo-600 bg-white px-6 py-3 rounded-xl text-sm font-semibold shadow-sm hover:bg-indigo-50 hover:scale-[1.03] active:scale-[0.99] transition"
@@ -214,9 +213,11 @@ export default function LandingPage() {
       <StickyCTA />
 
       {/* === FOOTER === */}
-      <footer className="relative z-10 text-slate-400 text-[12px] mt-16 mb-20 text-center">
-        © {new Date().getFullYear()} FlowAI — Focus, clarity, momentum.
-      </footer>
+      <footer className="relative z-10 text-slate-500 text-[12px] mt-16 mb-20 text-center">
+  © {new Date().getFullYear()} FlowAI — Focus, clarity, momentum. ·{" "}
+  <a href="/privacy" className="underline">Privacy Policy</a> ·{" "}
+  <a href="/terms" className="underline">Terms of Service</a>
+</footer>
 
       {/* === DEMO MODAL === */}
       {showDemoModal && (
@@ -233,30 +234,15 @@ export default function LandingPage() {
               FlowAI in Action
             </h3>
 
-            {/* EMBEDDED DEMO VIDEO */}
-<div
-  style={{
-    position: "relative",
-    paddingBottom: "56.544502617801044%",
-    height: 0,
-  }}
->
-  <iframe
-  src="https://app.govideolink.com/embed/I8YKF7jV1NwhUoDl1Fpc"
-  allow="autoplay; fullscreen"
-  allowFullScreen
-  frameBorder={0}
-  style={{
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    border: "none",
-    borderRadius: "12px",
-  }}
-></iframe>
-</div>
+            <div className="relative aspect-video rounded-lg overflow-hidden mb-4">
+              <iframe
+                src="https://www.loom.com/embed/20891e56c3ce4003aa054a5c47a450c9"
+                allow="autoplay; fullscreen"
+                allowFullScreen
+                frameBorder={0}
+                className="absolute top-0 left-0 w-full h-full rounded-lg"
+              ></iframe>
+            </div>
 
             <p className="text-slate-600 text-sm leading-relaxed mb-4">
               FlowAI plans your day, protects deep work, and automates your focus — see it in action.

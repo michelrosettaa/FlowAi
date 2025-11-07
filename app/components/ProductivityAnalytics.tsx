@@ -10,7 +10,7 @@ export default function ProductivityAnalyticsSection() {
         {/* Left side text */}
         <div className="flex-1">
           <h2 className="text-3xl font-bold tracking-tight mb-4 text-white">
-            Track & analyze your productivity
+            Track & analyse your productivity
           </h2>
           <p className="text-indigo-100 text-sm leading-relaxed max-w-md">
             FlowAI shows you where your time is really going — deep work,

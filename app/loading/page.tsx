@@ -2,35 +2,39 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 
-export default function LoadingPlannerPage() {
+export default function LoadingPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const t = setTimeout(() => {
+    // Simulate loading process for 3 seconds
+    const timer = setTimeout(() => {
       router.push("/app");
-    }, 2000); // 2s fake build
+    }, 3000);
 
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [router]);
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#0A0F1C] via-[#101a2e] to-[#1a2b46] text-slate-100 px-4">
-      <div className="bg-white/5 border border-white/10 rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center">
-        <div className="text-[11px] uppercase tracking-wide text-indigo-300 font-medium mb-2">
-          Setting up FlowAI
-        </div>
-        <div className="text-xl font-semibold text-white mb-4">
-          Building your intelligent planner…
-        </div>
-        <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-indigo-500 to-blue-400 animate-pulse w-2/3 rounded-full" />
-        </div>
-        <p className="text-[12px] text-slate-400 mt-4 leading-relaxed">
-          Blocking focus time, syncing calendar, prepping follow-up emails,
-          and getting your mentor ready.
+    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50 text-center px-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6 }}
+        className="bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-lg w-full max-w-md p-8"
+      >
+        <h1 className="text-2xl font-bold text-slate-900">
+          Building your FlowAI dashboard...
+        </h1>
+        <p className="text-slate-500 text-sm mt-3">
+          This may take a few seconds as we personalise your workspace.
         </p>
-      </div>
+
+        <div className="mt-8 flex justify-center">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      </motion.div>
     </main>
   );
 }
