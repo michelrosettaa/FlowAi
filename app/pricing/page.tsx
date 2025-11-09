@@ -9,7 +9,6 @@ export default function PricingPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  // 🧠 Stripe checkout handler (kept for completeness if you trigger it elsewhere)
   async function handleCheckout(plan: string) {
     const email = prompt("Enter your email to start your free trial:");
     if (!email) return;
@@ -24,7 +23,7 @@ export default function PricingPage() {
 
       const data = await res.json();
       if (data.url) {
-        window.location.href = data.url; // redirect to Stripe
+        window.location.href = data.url;
       } else {
         alert("Error starting checkout. Please try again.");
       }
@@ -50,7 +49,7 @@ export default function PricingPage() {
       ],
       button: "Get Started",
       color: "from-slate-400 to-slate-600",
-      path: "/onboarding", // ✅ ensures no looping back to signup
+      path: "/onboarding",
       highlight: false,
     },
     {
@@ -106,7 +105,7 @@ export default function PricingPage() {
 
   return (
     <main className="relative min-h-screen flex flex-col items-center text-gray-900 bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      {/* === NAVBAR === */}
+      {/* NAVBAR */}
       <nav className="w-full z-50 bg-white/60 backdrop-blur-md shadow-sm flex justify-between items-center px-8 py-4 border-b border-slate-200/60">
         <div
           onClick={() => router.push("/")}
@@ -116,28 +115,19 @@ export default function PricingPage() {
         </div>
 
         <div className="flex gap-6 text-slate-600 text-sm font-medium">
-          <button
-            className="hover:text-slate-900 transition"
-            onClick={() => router.push("/")}
-          >
+          <button className="hover:text-slate-900 transition" onClick={() => router.push("/")}>
             Home
           </button>
-          <button
-            className="hover:text-slate-900 transition"
-            onClick={() => router.push("/#why")}
-          >
+          <button className="hover:text-slate-900 transition" onClick={() => router.push("/#why")}>
             Why FlowAI
           </button>
-          <button
-            className="hover:text-slate-900 transition"
-            onClick={() => router.push("/signup")}
-          >
+          <button className="hover:text-slate-900 transition" onClick={() => router.push("/signup")}>
             Sign Up
           </button>
         </div>
       </nav>
 
-      {/* === HEADER === */}
+      {/* HEADER */}
       <section className="text-center mt-20 px-6">
         <h1 className="text-4xl md:text-5xl font-extrabold leading-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
           Choose your FlowAI plan
@@ -148,38 +138,29 @@ export default function PricingPage() {
         </p>
       </section>
 
-      {/* === PRICING CARDS === */}
+      {/* CARDS */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-16 px-8 max-w-6xl">
         {plans.map((plan, index) => (
           <motion.div
             key={index}
             whileHover={{ scale: 1.05 }}
-            className={`relative bg-white/90 backdrop-blur-xl border rounded-2xl shadow-lg p-8 text-center flex flex-col transition-all duration-300 
-              ${
-                plan.highlight
-                  ? "border-blue-400/70 shadow-blue-200 hover:shadow-blue-300"
-                  : "border-slate-200 hover:shadow-blue-100"
-              }`}
+            className={`relative bg-white/90 backdrop-blur-xl border rounded-2xl shadow-lg p-8 text-center flex flex-col transition-all duration-300 ${
+              plan.highlight
+                ? "border-blue-400/70 shadow-blue-200 hover:shadow-blue-300"
+                : "border-slate-200 hover:shadow-blue-100"
+            }`}
           >
             {plan.badge && (
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-600 to-indigo-500 text-white text-[10px] px-3 py-1 rounded-full shadow-md uppercase font-semibold tracking-wide">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-600 to-indigo-500 text-white text-[10px] px-3 py-1 rounded-full shadow-md uppercase font-semibold tracking-wide">
                 {plan.badge}
               </div>
             )}
 
-            <h2
-              className={`text-2xl font-bold mb-2 ${
-                plan.highlight ? "text-blue-700" : "text-slate-900"
-              }`}
-            >
+            <h2 className={`text-2xl font-bold mb-2 ${plan.highlight ? "text-blue-700" : "text-slate-900"}`}>
               {plan.name}
             </h2>
             <p className="text-slate-500 text-sm mb-4">{plan.description}</p>
-            <div
-              className={`text-4xl font-extrabold mb-6 ${
-                plan.highlight ? "text-blue-600" : "text-slate-900"
-              }`}
-            >
+            <div className={`text-4xl font-extrabold mb-6 ${plan.highlight ? "text-blue-600" : "text-slate-900"}`}>
               {plan.price}
               <span className="text-sm text-slate-500 font-medium"> /month</span>
             </div>
@@ -190,11 +171,9 @@ export default function PricingPage() {
               ))}
             </ul>
 
-            {/* ✅ Remember plan + prevent loops */}
             <button
               onClick={() => {
                 localStorage.setItem("selectedPlan", plan.name.toLowerCase());
-
                 if (plan.name === "Professional" || plan.name.startsWith("Teams")) {
                   router.push(`/checkout?plan=${plan.path}`);
                 } else {
@@ -212,16 +191,11 @@ export default function PricingPage() {
         ))}
       </section>
 
-      {/* === FOOTER === (use <Link> to fix ESLint build error) */}
+      {/* FOOTER */}
       <footer className="relative z-10 text-slate-500 text-[12px] mt-16 mb-20 text-center">
         © {new Date().getFullYear()} FlowAI — Focus, clarity, momentum. ·{" "}
-        <Link href="/privacy" className="underline">
-          Privacy Policy
-        </Link>{" "}
-        ·{" "}
-        <Link href="/terms" className="underline">
-          Terms of Service
-        </Link>
+        <Link href="/privacy" className="underline">Privacy Policy</Link> ·{" "}
+        <Link href="/terms" className="underline">Terms of Service</Link>
       </footer>
     </main>
   );

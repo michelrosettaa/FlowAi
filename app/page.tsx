@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link"; // ✅ add
 import { motion } from "framer-motion";
 
 // sections/components on the landing page
@@ -110,7 +111,7 @@ export default function LandingPage() {
       </nav>
 
       {/* === HERO SECTION === */}
-      <section className="relative z-10 flex flex-col items-center text-center px-6 pt-16 md:pt-20 max-w-3xl">
+      <section className="relative z-10 flex flex-col itemscenter text-center px-6 pt-16 md:pt-20 max-w-3xl">
         <h1 className="text-4xl md:text-5xl font-extrabold leading-tight text-slate-900 tracking-tight">
           Plan your day without burning your brain.
           <br />
@@ -132,11 +133,11 @@ export default function LandingPage() {
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 mt-8">
           <button
-  onClick={() => router.push("/onboarding")}
-  className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:scale-[1.03] transition"
->
-  Start Free Trial
-</button>
+            onClick={() => router.push("/onboarding")}
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:scale-[1.03] transition"
+          >
+            Start Free Trial
+          </button>
           <button
             onClick={() => setShowDemoModal(true)}
             className="inline-flex items-center justify-center border border-indigo-500/60 text-indigo-600 bg-white px-6 py-3 rounded-xl text-sm font-semibold shadow-sm hover:bg-indigo-50 hover:scale-[1.03] active:scale-[0.99] transition"
@@ -173,11 +174,7 @@ export default function LandingPage() {
         <motion.div
           className="flex gap-8"
           animate={{ x: ["0%", "-50%"] }}
-          transition={{
-            repeat: Infinity,
-            duration: 25,
-            ease: "linear",
-          }}
+          transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
         >
           {[...testimonials, ...testimonials].map((t, i) => (
             <div
@@ -214,10 +211,10 @@ export default function LandingPage() {
 
       {/* === FOOTER === */}
       <footer className="relative z-10 text-slate-500 text-[12px] mt-16 mb-20 text-center">
-  © {new Date().getFullYear()} FlowAI — Focus, clarity, momentum. ·{" "}
-  <a href="/privacy" className="underline">Privacy Policy</a> ·{" "}
-  <a href="/terms" className="underline">Terms of Service</a>
-</footer>
+        © {new Date().getFullYear()} FlowAI — Focus, clarity, momentum. ·{" "}
+        <Link href="/privacy" className="underline">Privacy Policy</Link> ·{" "}
+        <Link href="/terms" className="underline">Terms of Service</Link>
+      </footer>
 
       {/* === DEMO MODAL === */}
       {showDemoModal && (
@@ -241,7 +238,7 @@ export default function LandingPage() {
                 allowFullScreen
                 frameBorder={0}
                 className="absolute top-0 left-0 w-full h-full rounded-lg"
-              ></iframe>
+              />
             </div>
 
             <p className="text-slate-600 text-sm leading-relaxed mb-4">

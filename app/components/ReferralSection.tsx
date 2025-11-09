@@ -1,24 +1,33 @@
 "use client";
-import { useEffect, useState } from "react";
 
-export default function ReferralSection() {
-  const [userCode, setUserCode] = useState<string | null>(null);
+import { useEffect, useRef, useState } from "react";
 
-  // Read the code once from the URL
+type Props = { code?: string };
+
+export default function ReferralSection({ code }: Props) {
+  const [userCode, setUserCode] = useState("");
+  // Prevent repeated state changes on every render to satisfy the lint rule
+  const didSetRef = useRef(false);
+
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("ref") || params.get("code");
+    if (didSetRef.current) return;
     if (!code) return;
-    setUserCode(code); // set-state is OK here because effect runs once
-    localStorage.setItem("flowai_referral_code", code);
-  }, []); // ← runs once, no render loop
+
+    try {
+      localStorage.setItem("flowai_referral_code", code);
+      // guarded one-time state set
+      setUserCode(code);
+      didSetRef.current = true;
+    } catch {
+      // ignore storage errors (private mode, etc.)
+    }
+  }, [code]);
 
   if (!userCode) return null;
 
   return (
-    <div className="text-sm text-slate-600">
-      Thanks! Your referral code <span className="font-semibold">{userCode}</span> is applied.
+    <div className="text-xs text-slate-500">
+      Referred code: <span className="font-mono">{userCode}</span>
     </div>
   );
 }
