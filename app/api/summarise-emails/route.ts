@@ -13,14 +13,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No emails provided" }, { status: 400 });
     }
 
-    // Ask AI to summarize and prioritize
+    // Ask AI to summarise and prioritize
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
           content:
-            "You are an AI email assistant. Summarize each email briefly and rate its priority as High, Medium, or Low.",
+            "You are an AI email assistant. Summarise each email briefly and rate its priority as High, Medium, or Low.",
         },
         {
           role: "user",

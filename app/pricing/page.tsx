@@ -3,12 +3,13 @@
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function PricingPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  // 🧠 Stripe checkout handler
+  // 🧠 Stripe checkout handler (kept for completeness if you trigger it elsewhere)
   async function handleCheckout(plan: string) {
     const email = prompt("Enter your email to start your free trial:");
     if (!email) return;
@@ -189,7 +190,7 @@ export default function PricingPage() {
               ))}
             </ul>
 
-            {/* ✅ Added fix for remembering selected plan and preventing loops */}
+            {/* ✅ Remember plan + prevent loops */}
             <button
               onClick={() => {
                 localStorage.setItem("selectedPlan", plan.name.toLowerCase());
@@ -211,11 +212,16 @@ export default function PricingPage() {
         ))}
       </section>
 
-      {/* === FOOTER === */}
+      {/* === FOOTER === (use <Link> to fix ESLint build error) */}
       <footer className="relative z-10 text-slate-500 text-[12px] mt-16 mb-20 text-center">
         © {new Date().getFullYear()} FlowAI — Focus, clarity, momentum. ·{" "}
-        <a href="/privacy" className="underline">Privacy Policy</a> ·{" "}
-        <a href="/terms" className="underline">Terms of Service</a>
+        <Link href="/privacy" className="underline">
+          Privacy Policy
+        </Link>{" "}
+        ·{" "}
+        <Link href="/terms" className="underline">
+          Terms of Service
+        </Link>
       </footer>
     </main>
   );

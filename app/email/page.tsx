@@ -8,7 +8,7 @@ export default function EmailAssistantPage() {
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
 
-  function handleSummarize() {
+  function handleSummarise() {
     if (!input.trim()) return;
     setLoading(true);
     setOutput("");
@@ -47,7 +47,7 @@ export default function EmailAssistantPage() {
           <div className="mb-8 text-center">
             <h1 className="text-2xl font-semibold mb-2">✉️ FlowAI Email Assistant</h1>
             <p className="text-slate-400 text-sm">
-              Paste an email or your notes. FlowAI can summarize or draft a reply in your voice.
+              Paste an email or your notes. FlowAI can summarise or draft a reply in your voice.
             </p>
           </div>
 
@@ -63,7 +63,7 @@ export default function EmailAssistantPage() {
           {/* Action buttons */}
           <div className="flex flex-wrap gap-4 mt-4 justify-center">
             <button
-              onClick={handleSummarize}
+              onClick={handleSummarise}
               disabled={loading}
               className={
                 "px-6 py-2 rounded-lg text-sm font-semibold shadow-md transition-all " +

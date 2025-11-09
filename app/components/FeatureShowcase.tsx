@@ -21,7 +21,7 @@ const features = [
   {
     icon: "✉️",
     title: "Email Automation",
-    desc: "Drafts, summarizes, and schedules your emails for you — so your focus never breaks.",
+    desc: "Drafts, summarises, and schedules your emails for you — so your focus never breaks.",
     preview: "/dashboard/email-ai.svg",
     gradient: "from-pink-400 to-red-500",
   },
@@ -35,7 +35,7 @@ const features = [
   {
     icon: "📞",
     title: "AI Call Summariser",
-    desc: "Instantly summarizes meetings into action plans and next steps — powered by AI.",
+    desc: "Instantly summarises meetings into action plans and next steps — powered by AI.",
     preview: "/dashboard/call-summary.svg",
     gradient: "from-yellow-400 to-orange-500",
   },

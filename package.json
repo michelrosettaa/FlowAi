@@ -9,6 +9,7 @@
     "start": "next start -p $PORT"
   },
   "dependencies": {
+    "@auth/core": "^0.34.3",
     "@fontsource/dm-sans": "^5.2.8",
     "@fontsource/inter": "^5.2.8",
     "@stripe/stripe-js": "^8.2.0",
@@ -17,15 +18,17 @@
     "framer-motion": "^12.23.24",
     "lucide-react": "^0.548.0",
     "next": "^15.1.6",
+    "next-auth": "^4.24.13",
     "openai": "^6.7.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-markdown": "^9.0.3",
-    "stripe": "^19.2.0"
+    "stripe": "^19.3.0",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.16",
-    "@types/node": "^20.0.0",
+    "@types/node": "^20.19.24",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
     "autoprefixer": "^10.4.21",

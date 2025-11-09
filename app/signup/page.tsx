@@ -1,17 +1,26 @@
+// app/signup/page.tsx
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function SignupPage() {
   const router = useRouter();
+  const params = useSearchParams();
+  const plan = (params.get("plan") || "pro").toLowerCase(); // default pro
   const [email, setEmail] = useState("");
-  const [agreed, setAgreed] = useState(false);
+
+  // Utility: set short-lived cookie (30 min)
+  const setCookie = (name: string, value: string) => {
+    const expires = new Date(Date.now() + 30 * 60 * 1000).toUTCString();
+    document.cookie = `${name}=${encodeURIComponent(value)}; Path=/; Expires=${expires}; SameSite=Lax`;
+  };
 
   const onContinue = () => {
-    if (!email.trim() || !agreed) return;
-    localStorage.setItem("flowai_email", email.trim());
-    router.push("/onboarding"); // your questions slideshow
+    if (!email.trim()) return;
+    setCookie("fa_email", email.trim());
+    setCookie("fa_plan", plan);
+    router.push(`/onboarding?plan=${plan}`);
   };
 
   return (
@@ -25,7 +34,7 @@ export default function SignupPage() {
         </p>
 
         <label className="block text-xs font-medium text-slate-700 mt-6 mb-2">
-          Work email
+          Email
         </label>
         <input
           value={email}
@@ -34,31 +43,23 @@ export default function SignupPage() {
           className="w-full border border-slate-300 rounded-lg px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
         />
 
-        {/* Consent (required) */}
-        <label className="flex items-start gap-2 text-xs text-slate-600 mt-4">
-          <input
-            type="checkbox"
-            checked={agreed}
-            onChange={(e) => setAgreed(e.target.checked)}
-            required
-            className="mt-0.5"
-          />
-          <span>
-            I agree to the{" "}
-            <a href="/terms" className="text-blue-600 underline">Terms</a> and{" "}
-            <a href="/privacy" className="text-blue-600 underline">Privacy Policy</a>.
-          </span>
-        </label>
-
         <button
           onClick={onContinue}
-          disabled={!email.trim() || !agreed}
-          className={`w-full bg-gradient-to-r from-blue-600 to-indigo-500 text-white text-sm font-semibold px-4 py-3 rounded-lg mt-6 shadow-md hover:shadow-lg hover:scale-[1.02] transition ${
-            !email.trim() || !agreed ? "opacity-60 cursor-not-allowed" : ""
-          }`}
+          className="w-full bg-gradient-to-r from-blue-600 to-indigo-500 text-white text-sm font-semibold px-4 py-3 rounded-lg mt-6 shadow-md hover:shadow-lg hover:scale-[1.02] transition"
         >
           Continue →
         </button>
+
+        <div className="mt-4 text-center">
+          <a
+            href={`/api/auth/signin/google?callbackUrl=${encodeURIComponent(
+              `/onboarding?plan=${plan}`
+            )}`}
+            className="inline-block text-sm text-indigo-600 hover:underline"
+          >
+            Or continue with Google
+          </a>
+        </div>
       </div>
     </main>
   );
