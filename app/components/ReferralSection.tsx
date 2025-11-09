@@ -1,33 +1,30 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
-type Props = { code?: string };
+export default function ReferralSection() {
+  const params = useSearchParams();
+  const [userCode, setUserCode] = useState<string | null>(null);
 
-export default function ReferralSection({ code }: Props) {
-  const [userCode, setUserCode] = useState("");
-  // Prevent repeated state changes on every render to satisfy the lint rule
-  const didSetRef = useRef(false);
-
+  // Only write to state/localStorage when the code value changes.
   useEffect(() => {
-    if (didSetRef.current) return;
+    const code = params.get("ref") || params.get("r") || "";
     if (!code) return;
 
-    try {
+    // avoid pointless writes
+    setUserCode((prev) => (prev === code ? prev : code));
+    const existing = typeof window !== "undefined" ? localStorage.getItem("flowai_referral_code") : null;
+    if (existing !== code) {
       localStorage.setItem("flowai_referral_code", code);
-      // guarded one-time state set
-      setUserCode(code);
-      didSetRef.current = true;
-    } catch {
-      // ignore storage errors (private mode, etc.)
     }
-  }, [code]);
+  }, [params]); // runs when the querystring changes
 
   if (!userCode) return null;
 
   return (
-    <div className="text-xs text-slate-500">
-      Referred code: <span className="font-mono">{userCode}</span>
+    <div className="mt-2 text-[11px] text-slate-400">
+      Invited with code: <span className="font-medium">{userCode}</span>
     </div>
   );
 }

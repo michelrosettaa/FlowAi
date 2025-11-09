@@ -192,11 +192,13 @@ export default function PricingPage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="relative z-10 text-slate-500 text-[12px] mt-16 mb-20 text-center">
-        © {new Date().getFullYear()} FlowAI — Focus, clarity, momentum. ·{" "}
-        <Link href="/privacy" className="underline">Privacy Policy</Link> ·{" "}
-        <Link href="/terms" className="underline">Terms of Service</Link>
-      </footer>
-    </main>
-  );
-}
+      import Link from "next/link";
+// …keep the rest of your imports/code the same
+
+// … inside the component return, replace the footer with:
+<footer className="relative z-10 text-slate-500 text-[12px] mt-16 mb-20 text-center">
+  © {new Date().getFullYear()} FlowAI — Focus, clarity, momentum. ·{" "}
+  <Link href="/privacy" className="underline">Privacy Policy</Link> ·{" "}
+  <Link href="/terms" className="underline">Terms of Service</Link>
+</footer>
+
