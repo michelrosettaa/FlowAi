@@ -22,7 +22,7 @@ export default function MentorPage() {
     const replyMsg = {
       from: "mentor" as const,
       text:
-        "I hear you. Let's lock in one win today. Pick ONE thing that moves you forward, and I'll help you protect time for it. 💪",
+        "I hear you. Let's lock in one win today. Pick ONE thing that moves you forward, and I will help you protect time for it. 💪",
     };
 
     setMessages((prev) => [...prev, userMsg, replyMsg]);
@@ -41,7 +41,7 @@ export default function MentorPage() {
             <span>FlowAI Mentor</span>
           </div>
           <div className="text-[13px] text-slate-400 mt-2">
-            Tell me how you're doing. I’ll answer with motivation,
+            Tell me how you are feeling. I will answer with motivation,
             clarity, and focus.
           </div>
         </div>
