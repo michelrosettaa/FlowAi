@@ -9,7 +9,6 @@ export default function PricingPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  // (kept) Stripe checkout helper – you can still call this if you want direct Stripe from here
   async function handleCheckout(plan: string) {
     const email = prompt("Enter your email to start your free trial:");
     if (!email) return;
@@ -176,9 +175,11 @@ export default function PricingPage() {
               onClick={() => {
                 localStorage.setItem("selectedPlan", plan.name.toLowerCase());
                 if (plan.name === "Professional" || plan.name.startsWith("Teams")) {
-                  router.push(`/checkout?plan=${plan.path}`);
-                  // or: handleCheckout(plan.path)  // if you want to go straight to Stripe
+                  // Stripe flow
+                  // handleCheckout(plan.path); // if you want to go straight to Stripe
+                  router.push(`/checkout?plan=${plan.path}`); // if you have /checkout
                 } else {
+                  // Free / Student
                   router.push(plan.path);
                 }
               }}
@@ -193,16 +194,11 @@ export default function PricingPage() {
         ))}
       </section>
 
-      {/* FOOTER (use next/link to satisfy the ESLint rule) */}
+      {/* FOOTER (use Link, not <a>) */}
       <footer className="relative z-10 text-slate-500 text-[12px] mt-16 mb-20 text-center">
         © {new Date().getFullYear()} FlowAI — Focus, clarity, momentum. ·{" "}
-        <Link href="/privacy" className="underline">
-          Privacy Policy
-        </Link>{" "}
-        ·{" "}
-        <Link href="/terms" className="underline">
-          Terms of Service
-        </Link>
+        <Link href="/privacy" className="underline">Privacy Policy</Link> ·{" "}
+        <Link href="/terms" className="underline">Terms of Service</Link>
       </footer>
     </main>
   );

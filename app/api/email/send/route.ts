@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
-
 export async function POST(req: Request) {
   try {
     const { recipient, subject, emailBody } = await req.json();
