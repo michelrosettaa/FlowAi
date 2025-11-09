@@ -1,27 +1,22 @@
 "use client";
+import React, { createContext, useContext, useState, useCallback } from "react";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+type ThemeCtx = { theme: string; toggleTheme: (t: string) => void };
+const Ctx = createContext<ThemeCtx>({ theme: "dark", toggleTheme: () => {} });
 
-const ThemeContext = createContext<any>(null);
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setTheme] = useState<string>(() => {
+    if (typeof window === "undefined") return "dark";
+    return localStorage.getItem("flowai-theme") || "dark";
+  });
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState("dark");
-
-  useEffect(() => {
-    const stored = localStorage.getItem("flowai-theme");
-    if (stored) setTheme(stored);
+  const toggleTheme = useCallback((newTheme: string) => {
+    setTheme(newTheme);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("flowai-theme", newTheme);
+    }
   }, []);
 
-  const toggleTheme = (newTheme: string) => {
-    setTheme(newTheme);
-    localStorage.setItem("flowai-theme", newTheme);
-  };
-
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <div className={`theme-${theme} min-h-screen`}>{children}</div>
-    </ThemeContext.Provider>
-  );
+  return <Ctx.Provider value={{ theme, toggleTheme }}>{children}</Ctx.Provider>;
 }
-
-export const useTheme = () => useContext(ThemeContext);
+export const useTheme = () => useContext(Ctx);

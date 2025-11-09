@@ -9,6 +9,7 @@ export default function PricingPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
+  // (kept) Stripe checkout helper – you can still call this if you want direct Stripe from here
   async function handleCheckout(plan: string) {
     const email = prompt("Enter your email to start your free trial:");
     if (!email) return;
@@ -176,6 +177,7 @@ export default function PricingPage() {
                 localStorage.setItem("selectedPlan", plan.name.toLowerCase());
                 if (plan.name === "Professional" || plan.name.startsWith("Teams")) {
                   router.push(`/checkout?plan=${plan.path}`);
+                  // or: handleCheckout(plan.path)  // if you want to go straight to Stripe
                 } else {
                   router.push(plan.path);
                 }
@@ -191,14 +193,17 @@ export default function PricingPage() {
         ))}
       </section>
 
-      {/* FOOTER */}
-      import Link from "next/link";
-// …keep the rest of your imports/code the same
-
-// … inside the component return, replace the footer with:
-<footer className="relative z-10 text-slate-500 text-[12px] mt-16 mb-20 text-center">
-  © {new Date().getFullYear()} FlowAI — Focus, clarity, momentum. ·{" "}
-  <Link href="/privacy" className="underline">Privacy Policy</Link> ·{" "}
-  <Link href="/terms" className="underline">Terms of Service</Link>
-</footer>
-
+      {/* FOOTER (use next/link to satisfy the ESLint rule) */}
+      <footer className="relative z-10 text-slate-500 text-[12px] mt-16 mb-20 text-center">
+        © {new Date().getFullYear()} FlowAI — Focus, clarity, momentum. ·{" "}
+        <Link href="/privacy" className="underline">
+          Privacy Policy
+        </Link>{" "}
+        ·{" "}
+        <Link href="/terms" className="underline">
+          Terms of Service
+        </Link>
+      </footer>
+    </main>
+  );
+}
