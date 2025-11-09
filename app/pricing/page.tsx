@@ -192,10 +192,10 @@ export default function PricingPage() {
 
       {/* FOOTER */}
       <footer className="relative z-10 text-slate-500 text-[12px] mt-16 mb-20 text-center">
-        © {new Date().getFullYear()} FlowAI — Focus, clarity, momentum. ·{" "}
-        <Link href="/privacy" className="underline">Privacy Policy</Link> ·{" "}
-        <Link href="/terms" className="underline">Terms of Service</Link>
-      </footer>
+  © {new Date().getFullYear()} FlowAI — Focus, clarity, momentum. ·{" "}
+  <Link href="/privacy" className="underline">Privacy Policy</Link> ·{" "}
+  <Link href="/terms" className="underline">Terms of Service</Link>
+</footer>
     </main>
   );
 }

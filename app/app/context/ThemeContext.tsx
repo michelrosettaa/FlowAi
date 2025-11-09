@@ -1,42 +1,34 @@
 "use client";
-import React, { createContext, useContext, useMemo, useState, useEffect } from "react";
+import React, { createContext, useContext, useMemo, useState } from "react";
 
-type ThemeName = "dark" | "light" | "green" | "pink";
+type Theme = "dark" | "light" | "green" | "pink";
+type Ctx = { theme: Theme; toggleTheme: (t: Theme) => void };
 
-type ThemeContextValue = {
-  theme: ThemeName;
-  toggleTheme: (t: ThemeName) => void;
-};
-
-const ThemeContext = createContext<ThemeContextValue>({
+const ThemeContext = createContext<Ctx>({
   theme: "dark",
   toggleTheme: () => {},
 });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<ThemeName>(() => {
+  const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window === "undefined") return "dark";
-    const stored = window.localStorage.getItem("flowai-theme") as ThemeName | null;
-    return stored ?? "dark";
+    return (localStorage.getItem("flowai-theme") as Theme) || "dark";
   });
 
-  // persist only when theme changes (no setState inside effect init)
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("flowai-theme", theme);
-      document.documentElement.setAttribute("data-theme", theme);
-    }
-  }, [theme]);
-
-  const value = useMemo(
+  const ctx = useMemo<Ctx>(
     () => ({
       theme,
-      toggleTheme: (t: ThemeName) => setTheme(t),
+      toggleTheme: (t: Theme) => {
+        setTheme(t);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("flowai-theme", t);
+        }
+      },
     }),
     [theme]
   );
 
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+  return <ThemeContext.Provider value={ctx}>{children}</ThemeContext.Provider>;
 }
 
 export const useTheme = () => useContext(ThemeContext);
