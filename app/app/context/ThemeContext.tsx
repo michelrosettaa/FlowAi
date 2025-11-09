@@ -1,38 +1,34 @@
 "use client";
+import React, { createContext, useContext, useMemo, useState } from "react";
 
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+type Theme = "dark" | "light" | "green" | "pink";
 
-type ThemeName = "dark" | "light" | "green" | "pink";
-
-type ThemeContextValue = {
-  theme: ThemeName;
-  toggleTheme: (t: ThemeName) => void;
+type ThemeCtx = {
+  theme: Theme;
+  toggleTheme: (t: Theme) => void;
 };
 
-const ThemeContext = createContext<ThemeContextValue>({
+const ThemeContext = createContext<ThemeCtx>({
   theme: "dark",
   toggleTheme: () => {},
 });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<ThemeName>(() => {
+  // Read localStorage once during initialisation (no useEffect setState)
+  const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window === "undefined") return "dark";
-    const stored = window.localStorage.getItem("flowai-theme") as ThemeName | null;
+    const stored = window.localStorage.getItem("flowai-theme") as Theme | null;
     return stored ?? "dark";
   });
 
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    window.localStorage.setItem("flowai-theme", theme);
-  }, [theme]);
+  const toggleTheme = (t: Theme) => {
+    setTheme(t);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("flowai-theme", t);
+    }
+  };
 
-  const value = useMemo(
-    () => ({
-      theme,
-      toggleTheme: (t: ThemeName) => setTheme(t),
-    }),
-    [theme]
-  );
+  const value = useMemo(() => ({ theme, toggleTheme }), [theme]);
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
