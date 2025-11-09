@@ -13,20 +13,15 @@ export default function PricingPage() {
     const email = prompt("Enter your email to start your free trial:");
     if (!email) return;
     setLoading(true);
-
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ plan, email }),
       });
-
       const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        alert("Error starting checkout. Please try again.");
-      }
+      if (data.url) window.location.href = data.url;
+      else alert("Error starting checkout. Please try again.");
     } catch (err) {
       console.error("Checkout error:", err);
       alert("Failed to start checkout.");
@@ -175,11 +170,13 @@ export default function PricingPage() {
               onClick={() => {
                 localStorage.setItem("selectedPlan", plan.name.toLowerCase());
                 if (plan.name === "Professional" || plan.name.startsWith("Teams")) {
-                  // Stripe path
-                  router.push(`/checkout?plan=${plan.path}`);
+                  // Stripe flow
+                  // handleCheckout(plan.path)  // if you want direct Stripe now
+                  // or route to your /checkout page:
+                  window.location.href = `/checkout?plan=${plan.path}`;
                 } else {
-                  // Free & Student
-                  router.push(plan.path);
+                  // onboarding first for Free / Student
+                  window.location.href = plan.path;
                 }
               }}
               disabled={loading}
@@ -193,7 +190,7 @@ export default function PricingPage() {
         ))}
       </section>
 
-      {/* FOOTER (uses Link so it won’t trigger the ESLint error) */}
+      {/* FOOTER */}
       <footer className="relative z-10 text-slate-500 text-[12px] mt-16 mb-20 text-center">
         © {new Date().getFullYear()} FlowAI — Focus, clarity, momentum. ·{" "}
         <Link href="/privacy" className="underline">Privacy Policy</Link> ·{" "}

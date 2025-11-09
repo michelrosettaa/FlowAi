@@ -1,23 +1,21 @@
 "use client";
-
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 
 export default function ReferralSection() {
-  const initialCode = useMemo(() => {
+  const [userCode] = useState<string>(() => {
     if (typeof window === "undefined") return "";
-    const existing = localStorage.getItem("flowai_referral_code");
-    if (existing) return existing;
-    const code = Math.random().toString(36).slice(2, 8).toUpperCase();
-    localStorage.setItem("flowai_referral_code", code);
+    let code = window.localStorage.getItem("flowai_referral_code");
+    if (!code) {
+      code = Math.random().toString(36).slice(2, 8);
+      window.localStorage.setItem("flowai_referral_code", code);
+    }
     return code;
-  }, []);
-
-  const [userCode] = useState<string>(initialCode);
+  });
 
   if (!userCode) return null;
 
   return (
-    <div className="text-xs text-slate-500 text-center mt-6">
+    <div className="text-[12px] text-slate-500 mt-6">
       Your referral code: <span className="font-semibold">{userCode}</span>
     </div>
   );
