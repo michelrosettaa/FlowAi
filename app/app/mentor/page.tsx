@@ -8,7 +8,7 @@ export default function MentorPage() {
   >([
     {
       from: "mentor",
-      text: "Start a conversation — tell me how you're feeling or what you're stuck on today 👇",
+      text: "Start a conversation \u2014 tell me how you&apos;re feeling or what you&apos;re stuck on today \ud83d\udc47",
     },
   ]);
 
@@ -22,7 +22,7 @@ export default function MentorPage() {
     const replyMsg = {
       from: "mentor" as const,
       text:
-        "I hear you. Let's lock in one win today. Pick ONE thing that moves you forward, and I will help you protect time for it. 💪",
+        "I hear you. Let\u2019s lock in one win today. Pick ONE thing that moves you forward, and I\u2019ll help you protect time for it. \ud83d\udcaa",
     };
 
     setMessages((prev) => [...prev, userMsg, replyMsg]);
@@ -35,33 +35,19 @@ export default function MentorPage() {
         {/* header text */}
         <div className="text-center mb-6">
           <div className="text-[15px] font-semibold text-slate-100 flex items-center justify-center gap-2">
-            <span role="img" aria-label="compass">
-              🧭
-            </span>
+            <span role="img" aria-label="compass">🧭</span>
             <span>FlowAI Mentor</span>
           </div>
           <div className="text-[13px] text-slate-400 mt-2">
-            Tell me how you are feeling. I will answer with motivation,
-            clarity, and focus.
+            Tell me how you&apos;re doing. I&apos;ll answer with motivation, clarity, and focus.
           </div>
         </div>
 
         {/* chat box */}
         <div className="bg-white/5 border border-white/10 rounded-lg shadow-xl p-4 h-[320px] overflow-y-auto text-[13px] leading-relaxed mb-4 text-slate-200">
           {messages.map((m, i) => (
-            <div
-              key={i}
-              className={`mb-4 ${
-                m.from === "you" ? "text-right" : "text-left"
-              }`}
-            >
-              <div
-                className={`inline-block max-w-[80%] rounded-lg px-3 py-2 ${
-                  m.from === "you"
-                    ? "bg-indigo-600 text-white"
-                    : "bg-white/10 text-slate-200 border border-white/10"
-                }`}
-              >
+            <div key={i} className={`mb-4 ${m.from === "you" ? "text-right" : "text-left"}`}>
+              <div className={`inline-block max-w-[80%] rounded-lg px-3 py-2 ${m.from === "you" ? "bg-indigo-600 text-white" : "bg-white/10 text-slate-200 border border-white/10"}`}>
                 {m.text}
               </div>
             </div>
@@ -75,16 +61,9 @@ export default function MentorPage() {
             placeholder="Type how you feel, or ask for a push..."
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") sendMessage();
-            }}
+            onKeyDown={(e) => { if (e.key === "Enter") sendMessage(); }}
           />
-          <button
-            onClick={sendMessage}
-            className="text-[12px] font-semibold px-3 py-2 rounded-md bg-gradient-to-r from-blue-600 to-indigo-500 text-white hover:scale-[1.03] active:scale-[0.98] transition"
-          >
-            Send
-          </button>
+          <button onClick={sendMessage} className="text-[12px] font-semibold px-3 py-2 rounded-md bg-gradient-to-r from-blue-600 to-indigo-500 text-white hover:scale-[1.03] active:scale-[0.98] transition">Send</button>
         </div>
 
         <div className="text-[11px] text-slate-500 text-center mt-3">
