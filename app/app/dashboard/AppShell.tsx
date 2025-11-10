@@ -1,4 +1,4 @@
-"use client";
+use client;
 
 import { useRouter, usePathname } from "next/navigation";
 import React from "react";
@@ -21,38 +21,32 @@ const coreFeatures = [
   },
 ];
 
-export default function AppShell({ children }: { children: React.ReactNode }) {
+function NavButton({ label, path }: { label: string; path: string }) {
   const router = useRouter();
   const pathname = usePathname();
+  const active = pathname === path;
 
-  const NavButton = ({
-    label,
-    path,
-  }: {
-    label: string;
-    path: string;
-  }) => {
-    const active = pathname === path;
-    return (
-      <button
-        onClick={() => router.push(path)}
-        className={`w-full text-left text-sm rounded-lg px-3 py-2 mb-3 transition border ${
-          active
-            ? "bg-white/10 border-white/20 text-slate-100 shadow"
-            : "bg-transparent border-transparent text-slate-300 hover:bg-white/5 hover:border-white/10 hover:text-slate-100"
-        }`}
-      >
-        {label}
-      </button>
-    );
-  };
+  return (
+    <button
+      onClick={() => router.push(path)}
+      className={`w-full text-left text-sm rounded-lg px-3 py-2 mb-3 transition border ${
+        active
+          ? "bg-white/10 border-white/20 text-slate-100 shadow"
+          : "bg-transparent border-transparent text-slate-300 hover:bg-white/5 hover:border-white/10 hover:text-slate-100"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
 
+export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_20%_20%,#1a2545_0%,#0a0f1c_60%)] text-slate-100 flex">
       {/* SIDEBAR */}
-      <aside className="w-[240px] bg-white/5 border-r border-white/10 p-6 flex flex-col">
+      <aside className="w-[240px] bg-white/5 border-r border-white/10 p-6 flex flex-col"> 
         {/* brand */}
-        <div className="flex items-center gap-3 mb-8">
+        <div className="flex items-center gap-3 mb-8"> 
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-xs font-semibold flex items-center justify-center">
             F
           </div>
