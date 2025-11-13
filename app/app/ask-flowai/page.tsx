@@ -13,29 +13,38 @@ export default function AskFlowAIPage() {
   const handleAskFlowAI = async () => {
     if (!input.trim()) return;
     const userMsg: { role: "user"; content: string } = {
-  role: "user",
-  content: input,
-};
-    setMessages((prev) => [...prev, userMsg]);
+      role: "user",
+      content: input,
+    };
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
     setInput("");
     setLoading(true);
 
     try {
-      // simulate an AI response
-      const reply = await new Promise<string>((resolve) =>
-        setTimeout(() => {
-          if (input.toLowerCase().includes("meeting")) {
-            resolve("Yesterday’s meeting covered your project milestones — want me to summarise it?");
-          } else if (input.toLowerCase().includes("email")) {
-            resolve("I can draft an email for you — who should it go to?");
-          } else if (input.toLowerCase().includes("plan")) {
-            resolve("You have 3 tasks today: Finalise proposal, team sync at 2 PM, and review marketing report.");
-          } else {
-            resolve("Got it — I’ll take note and keep your planner updated!");
-          }
-        }, 1200)
-      );
-      setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
+      const response = await fetch("/api/ask-flowai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ messages: updatedMessages }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to get AI response");
+      }
+
+      const data = await response.json();
+      setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
+    } catch (error) {
+      console.error("Error asking FlowAI:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "Sorry, I'm having trouble responding right now. Please try again.",
+        },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -105,7 +114,7 @@ export default function AskFlowAIPage() {
           <button
             onClick={handleAskFlowAI}
             disabled={loading}
-            className="bg-gradient-to-r from-blue-600 to-indigo-500 px-4 py-2 rounded-lg text-white text-sm font-semibold hover:scale-[1.03] transition-all"
+            className="bg-gradient-to-r from-blue-600 to-indigo-500 px-4 py-2 rounded-lg text-white text-sm font-semibold hover:scale-[1.03] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Send className="w-4 h-4" />
           </button>
