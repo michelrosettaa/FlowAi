@@ -48,31 +48,34 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
   // pulled from ThemeContext
   const { toggleTheme } = useTheme();
 
-  const navItems = [
-    { name: "Dashboard", path: "/app", icon: <LayoutDashboard size={18} /> },
-    { name: "Mentor", path: "/app/mentor", icon: <Settings size={18} /> },
-    { name: "Email", path: "/app/email", icon: <Mail size={18} /> },
-    { name: "Stats", path: "/app/stats", icon: <LineChart size={18} /> },
-    { name: "Calendar", path: "/app/calendar", icon: <Calendar size={18} /> },
+  const navSections = [
     {
-      name: "AI Daily Planner",
-      path: "/app/planner",
-      icon: <BrainCircuit size={18} />,
+      section: "Home",
+      items: [
+        { name: "Dashboard", path: "/app", icon: <LayoutDashboard size={18} /> },
+      ]
     },
     {
-      name: "AI Call Summariser",
-      path: "/app/calls",
-      icon: <PhoneCall size={18} />,
+      section: "AI Assistants",
+      items: [
+        { name: "Ask FlowAI", path: "/app/ask-flowai", icon: <BrainCircuit size={18} /> },
+        { name: "Mentor", path: "/app/mentor", icon: <Users size={18} /> },
+        { name: "Email Helper", path: "/app/email", icon: <Mail size={18} /> },
+      ]
     },
     {
-      name: "Meetings",
-      path: "/app/meetings",
-      icon: <Users size={18} />,
+      section: "Productivity",
+      items: [
+        { name: "Planner", path: "/app/planner", icon: <Calendar size={18} /> },
+        { name: "Calendar", path: "/app/calendar", icon: <Calendar size={18} /> },
+        { name: "Call Summaries", path: "/app/calls", icon: <PhoneCall size={18} /> },
+      ]
     },
     {
-      name: "Calendar Sync",
-      path: "/app/sync",
-      icon: <Settings size={18} />,
+      section: "Insights",
+      items: [
+        { name: "Analytics", path: "/app/stats", icon: <LineChart size={18} /> },
+      ]
     },
   ];
 
@@ -113,39 +116,50 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* NAVIGATION */}
-        <div className="flex flex-col gap-0.5 px-3">
-          {navItems.map((item) => (
-            <button
-              key={item.path}
-              onClick={() => router.push(item.path)}
-              className={`flex items-center gap-3 text-left text-sm rounded-xl px-3 py-2.5 transition-all duration-200 ${
-                pathname === item.path
-                  ? "font-semibold shadow-lg"
-                  : "font-medium"
-              }`}
-              style={{
-                background: pathname === item.path 
-                  ? 'var(--app-surface-hover)' 
-                  : 'transparent',
-                border: `1px solid ${pathname === item.path ? 'var(--app-border-strong)' : 'transparent'}`,
-                color: pathname === item.path ? 'var(--app-accent)' : 'var(--app-text-dim)',
-              }}
-              onMouseEnter={(e) => {
-                if (pathname !== item.path) {
-                  e.currentTarget.style.background = 'var(--app-surface)';
-                  e.currentTarget.style.borderColor = 'var(--app-border)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (pathname !== item.path) {
-                  e.currentTarget.style.background = 'transparent';
-                  e.currentTarget.style.borderColor = 'transparent';
-                }
-              }}
-            >
-              {item.icon}
-              {!collapsed && <span>{item.name}</span>}
-            </button>
+        <div className="flex-1 overflow-y-auto px-3">
+          {navSections.map((section) => (
+            <div key={section.section} className="mb-6">
+              {!collapsed && (
+                <div className="px-2 mb-2 text-[10px] uppercase tracking-wider font-semibold" style={{ color: 'var(--app-text-muted)' }}>
+                  {section.section}
+                </div>
+              )}
+              <div className="flex flex-col gap-0.5">
+                {section.items.map((item) => (
+                  <button
+                    key={item.path}
+                    onClick={() => router.push(item.path)}
+                    className={`flex items-center gap-3 text-left text-sm rounded-xl px-3 py-2.5 transition-all duration-200 ${
+                      pathname === item.path
+                        ? "font-semibold shadow-lg"
+                        : "font-medium"
+                    }`}
+                    style={{
+                      background: pathname === item.path 
+                        ? 'var(--app-surface-hover)' 
+                        : 'transparent',
+                      border: `1px solid ${pathname === item.path ? 'var(--app-border-strong)' : 'transparent'}`,
+                      color: pathname === item.path ? 'var(--app-accent)' : 'var(--app-text-dim)',
+                    }}
+                    onMouseEnter={(e) => {
+                      if (pathname !== item.path) {
+                        e.currentTarget.style.background = 'var(--app-surface)';
+                        e.currentTarget.style.borderColor = 'var(--app-border)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (pathname !== item.path) {
+                        e.currentTarget.style.background = 'transparent';
+                        e.currentTarget.style.borderColor = 'transparent';
+                      }
+                    }}
+                  >
+                    {item.icon}
+                    {!collapsed && <span>{item.name}</span>}
+                  </button>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
 

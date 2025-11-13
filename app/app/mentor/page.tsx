@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Sparkles } from "lucide-react";
 
 export default function MentorPage() {
   const [messages, setMessages] = useState<
@@ -8,7 +9,7 @@ export default function MentorPage() {
   >([
     {
       from: "mentor",
-      text: "Start a conversation — tell me how you're feeling or what you're stuck on today 👇",
+      text: "Hey! I'm here to help you stay focused and motivated. Tell me what's on your mind today 👇",
     },
   ]);
 
@@ -30,37 +31,46 @@ export default function MentorPage() {
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center px-4 py-10 text-slate-100">
-      <div className="max-w-xl w-full">
-        {/* header text */}
-        <div className="text-center mb-6">
-          <div className="text-[15px] font-semibold text-slate-100 flex items-center justify-center gap-2">
-            <span role="img" aria-label="compass">
-              🧭
-            </span>
-            <span>FlowAI Mentor</span>
+    <div className="flex-1 flex flex-col items-center px-6 py-12">
+      <div className="max-w-2xl w-full">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4 bg-gradient-to-br from-purple-500 to-indigo-600 shadow-lg">
+            <Sparkles className="w-7 h-7 text-white" />
           </div>
-          <div className="text-[13px] text-slate-400 mt-2">
-            Tell me how you're doing. I’ll answer with motivation,
-            clarity, and focus.
-          </div>
+          <h1 className="text-3xl font-bold mb-3" style={{ color: 'var(--app-text)' }}>
+            AI Mentor
+          </h1>
+          <p className="text-base" style={{ color: 'var(--app-text-dim)' }}>
+            Your personal productivity coach. Share what's on your mind and get focused, actionable guidance.
+          </p>
         </div>
 
-        {/* chat box */}
-        <div className="bg-white/5 border border-white/10 rounded-lg shadow-xl p-4 h-[320px] overflow-y-auto text-[13px] leading-relaxed mb-4 text-slate-200">
+        {/* Chat Box */}
+        <div 
+          className="premium-card h-[400px] overflow-y-auto p-5 mb-4 space-y-4"
+          style={{ background: 'var(--app-surface)' }}
+        >
           {messages.map((m, i) => (
             <div
               key={i}
-              className={`mb-4 ${
-                m.from === "you" ? "text-right" : "text-left"
+              className={`flex ${
+                m.from === "you" ? "justify-end" : "justify-start"
               }`}
             >
               <div
-                className={`inline-block max-w-[80%] rounded-lg px-3 py-2 ${
+                className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm ${
                   m.from === "you"
-                    ? "bg-indigo-600 text-white"
-                    : "bg-white/10 text-slate-200 border border-white/10"
+                    ? "text-white shadow-lg"
+                    : "shadow-md"
                 }`}
+                style={{
+                  background: m.from === "you" 
+                    ? 'linear-gradient(to right, var(--app-accent), var(--app-accent-hover))' 
+                    : 'var(--app-surface-hover)',
+                  color: m.from === "you" ? 'white' : 'var(--app-text)',
+                  border: m.from === "mentor" ? '1px solid var(--app-border)' : 'none'
+                }}
               >
                 {m.text}
               </div>
@@ -68,10 +78,11 @@ export default function MentorPage() {
           ))}
         </div>
 
-        {/* input row */}
-        <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-2 shadow-lg">
+        {/* Input Row */}
+        <div className="flex items-center gap-3 premium-card p-3">
           <input
-            className="flex-1 bg-transparent text-[13px] text-slate-100 placeholder-slate-500 outline-none"
+            className="flex-1 bg-transparent text-sm outline-none"
+            style={{ color: 'var(--app-text)' }}
             placeholder="Type how you feel, or ask for a push..."
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
@@ -81,14 +92,17 @@ export default function MentorPage() {
           />
           <button
             onClick={sendMessage}
-            className="text-[12px] font-semibold px-3 py-2 rounded-md bg-gradient-to-r from-blue-600 to-indigo-500 text-white hover:scale-[1.03] active:scale-[0.98] transition"
+            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white shadow-lg hover:scale-105 transition-all"
+            style={{
+              background: 'linear-gradient(to right, var(--app-accent), var(--app-accent-hover))'
+            }}
           >
             Send
           </button>
         </div>
 
-        <div className="text-[11px] text-slate-500 text-center mt-3">
-          Coming soon: voice notes & daily audio boosts.
+        <div className="text-xs text-center mt-4" style={{ color: 'var(--app-text-muted)' }}>
+          ✨ Coming soon: voice notes & daily audio motivation
         </div>
       </div>
     </div>

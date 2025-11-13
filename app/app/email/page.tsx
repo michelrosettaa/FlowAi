@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Mail, Sparkles, Loader2 } from "lucide-react";
 
 export default function EmailAssistantPage() {
   const [input, setInput] = useState("");
@@ -29,61 +30,88 @@ export default function EmailAssistantPage() {
 
     setTimeout(() => {
       const reply =
-        "✍️ Hi there,\n\nThanks for your email — I appreciate the clarity. I’ll review and follow up shortly.\n\nBest,\nFlowAI ✨";
+        "✍️ Hi there,\n\nThanks for your email — I appreciate the clarity. I'll review and follow up shortly.\n\nBest,\nFlowAI ✨";
       setOutput(reply);
       setLoading(false);
     }, 800);
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center px-6 py-10 text-slate-100">
-      <div className="max-w-2xl w-full">
-        <h1 className="text-2xl font-semibold mb-2 text-center">
-          ✉️ FlowAI Email Assistant
-        </h1>
-        <p className="text-slate-400 text-sm mb-8 text-center">
-          Paste an email or rough notes — FlowAI can summarize or draft replies instantly.
-        </p>
+    <div className="flex-1 flex flex-col items-center px-6 py-12">
+      <div className="max-w-3xl w-full">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4 bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg">
+            <Mail className="w-7 h-7 text-white" />
+          </div>
+          <h1 className="text-3xl font-bold mb-3" style={{ color: 'var(--app-text)' }}>
+            Email Helper
+          </h1>
+          <p className="text-base" style={{ color: 'var(--app-text-dim)' }}>
+            Paste an email or rough notes — AI will summarize or draft smart replies instantly.
+          </p>
+        </div>
 
         {/* Input */}
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Paste an email you received, or write notes for a reply..."
-          rows={8}
-          className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-blue-500 outline-none resize-none shadow-inner"
+          rows={10}
+          className="w-full premium-card p-5 text-sm resize-none outline-none focus:ring-2 mb-6"
+          style={{ 
+            color: 'var(--app-text)',
+            background: 'var(--app-surface)',
+            borderColor: 'var(--app-border)',
+            focusRing: '2px solid var(--app-accent)'
+          }}
         />
 
         {/* Buttons */}
-        <div className="flex gap-4 mt-4 justify-center">
+        <div className="flex gap-4 justify-center mb-8">
           <button
             onClick={handleSummarize}
             disabled={loading}
-            className={`px-6 py-2 rounded-lg text-sm font-semibold shadow-md transition-all ${
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold shadow-lg transition-all ${
               loading
-                ? "bg-slate-600 text-slate-300 cursor-not-allowed"
-                : "bg-gradient-to-r from-indigo-500 to-blue-600 hover:scale-[1.03] text-white"
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:scale-105"
             }`}
+            style={{
+              background: loading ? 'var(--app-surface-hover)' : 'linear-gradient(to right, var(--app-accent), var(--app-accent-hover))',
+              color: 'white'
+            }}
           >
-            {loading ? "Processing..." : "🧠 Summarize Email"}
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+            {loading ? "Processing..." : "Summarize Email"}
           </button>
 
           <button
             onClick={handleDraftReply}
             disabled={loading}
-            className={`px-6 py-2 rounded-lg text-sm font-semibold shadow-md transition-all ${
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold shadow-lg transition-all ${
               loading
-                ? "bg-slate-600 text-slate-300 cursor-not-allowed"
-                : "bg-gradient-to-r from-blue-600 to-indigo-500 hover:scale-[1.03] text-white"
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:scale-105"
             }`}
+            style={{
+              background: loading ? 'var(--app-surface-hover)' : 'linear-gradient(to right, var(--app-accent), var(--app-accent-hover))',
+              color: 'white'
+            }}
           >
-            {loading ? "Thinking..." : "✍️ Draft Reply"}
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+            {loading ? "Thinking..." : "Draft Reply"}
           </button>
         </div>
 
         {/* Output */}
         {output && (
-          <div className="mt-8 bg-white/5 border border-white/10 rounded-2xl p-5 text-sm leading-relaxed text-slate-200 shadow-xl whitespace-pre-wrap">
+          <div className="premium-card p-6 text-sm leading-relaxed whitespace-pre-wrap animate-in fade-in duration-300"
+            style={{ 
+              background: 'var(--app-surface-hover)',
+              color: 'var(--app-text)'
+            }}
+          >
             {output}
           </div>
         )}
