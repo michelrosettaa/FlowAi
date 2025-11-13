@@ -169,3 +169,97 @@ body {
   backdrop-filter: none !important;
   background-color: rgba(16, 185, 129, 0.6) !important;
 }
+
+/* === PREMIUM APP THEME ENHANCEMENTS === */
+
+/* CSS Variables for each theme */
+.theme-dark {
+  --app-surface: rgba(255, 255, 255, 0.03);
+  --app-surface-hover: rgba(255, 255, 255, 0.07);
+  --app-border: rgba(255, 255, 255, 0.08);
+  --app-border-strong: rgba(255, 255, 255, 0.15);
+  --app-text-dim: #94a3b8;
+  --app-accent: #3b82f6;
+  --app-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.2), 0 12px 24px rgba(0,0,0,0.15);
+  --app-shadow-lg: 0 4px 8px rgba(0,0,0,0.4), 0 12px 24px rgba(0,0,0,0.3), 0 24px 48px rgba(0,0,0,0.25);
+}
+
+.theme-light {
+  --app-surface: rgba(255, 255, 255, 0.9);
+  --app-surface-hover: rgba(248, 250, 252, 0.95);
+  --app-border: rgba(0, 0, 0, 0.08);
+  --app-border-strong: rgba(0, 0, 0, 0.12);
+  --app-text-dim: #475569;
+  --app-accent: #2563eb;
+  --app-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 8px rgba(0,0,0,0.04), 0 12px 24px rgba(0,0,0,0.06);
+  --app-shadow-lg: 0 4px 8px rgba(0,0,0,0.06), 0 12px 24px rgba(0,0,0,0.08), 0 24px 48px rgba(0,0,0,0.1);
+}
+
+.theme-pink {
+  --app-surface: rgba(255, 255, 255, 0.7);
+  --app-surface-hover: rgba(255, 241, 247, 0.9);
+  --app-border: rgba(157, 23, 77, 0.12);
+  --app-border-strong: rgba(157, 23, 77, 0.2);
+  --app-text-dim: #9f1239;
+  --app-accent: #db2777;
+  --app-shadow: 0 1px 2px rgba(157,23,77,0.06), 0 4px 8px rgba(157,23,77,0.04), 0 12px 24px rgba(157,23,77,0.08);
+  --app-shadow-lg: 0 4px 8px rgba(157,23,77,0.08), 0 12px 24px rgba(157,23,77,0.1), 0 24px 48px rgba(157,23,77,0.12);
+}
+
+.theme-green {
+  --app-surface: rgba(255, 255, 255, 0.7);
+  --app-surface-hover: rgba(240, 253, 249, 0.9);
+  --app-border: rgba(6, 78, 59, 0.12);
+  --app-border-strong: rgba(6, 78, 59, 0.2);
+  --app-text-dim: #065f46;
+  --app-accent: #10b981;
+  --app-shadow: 0 1px 2px rgba(6,78,59,0.06), 0 4px 8px rgba(6,78,59,0.04), 0 12px 24px rgba(6,78,59,0.08);
+  --app-shadow-lg: 0 4px 8px rgba(6,78,59,0.08), 0 12px 24px rgba(6,78,59,0.1), 0 24px 48px rgba(6,78,59,0.12);
+}
+
+/* Premium utility classes */
+.premium-glass {
+  background: var(--app-surface);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+}
+
+.premium-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+}
+
+.premium-card:hover {
+  background: var(--app-surface-hover);
+  box-shadow: var(--app-shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* === FIX: Add missing tokens to theme palettes === */
+.theme-dark {
+  --app-text: #f1f5f9;
+  --app-text-muted: #64748b;
+  --app-accent-hover: #60a5fa;
+}
+
+.theme-light {
+  --app-text: #0f172a;
+  --app-text-muted: #94a3b8;
+  --app-accent-hover: #1d4ed8;
+}
+
+.theme-pink {
+  --app-text: #831843;
+  --app-text-muted: #be185d;
+  --app-accent-hover: #be185d;
+}
+
+.theme-green {
+  --app-text: #064e3b;
+  --app-text-muted: #047857;
+  --app-accent-hover: #059669;
+}

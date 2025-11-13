@@ -77,45 +77,71 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
   ];
 
   return (
-    <main className="min-h-screen text-slate-100 flex">
+    <main className="min-h-screen flex" style={{ color: 'var(--app-text, #f1f5f9)' }}>
       {/* SIDEBAR */}
       <aside
         className={`${
-          collapsed ? "w-[72px]" : "w-[240px]"
-        } bg-[#0d152a] border-r border-white/10 p-4 flex flex-col transition-all duration-300`}
+          collapsed ? "w-[72px]" : "w-[260px]"
+        } premium-glass flex flex-col transition-all duration-300 border-r`}
+        style={{ 
+          borderColor: 'var(--app-border-strong)',
+          backdropFilter: 'blur(24px)'
+        }}
       >
         {/* HEADER */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-xs font-semibold flex items-center justify-center">
-              F
-            </div>
-            {!collapsed && (
-              <div className="text-slate-100 font-semibold text-sm">
-                FlowAI
+        <div className="px-4 pt-6 pb-4">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 text-white text-base font-bold flex items-center justify-center shadow-lg">
+                F
               </div>
-            )}
-          </div>
+              {!collapsed && (
+                <div className="font-bold text-base" style={{ color: 'var(--app-text)' }}>
+                  FlowAI
+                </div>
+              )}
+            </div>
 
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="text-slate-400 hover:text-slate-100 transition"
-          >
-            {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-          </button>
+            <button
+              onClick={() => setCollapsed(!collapsed)}
+              className="p-1.5 rounded-lg hover:bg-white/5 transition-colors"
+              style={{ color: 'var(--app-text-dim)' }}
+            >
+              {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+            </button>
+          </div>
         </div>
 
         {/* NAVIGATION */}
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-0.5 px-3">
           {navItems.map((item) => (
             <button
               key={item.path}
               onClick={() => router.push(item.path)}
-              className={`flex items-center gap-2 text-left text-sm rounded-lg px-3 py-2 mb-1 border transition ${
+              className={`flex items-center gap-3 text-left text-sm rounded-xl px-3 py-2.5 transition-all duration-200 ${
                 pathname === item.path
-                  ? "bg-white/10 border-white/20 text-white"
-                  : "text-slate-300 bg-transparent border-transparent hover:bg-white/5 hover:border-white/10"
+                  ? "font-semibold shadow-lg"
+                  : "font-medium"
               }`}
+              style={{
+                background: pathname === item.path 
+                  ? 'var(--app-surface-hover)' 
+                  : 'transparent',
+                border: `1px solid ${pathname === item.path ? 'var(--app-border-strong)' : 'transparent'}`,
+                color: pathname === item.path ? 'var(--app-accent)' : 'var(--app-text-dim)',
+              }}
+              onMouseEnter={(e) => {
+                if (pathname !== item.path) {
+                  e.currentTarget.style.background = 'var(--app-surface)';
+                  e.currentTarget.style.borderColor = 'var(--app-border)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (pathname !== item.path) {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.borderColor = 'transparent';
+                }
+              }}
             >
               {item.icon}
               {!collapsed && <span>{item.name}</span>}
@@ -127,45 +153,61 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
         <div className="flex-1" />
 
         {/* THEME PICKER / SETTINGS / HELP / SIGN OUT */}
-        <div className="flex flex-col gap-1 mt-4">
+        <div className="flex flex-col gap-2 px-3 pb-6">
           {/* THEME SELECTOR */}
           {!collapsed && (
-            <div className="text-[12px] text-slate-400 mb-3">
-              <p className="mb-2 font-semibold text-slate-300">
-                Choose your mode
+            <div className="mb-4 px-2">
+              <p className="mb-3 font-semibold text-xs uppercase tracking-wider" style={{ color: 'var(--app-text-muted)' }}>
+                Theme
               </p>
 
-              <div className="flex flex-col gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => toggleTheme("dark")}
-                  className="flex items-center gap-2 text-left px-2 py-1.5 rounded-md hover:bg-white/5"
+                  className="flex flex-col items-center gap-1.5 px-3 py-2.5 rounded-lg transition-all hover:scale-105"
+                  style={{
+                    background: 'var(--app-surface)',
+                    border: '1px solid var(--app-border)'
+                  }}
                 >
-                  <div className="w-4 h-4 rounded-full bg-[#0a0f1c] border border-white/20" />
-                  <span>Dark Mode</span>
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-slate-900 to-indigo-900 border-2 border-slate-700" />
+                  <span className="text-[10px] font-medium" style={{ color: 'var(--app-text-dim)' }}>Dark</span>
                 </button>
 
                 <button
                   onClick={() => toggleTheme("light")}
-                  className="flex items-center gap-2 text-left px-2 py-1.5 rounded-md hover:bg-white/5"
+                  className="flex flex-col items-center gap-1.5 px-3 py-2.5 rounded-lg transition-all hover:scale-105"
+                  style={{
+                    background: 'var(--app-surface)',
+                    border: '1px solid var(--app-border)'
+                  }}
                 >
-                  <div className="w-4 h-4 rounded-full bg-[#f9fafb] border border-white/20" />
-                  <span>Light Mode</span>
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-gray-100 to-blue-100 border-2 border-gray-300" />
+                  <span className="text-[10px] font-medium" style={{ color: 'var(--app-text-dim)' }}>Light</span>
                 </button>
 
                 <button
                   onClick={() => toggleTheme("green")}
-                  className="flex items-center gap-2 text-left px-2 py-1.5 rounded-md hover:bg-white/5"
+                  className="flex flex-col items-center gap-1.5 px-3 py-2.5 rounded-lg transition-all hover:scale-105"
+                  style={{
+                    background: 'var(--app-surface)',
+                    border: '1px solid var(--app-border)'
+                  }}
                 >
-                  <div className="w-4 h-4 rounded-full bg-green-300 border border-white/20" />
-                  <span>Earth Mode</span>
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-200 to-green-300 border-2 border-emerald-400" />
+                  <span className="text-[10px] font-medium" style={{ color: 'var(--app-text-dim)' }}>Earth</span>
                 </button>
 
                 <button
                   onClick={() => toggleTheme("pink")}
-                  className="flex items-center gap-2 text-left px-2 py-1.5 rounded-md hover:bg-white/5"
+                  className="flex flex-col items-center gap-1.5 px-3 py-2.5 rounded-lg transition-all hover:scale-105"
+                  style={{
+                    background: 'var(--app-surface)',
+                    border: '1px solid var(--app-border)'
+                  }}
                 >
-                  <div className="w-4 h-4 rounded-full bg-pink-300 border border-white/20" />
-                  <span>Bloom Mode</span>
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-pink-200 to-rose-300 border-2 border-pink-400" />
+                  <span className="text-[10px] font-medium" style={{ color: 'var(--app-text-dim)' }}>Bloom</span>
                 </button>
               </div>
             </div>
@@ -176,8 +218,16 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
             onClick={() => router.push("/app/settings")}
             className={`flex items-center ${
               collapsed ? "justify-center" : "gap-2"
-            } text-left text-sm text-slate-400 hover:text-slate-100 hover:bg-white/5 
-            border border-transparent hover:border-white/10 rounded-lg px-3 py-2 transition`}
+            } text-left text-sm rounded-xl px-3 py-2 transition-all`}
+            style={{ color: 'var(--app-text-dim)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'var(--app-surface)';
+              e.currentTarget.style.color = 'var(--app-text)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.color = 'var(--app-text-dim)';
+            }}
           >
             <Settings size={18} />
             {!collapsed && <span>Settings</span>}
@@ -188,8 +238,16 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
             onClick={() => router.push("/app/help")}
             className={`flex items-center ${
               collapsed ? "justify-center" : "gap-2"
-            } text-left text-sm text-slate-400 hover:text-slate-100 hover:bg-white/5 
-            border border-transparent hover:border-white/10 rounded-lg px-3 py-2 transition`}
+            } text-left text-sm rounded-xl px-3 py-2 transition-all`}
+            style={{ color: 'var(--app-text-dim)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'var(--app-surface)';
+              e.currentTarget.style.color = 'var(--app-text)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.color = 'var(--app-text-dim)';
+            }}
           >
             <HelpCircle size={18} />
             {!collapsed && <span>Help</span>}
@@ -200,19 +258,30 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
             onClick={() => router.push("/login")}
             className={`flex items-center ${
               collapsed ? "justify-center" : "gap-2"
-            } text-left text-sm text-slate-400 hover:text-slate-100 hover:bg-white/5 
-            border border-transparent hover:border-white/10 rounded-lg px-3 py-2 transition mt-2`}
+            } text-left text-sm rounded-xl px-3 py-2 transition-all mt-2`}
+            style={{ color: 'var(--app-text-dim)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'var(--app-surface)';
+              e.currentTarget.style.color = 'var(--app-text)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.color = 'var(--app-text-dim)';
+            }}
           >
             <LogOut size={18} />
             {!collapsed && <span>Sign Out</span>}
           </button>
-        </div>
 
-        {!collapsed && (
-          <div className="text-[11px] text-slate-500 border-t border-white/10 pt-4 mt-3">
-            © {new Date().getFullYear()} FlowAI
-          </div>
-        )}
+          {!collapsed && (
+            <div className="text-[10px] pt-4 mt-3 text-center" style={{ 
+              color: 'var(--app-text-muted)',
+              borderTop: '1px solid var(--app-border)'
+            }}>
+              © {new Date().getFullYear()} FlowAI
+            </div>
+          )}
+        </div>
       </aside>
 
       {/* MAIN CONTENT AREA */}

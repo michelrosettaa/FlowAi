@@ -47,60 +47,96 @@ export default function DashboardPage() {
   return (
     <>
       {/* HEADER */}
-      <header className="border-b border-white/10 flex justify-between items-center px-6 py-4 text-[13px]">
-        <div>
-          <div className="text-[11px] text-slate-400">Week of Oct 27</div>
-          <div className="text-slate-100 font-semibold">My Calendar (Demo view)</div>
-        </div>
-        <div className="flex items-center gap-3 text-[12px] text-slate-400">
-          <button className="bg-white/5 border border-white/10 rounded-md px-3 py-2 hover:bg-white/10 text-slate-200">
-            + New Block
-          </button>
-          <div className="text-[12px] text-slate-500">you@company.com</div>
+      <header className="px-8 py-6" style={{ 
+        borderBottom: '1px solid var(--app-border)',
+        background: 'var(--app-surface)'
+      }}>
+        <div className="flex justify-between items-center">
+          <div>
+            <div className="text-xs font-medium mb-1" style={{ color: 'var(--app-text-muted)' }}>
+              Week of Oct 27
+            </div>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--app-text)' }}>
+              My Calendar
+            </h1>
+          </div>
+          <div className="flex items-center gap-3">
+            <button 
+              className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:scale-105 shadow-lg"
+              style={{
+                background: 'linear-gradient(to right, var(--app-accent), var(--app-accent-hover))',
+                color: 'white'
+              }}
+            >
+              + New Block
+            </button>
+            <div className="text-sm" style={{ color: 'var(--app-text-dim)' }}>
+              you@company.com
+            </div>
+          </div>
         </div>
       </header>
 
       {/* CALENDAR GRID */}
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-8">
         {/* Days header */}
-        <div className="grid grid-cols-[80px_repeat(5,1fr)] text-[12px] text-slate-300 mb-2">
+        <div className="grid grid-cols-[90px_repeat(5,1fr)] text-sm mb-4" style={{ color: 'var(--app-text-dim)' }}>
           <div></div>
-          <div className="text-left font-medium text-slate-100">Mon</div>
-          <div className="text-left font-medium text-slate-100">Tue</div>
-          <div className="text-left font-medium text-slate-100">Wed</div>
-          <div className="text-left font-medium text-slate-100">Thu</div>
-          <div className="text-left font-medium text-slate-100">Fri</div>
+          <div className="text-left font-semibold pl-4" style={{ color: 'var(--app-text)' }}>Monday</div>
+          <div className="text-left font-semibold pl-4" style={{ color: 'var(--app-text)' }}>Tuesday</div>
+          <div className="text-left font-semibold pl-4" style={{ color: 'var(--app-text)' }}>Wednesday</div>
+          <div className="text-left font-semibold pl-4" style={{ color: 'var(--app-text)' }}>Thursday</div>
+          <div className="text-left font-semibold pl-4" style={{ color: 'var(--app-text)' }}>Friday</div>
         </div>
 
-        {/* Time rows */}
-        <div className="relative border-t border-white/10">
-          {hours.map((h) => (
-            <div
-              key={h}
-              className="grid grid-cols-[80px_repeat(5,1fr)] text-[11px] text-slate-500"
-            >
-              <div className="p-2 text-right pr-3 text-slate-500 border-b border-white/5">
+        {/* Time rows - Using CSS Grid for proper alignment */}
+        <div 
+          className="premium-card overflow-hidden grid"
+          style={{
+            gridTemplateColumns: '90px repeat(5, 1fr)',
+            gridTemplateRows: `repeat(${hours.length}, 5rem)`
+          }}
+        >
+          {/* Hour labels and day cells */}
+          {hours.map((h, rowIdx) => (
+            <React.Fragment key={h}>
+              {/* Time label */}
+              <div 
+                className="p-3 text-right pr-4 text-xs font-medium"
+                style={{ 
+                  color: 'var(--app-text-muted)',
+                  borderBottom: '1px solid var(--app-border)',
+                  gridColumn: 1,
+                  gridRow: rowIdx + 1
+                }}
+              >
                 {h}
               </div>
+              {/* Day cells */}
               {[0, 1, 2, 3, 4].map((col) => (
                 <div
                   key={col}
-                  className="border-l border-white/5 border-b border-white/5 h-16 relative"
-                ></div>
+                  className="transition-colors hover:bg-white/5"
+                  style={{ 
+                    borderLeft: '1px solid var(--app-border)',
+                    borderBottom: '1px solid var(--app-border)',
+                    gridColumn: col + 2,
+                    gridRow: rowIdx + 1
+                  }}
+                />
               ))}
-            </div>
+            </React.Fragment>
           ))}
 
-          {/* Events */}
+          {/* Events - positioned using grid-column and grid-row */}
           {mockBlocks.map((block, i) => (
             <div
               key={i}
-              className={`absolute ${block.color} border text-[11px] font-medium rounded-md p-2 leading-snug shadow-[0_20px_60px_rgba(0,0,0,0.6)]`}
+              className={`${block.color} border text-xs font-semibold rounded-xl p-3 leading-snug cursor-pointer transition-all hover:scale-105 m-1`}
               style={{
-                top: block.startRow * 64,
-                left: `calc(80px + ${block.dayCol * (100 / 5)}%)`,
-                width: `calc(${100 / 5}% - 2px)`,
-                height: block.span * 64 - 8,
+                gridColumn: `${block.dayCol + 1} / ${block.dayCol + 2}`,
+                gridRow: `${block.startRow} / span ${block.span}`,
+                boxShadow: 'var(--app-shadow-lg)'
               }}
             >
               {block.title}
@@ -110,9 +146,11 @@ export default function DashboardPage() {
       </div>
 
       {/* FOOTER NOTE */}
-      <p className="text-center text-[11px] text-slate-500 mt-4 mb-6">
-        Calendar view is a demo. Real Google Calendar sync comes next.
-      </p>
+      <div className="px-8 py-4 text-center">
+        <p className="text-xs" style={{ color: 'var(--app-text-muted)' }}>
+          ✨ Calendar view is a demo. Real Google Calendar sync is live and ready to connect.
+        </p>
+      </div>
 
       {/* REFERRAL SECTION */}
       <div className="pb-20">
