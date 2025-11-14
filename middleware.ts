@@ -9,7 +9,9 @@ export async function middleware(request: NextRequest) {
   const isOnboardingRoute = request.nextUrl.pathname === "/onboarding";
   const isLoginRoute = request.nextUrl.pathname === "/login";
 
-  if (!session && (isAppRoute || isOnboardingRoute)) {
+  // Only block /app routes for unauthenticated users
+  // Allow /onboarding access for email-only flow
+  if (!session && isAppRoute) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
