@@ -4,7 +4,9 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import OpenAI from "openai";
 import { getGmailClient } from "../lib/integrations/gmail";
+import { getCalendarClient } from "../lib/integrations/calendar";
 import { sendNotificationEmail, emailTemplates } from "./notifications";
+import { fromZonedTime, toZonedTime, format } from "date-fns-tz";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -32,6 +34,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Messages array is required" });
       }
 
+      let calendarContext = "";
+      try {
+        const calendar = await getCalendarClient();
+        
+        const calendarInfo = await calendar.calendars.get({ calendarId: 'primary' });
+        const userTimezone = calendarInfo.data.timeZone || 'UTC';
+
+        const now = new Date();
+        const nowInUserTz = toZonedTime(now, userTimezone);
+        
+        const todayDateStr = format(nowInUserTz, 'yyyy-MM-dd', { timeZone: userTimezone });
+        
+        const todayStart = fromZonedTime(`${todayDateStr} 00:00:00`, userTimezone);
+        const todayEnd = fromZonedTime(`${todayDateStr} 23:59:59`, userTimezone);
+
+        const response = await calendar.events.list({
+          calendarId: 'primary',
+          timeMin: todayStart.toISOString(),
+          timeMax: todayEnd.toISOString(),
+          singleEvents: true,
+          orderBy: 'startTime',
+          timeZone: userTimezone,
+        });
+
+        const events = response.data.items || [];
+        
+        if (events.length > 0) {
+          const eventsList = events.map((event: any) => {
+            const isAllDay = !event.start?.dateTime;
+            
+            if (isAllDay) {
+              return `- All day: ${event.summary || 'Untitled event'}`;
+            }
+            
+            const start = new Date(event.start.dateTime);
+            const end = new Date(event.end.dateTime);
+            
+            const startTime = start.toLocaleTimeString('en-US', { 
+              hour: 'numeric', 
+              minute: '2-digit',
+              timeZone: userTimezone 
+            });
+            const endTime = end.toLocaleTimeString('en-US', { 
+              hour: 'numeric', 
+              minute: '2-digit',
+              timeZone: userTimezone 
+            });
+            
+            return `- ${startTime} - ${endTime}: ${event.summary || 'Untitled event'}`;
+          }).join('\n');
+          
+          calendarContext = `\n\nUSER'S CALENDAR FOR TODAY (${userTimezone}):\n${eventsList}\n`;
+        } else {
+          calendarContext = "\n\nUSER'S CALENDAR: No events scheduled for today.";
+        }
+      } catch (calError) {
+        console.error("Calendar fetch error:", calError);
+        calendarContext = "\n\n(Calendar data currently unavailable)";
+      }
+
       const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [
@@ -44,7 +106,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 - Meeting summaries and action items
 - Focus time and productivity insights
 
-Be concise, helpful, and actionable. Provide specific suggestions when possible. Keep responses brief (2-3 sentences max unless asked for more detail).`,
+Be concise, helpful, and actionable. Provide specific suggestions when possible. Keep responses brief (2-3 sentences max unless asked for more detail).${calendarContext}`,
           },
           ...messages,
         ],
