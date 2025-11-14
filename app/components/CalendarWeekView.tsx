@@ -29,26 +29,47 @@ export function useCalendarEvents() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchEvents = async () => {
-    // Skip fetching for unauthenticated users
-    if (!isAuthenticated) {
-      setLoading(false);
-      setEvents([]);
-      return;
-    }
-
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch("/api/calendar/events");
+
+      // Always fetch app calendar events (works for both authenticated and unauthenticated)
+      const appCalendarPromise = fetch("/api/app-calendar/events");
       
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || "Failed to fetch calendar events");
+      // Conditionally fetch Google Calendar events for authenticated users
+      const googleCalendarPromise = isAuthenticated 
+        ? fetch("/api/calendar/events").catch(err => {
+            console.warn("Google Calendar fetch failed, continuing with app calendar only:", err);
+            return null;
+          })
+        : Promise.resolve(null);
+
+      const [appResponse, googleResponse] = await Promise.all([
+        appCalendarPromise,
+        googleCalendarPromise
+      ]);
+
+      // Parse app calendar events
+      let appEvents: CalendarEvent[] = [];
+      if (appResponse.ok) {
+        const appData = await appResponse.json();
+        appEvents = transformAppEventsToCalendarEvents(appData.events || []);
       }
+
+      // Parse Google Calendar events (if authenticated and successful)
+      let googleEvents: CalendarEvent[] = [];
+      let weekStartDate = "";
+      if (googleResponse && googleResponse.ok) {
+        const googleData = await googleResponse.json();
+        googleEvents = googleData.events || [];
+        weekStartDate = googleData.weekStart || "";
+      }
+
+      // Merge events (Google events first, then app events)
+      const mergedEvents = [...googleEvents, ...appEvents];
       
-      const data = await response.json();
-      setEvents(data.events || []);
-      setWeekStart(data.weekStart || "");
+      setEvents(mergedEvents);
+      setWeekStart(weekStartDate);
     } catch (err: any) {
       console.error("Error fetching calendar:", err);
       setError(err.message || "Failed to load calendar");
@@ -62,6 +83,72 @@ export function useCalendarEvents() {
   }, [isAuthenticated]);
 
   return { events, weekStart, loading, error, refetch: fetchEvents, isAuthenticated };
+}
+
+function transformAppEventsToCalendarEvents(appEvents: any[]): CalendarEvent[] {
+  const getMonday = (d: Date) => {
+    const day = d.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+    const monday = new Date(d);
+    monday.setDate(d.getDate() + diff);
+    monday.setHours(0, 0, 0, 0);
+    return monday;
+  };
+
+  const today = new Date();
+  const weekStart = getMonday(today);
+
+  return appEvents.filter(event => {
+    const start = new Date(event.startDate);
+    const daysDiff = Math.floor((start.getTime() - weekStart.getTime()) / (1000 * 60 * 60 * 24));
+    return daysDiff >= 0 && daysDiff <= 4;
+  }).map(event => {
+    const start = new Date(event.startDate);
+    const end = new Date(event.endDate);
+    
+    const daysDiff = Math.floor((start.getTime() - weekStart.getTime()) / (1000 * 60 * 60 * 24));
+    const dayCol = daysDiff;
+
+    if (event.allDay) {
+      return {
+        id: event.id,
+        title: event.title,
+        daySegments: [{
+          dayCol,
+          startRow: 0,
+          span: 9,
+          color: "bg-emerald-500/90",
+          allDay: true
+        }]
+      };
+    }
+
+    const startHour = start.getHours() + start.getMinutes() / 60;
+    const endHour = end.getHours() + end.getMinutes() / 60;
+    
+    const startRow = Math.max(0, Math.floor((startHour - 9) * 1));
+    const endRow = Math.min(9, Math.ceil((endHour - 9) * 1));
+    const span = Math.max(1, endRow - startRow);
+
+    if (startRow < 0 || startRow >= 9) {
+      return {
+        id: event.id,
+        title: event.title,
+        daySegments: []
+      };
+    }
+
+    return {
+      id: event.id,
+      title: event.title,
+      daySegments: [{
+        dayCol,
+        startRow,
+        span,
+        color: "bg-emerald-500/90"
+      }]
+    };
+  });
 }
 
 export default function CalendarWeekView({ onEventCreate, readOnly = false }: CalendarWeekViewProps) {
@@ -111,22 +198,15 @@ export default function CalendarWeekView({ onEventCreate, readOnly = false }: Ca
         </div>
       </header>
 
-      {/* UNAUTHENTICATED MESSAGE */}
+      {/* UNAUTHENTICATED INFO */}
       {!isAuthenticated && (
-        <div className="mx-8 mt-6 p-6 premium-card text-center">
-          <div className="text-4xl mb-3">📅</div>
-          <div className="font-semibold mb-2" style={{ color: 'var(--app-text)' }}>
-            Connect Your Calendar
+        <div className="mx-8 mt-6 p-4 premium-card border-l-4" style={{ borderLeftColor: 'var(--app-accent)' }}>
+          <div className="font-semibold mb-1" style={{ color: 'var(--app-text)' }}>
+            📅 Local Calendar
           </div>
-          <div className="text-sm mb-4" style={{ color: 'var(--app-text-muted)' }}>
-            Sign in with Google to sync your calendar and create time blocks.
+          <div className="text-sm" style={{ color: 'var(--app-text-muted)' }}>
+            You're using the local calendar. Events are saved to your browser session. Sign in with Google to sync with Google Calendar and access your events across devices.
           </div>
-          <button
-            onClick={() => window.location.href = '/login'}
-            className="premium-btn"
-          >
-            Sign In with Google
-          </button>
         </div>
       )}
 

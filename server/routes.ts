@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { requireNextAuth } from "./nextAuthMiddleware";
+import { requireNextAuth, optionalNextAuth } from "./nextAuthMiddleware";
 import OpenAI from "openai";
 import { getGmailClient } from "../lib/integrations/gmail";
 import { getCalendarClient } from "../lib/integrations/calendar";
@@ -519,7 +519,7 @@ Keep it warm, professional, and include clear next steps.`;
   });
 
   // App Calendar Endpoints (work for both authenticated and unauthenticated users)
-  app.get("/api/app-calendar/events", async (req: any, res) => {
+  app.get("/api/app-calendar/events", optionalNextAuth, async (req: any, res) => {
     try {
       // Determine user identifier (userId for authenticated, sessionId for anonymous)
       let userIdentifier: string;
@@ -555,7 +555,7 @@ Keep it warm, professional, and include clear next steps.`;
     }
   });
 
-  app.post("/api/app-calendar/events", async (req: any, res) => {
+  app.post("/api/app-calendar/events", optionalNextAuth, async (req: any, res) => {
     try {
       const { title, description, startDate, endDate, allDay, color } = req.body;
 
@@ -596,7 +596,7 @@ Keep it warm, professional, and include clear next steps.`;
     }
   });
 
-  app.delete("/api/app-calendar/events/:id", async (req: any, res) => {
+  app.delete("/api/app-calendar/events/:id", optionalNextAuth, async (req: any, res) => {
     try {
       // Determine user identifier
       let userIdentifier: string;

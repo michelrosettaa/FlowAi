@@ -32,17 +32,19 @@ export default function AddEventModal({ isOpen, onClose, onEventCreated }: AddEv
     try {
       setLoading(true);
       
-      const start = `${date}T${startTime}:00`;
-      const end = `${date}T${endTime}:00`;
+      const startDate = `${date}T${startTime}:00`;
+      const endDate = `${date}T${endTime}:00`;
 
-      const response = await fetch("/api/calendar/events", {
+      const response = await fetch("/api/app-calendar/events", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title,
           description,
-          start,
-          end,
+          startDate,
+          endDate,
+          allDay: false,
+          color: "#10b981",
         }),
       });
 
@@ -212,7 +214,7 @@ export default function AddEventModal({ isOpen, onClose, onEventCreated }: AddEv
         </form>
 
         <div className="mt-4 text-xs text-center" style={{ color: 'var(--app-text-dim)' }}>
-          This event will be added to your Google Calendar
+          Event saved to your FlowAI calendar. Google Calendar events are read-only.
         </div>
       </div>
     </div>
