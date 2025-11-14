@@ -14,7 +14,8 @@ FlowAI is a Next.js-based AI productivity platform that helps users manage their
 3. ✅ **Google Calendar Integration** - Calendar sync now live with read/write access via Replit connector
 4. ✅ **PostgreSQL Database** - Infrastructure set up with Drizzle ORM (schema ready for migration from localStorage)
 5. ✅ **Replit Migration** - Fully migrated from Vercel to Replit environment
-6. ✅ **Premium Design Upgrade** - Complete platform redesign with premium aesthetics:
+6. ✅ **Replit Auth System** - **NEW** Production-ready authentication with OpenID Connect, PostgreSQL session storage, and protected API routes
+7. ✅ **Premium Design Upgrade** - Complete platform redesign with premium aesthetics:
    
    **Landing Page:**
    - Upgraded typography (6xl-7xl headlines with tighter tracking)
@@ -70,26 +71,41 @@ Preferred communication style: Simple, everyday language.
 
 ### Backend Architecture
 
-**API Routes** (Next.js Route Handlers):
-- `/api/plan` - Generates AI-powered daily schedules
-- `/api/summarise` - Summarizes tasks into time-blocked plans
-- `/api/email/generate` - Drafts emails using AI
-- `/api/email/send` - ✅ **LIVE** - Sends real emails via Gmail API
-- `/api/mentor` - Provides motivational feedback with voice synthesis
-- `/api/summarise-call` - Summarizes meeting transcripts
-- `/api/summarise-emails` - Processes and prioritizes email threads
-- `/api/signup` - Handles user trial registration
-- `/api/ask-flowai` - ✅ **NEW** - Real-time AI chat assistant powered by OpenAI
-- `/api/calendar/events` - ✅ **NEW** - Fetch and create Google Calendar events
+**Express Server** (server/index.ts):
+- Custom Express server running on port 5000 alongside Next.js
+- Handles authentication, sessions, and protected API routes
+- Uses Passport.js with OpenID Connect for Replit Auth
 
-**Authentication**: Currently mocked with localStorage-based session simulation
-- **Status**: Basic session handling in place, full Replit Auth integration pending
+**Protected API Routes** (server/routes.ts - All require authentication):
+- `/api/ask-flowai` - ✅ **PROTECTED** - Real-time AI chat assistant powered by OpenAI
+- `/api/email/generate` - ✅ **PROTECTED** - Drafts emails using AI
+- `/api/email/send` - ✅ **PROTECTED** - Sends real emails via Gmail API
+- `/api/mentor` - ✅ **PROTECTED** - Provides motivational feedback with voice synthesis
+- `/api/tasks` - ✅ **PROTECTED** - CRUD operations for user tasks (database-backed)
+- `/api/preferences` - ✅ **PROTECTED** - Get/update user preferences (database-backed)
+
+**Legacy Next.js Routes** (Pending migration):
+- `/api/plan` - Generates AI-powered daily schedules (to be migrated)
+- `/api/summarise` - Summarizes tasks into time-blocked plans (to be migrated)
+- `/api/summarise-call` - Summarizes meeting transcripts (to be migrated)
+- `/api/summarise-emails` - Processes and prioritizes email threads (to be migrated)
+- `/api/signup` - Handles user trial registration (to be migrated)
+- `/api/calendar/events` - Fetch and create Google Calendar events (to be migrated)
+
+**Authentication**: ✅ **PRODUCTION-READY** Replit Auth with OpenID Connect
+- **Implementation**: Passport.js + openid-client for secure OAuth flow
+- **Session Storage**: PostgreSQL-backed sessions (connect-pg-simple)
+- **Security**: HttpOnly cookies, automatic token refresh, 401 handling
+- **Client Integration**: useAuth hook provides authentication state across the app
+- **Protected Routes**: isAuthenticated middleware guards all sensitive endpoints
+- **User Experience**: Auto-redirect to login, user info display in sidebar, logout functionality
 
 **Data Storage**:
-- ✅ **PostgreSQL Database** (Neon-backed) - Configured with Drizzle ORM
+- ✅ **PostgreSQL Database** (Neon-backed) - Fully operational with Drizzle ORM
 - **Schema**: Users, tasks, user preferences, and sessions tables
-- **Status**: Database infrastructure ready; migration from localStorage in progress
-- LocalStorage still used for some client-side data (migration underway)
+- **Status**: ✅ **LIVE** - All critical features (tasks, preferences) now use database storage
+- **User Isolation**: All data queries filtered by authenticated user ID for security
+- **Migration**: localStorage completely replaced with PostgreSQL for all protected features
 
 ### AI Integration
 
@@ -121,6 +137,8 @@ Preferred communication style: Simple, everyday language.
 - **googleapis** (v148+): Official Google API client for Gmail and Calendar
 - **Drizzle ORM** (v0.44+): Type-safe database queries
 - **@neondatabase/serverless**: PostgreSQL connection pooling
+- **passport** + **openid-client**: OpenID Connect authentication
+- **express-session** + **connect-pg-simple**: Session management with PostgreSQL storage
 
 **Icon Library**: Lucide React for consistent, modern iconography
 
@@ -144,15 +162,19 @@ Preferred communication style: Simple, everyday language.
 
 1. **Database-First Migration**: ✅ Migrated from localStorage to PostgreSQL with Drizzle ORM for production-grade persistence. Schema supports users, tasks, and preferences with proper relations and cascading deletes.
 
-2. **Replit Connectors**: ✅ Using managed OAuth connectors for Gmail and Calendar eliminates manual token management and provides automatic refresh, making integrations more reliable and secure.
+2. **Replit Auth Integration**: ✅ Production-ready authentication using Replit's OpenID Connect provider. Sessions stored in PostgreSQL for scalability. All sensitive endpoints (OpenAI, Gmail, tasks) require authentication with automatic user isolation.
 
-3. **Client-Heavy Routing**: Most interactivity happens client-side with "use client" directives, trading server component benefits for simpler state management during MVP phase.
+3. **Hybrid Express + Next.js Architecture**: Critical API routes run through Express with authentication middleware, while public routes remain on Next.js. This allows fine-grained security control while maintaining Next.js benefits for frontend.
 
-4. **Real External Integrations**: Email sending and calendar sync now use production Gmail/Calendar APIs (no mocking). Authentication still uses lightweight session simulation pending full Replit Auth integration.
+4. **Replit Connectors**: ✅ Using managed OAuth connectors for Gmail and Calendar eliminates manual token management and provides automatic refresh, making integrations more reliable and secure.
 
-5. **Monolithic Structure**: All features live in a single Next.js app rather than microservices, appropriate for current scale but may need decomposition as features grow.
+5. **Client-Heavy Routing**: Most interactivity happens client-side with "use client" directives, trading server component benefits for simpler state management during MVP phase.
 
-6. **Theme Management**: Custom context provider for dark/light mode rather than external library, giving full control but requiring manual implementation of theme switching logic.
+6. **Real External Integrations**: Email sending, calendar sync, and AI features all use production APIs (OpenAI, Gmail, Calendar) with proper authentication and error handling.
+
+7. **Monolithic Structure**: All features live in a single Next.js app rather than microservices, appropriate for current scale but may need decomposition as features grow.
+
+8. **Theme Management**: Custom context provider for dark/light mode rather than external library, giving full control but requiring manual implementation of theme switching logic.
 
 ### Database Schema
 
