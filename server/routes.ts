@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { requireNextAuth } from "./nextAuthMiddleware";
 import OpenAI from "openai";
 import { getGmailClient } from "../lib/integrations/gmail";
 import { getCalendarClient } from "../lib/integrations/calendar";
@@ -13,11 +13,9 @@ const openai = new OpenAI({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  await setupAuth(app);
-
-  app.get("/api/auth/user", isAuthenticated, async (req: any, res) => {
+  app.get("/api/auth/user", requireNextAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.auth!.userId;
       const user = await storage.getUser(userId);
       res.json(user);
     } catch (error) {
@@ -26,8 +24,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/ask-flowai", isAuthenticated, async (req: any, res) => {
+  app.post("/api/ask-flowai", requireNextAuth, async (req: any, res) => {
     try {
+      const userId = req.auth!.userId;
       const { messages } = req.body;
 
       if (!messages || !Array.isArray(messages)) {
@@ -36,7 +35,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       let calendarContext = "";
       try {
-        const calendar = await getCalendarClient();
+        const calendar = await getCalendarClient(userId);
         
         const calendarInfo = await calendar.calendars.get({ calendarId: 'primary' });
         const userTimezone = calendarInfo.data.timeZone || 'UTC';
@@ -122,15 +121,16 @@ Be concise, helpful, and actionable. Provide specific suggestions when possible.
     }
   });
 
-  app.post("/api/email/send", isAuthenticated, async (req: any, res) => {
+  app.post("/api/email/send", requireNextAuth, async (req: any, res) => {
     try {
+      const userId = req.auth!.userId;
       const { recipient, subject, emailBody } = req.body;
 
       if (!recipient || !subject || !emailBody) {
         return res.status(400).json({ error: "Recipient, subject, and email body are required" });
       }
 
-      const gmail = await getGmailClient();
+      const gmail = await getGmailClient(userId);
 
       const email = [
         `To: ${recipient}`,
@@ -161,7 +161,7 @@ Be concise, helpful, and actionable. Provide specific suggestions when possible.
     }
   });
 
-  app.post("/api/email/generate", isAuthenticated, async (req: any, res) => {
+  app.post("/api/email/generate", requireNextAuth, async (req: any, res) => {
     try {
       const { recipient, subject = "", context = "" } = req.body;
 
@@ -193,9 +193,10 @@ Keep it warm, professional, and include clear next steps.`;
     }
   });
 
-  app.get("/api/calendar/events", isAuthenticated, async (req: any, res) => {
+  app.get("/api/calendar/events", requireNextAuth, async (req: any, res) => {
     try {
-      const calendar = await getCalendarClient();
+      const userId = req.auth!.userId;
+      const calendar = await getCalendarClient(userId);
       
       const calendarInfo = await calendar.calendars.get({ calendarId: 'primary' });
       const userTimezone = calendarInfo.data.timeZone || 'UTC';
@@ -346,8 +347,9 @@ Keep it warm, professional, and include clear next steps.`;
     }
   });
 
-  app.post("/api/calendar/events", isAuthenticated, async (req: any, res) => {
+  app.post("/api/calendar/events", requireNextAuth, async (req: any, res) => {
     try {
+      const userId = req.auth!.userId;
       const { title, start, end, description } = req.body;
 
       if (!title || !start || !end) {
@@ -361,7 +363,7 @@ Keep it warm, professional, and include clear next steps.`;
         return res.status(400).json({ error: "End time must be after start time" });
       }
 
-      const calendar = await getCalendarClient();
+      const calendar = await getCalendarClient(userId);
       
       const calendarInfo = await calendar.calendars.get({ calendarId: 'primary' });
       const userTimezone = calendarInfo.data.timeZone || 'UTC';
@@ -395,7 +397,7 @@ Keep it warm, professional, and include clear next steps.`;
     }
   });
 
-  app.post("/api/mentor", isAuthenticated, async (req: any, res) => {
+  app.post("/api/mentor", requireNextAuth, async (req: any, res) => {
     try {
       const { text, voice } = req.body;
       const voiceMap: Record<string, string> = {
@@ -435,9 +437,9 @@ Keep it warm, professional, and include clear next steps.`;
     }
   });
 
-  app.get("/api/tasks", isAuthenticated, async (req: any, res) => {
+  app.get("/api/tasks", requireNextAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.auth!.userId;
       const tasks = await storage.getTasks(userId);
       res.json(tasks);
     } catch (error) {
@@ -446,9 +448,9 @@ Keep it warm, professional, and include clear next steps.`;
     }
   });
 
-  app.post("/api/tasks", isAuthenticated, async (req: any, res) => {
+  app.post("/api/tasks", requireNextAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.auth!.userId;
       const task = await storage.createTask({
         ...req.body,
         userId,
@@ -460,9 +462,9 @@ Keep it warm, professional, and include clear next steps.`;
     }
   });
 
-  app.patch("/api/tasks/:id", isAuthenticated, async (req: any, res) => {
+  app.patch("/api/tasks/:id", requireNextAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.auth!.userId;
       const task = await storage.updateTask(req.params.id, userId, req.body);
       if (!task) {
         return res.status(404).json({ message: "Task not found" });
@@ -474,9 +476,9 @@ Keep it warm, professional, and include clear next steps.`;
     }
   });
 
-  app.delete("/api/tasks/:id", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/tasks/:id", requireNextAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.auth!.userId;
       const deleted = await storage.deleteTask(req.params.id, userId);
       if (!deleted) {
         return res.status(404).json({ message: "Task not found" });
@@ -488,9 +490,9 @@ Keep it warm, professional, and include clear next steps.`;
     }
   });
 
-  app.get("/api/preferences", isAuthenticated, async (req: any, res) => {
+  app.get("/api/preferences", requireNextAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.auth!.userId;
       const prefs = await storage.getUserPreferences(userId);
       res.json(prefs?.preferences || {});
     } catch (error) {
@@ -499,9 +501,9 @@ Keep it warm, professional, and include clear next steps.`;
     }
   });
 
-  app.post("/api/preferences", isAuthenticated, async (req: any, res) => {
+  app.post("/api/preferences", requireNextAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.auth!.userId;
       const prefs = await storage.upsertUserPreferences({
         userId,
         preferences: req.body,
@@ -514,9 +516,9 @@ Keep it warm, professional, and include clear next steps.`;
   });
 
   // Notification endpoints
-  app.post("/api/notifications/send-daily-digest", isAuthenticated, async (req: any, res) => {
+  app.post("/api/notifications/send-daily-digest", requireNextAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.auth!.userId;
       const user = await storage.getUser(userId);
       
       if (!user?.email) {
@@ -524,7 +526,7 @@ Keep it warm, professional, and include clear next steps.`;
       }
 
       // Get user's tasks and events
-      const tasks = await storage.getUserTasks(userId);
+      const tasks = await storage.getTasks(userId);
       const todayTasks = tasks.filter((t: any) => !t.completed);
       
       // Mock events for now - in the future, integrate with Google Calendar
@@ -552,9 +554,9 @@ Keep it warm, professional, and include clear next steps.`;
     }
   });
 
-  app.post("/api/notifications/send-task-reminder", isAuthenticated, async (req: any, res) => {
+  app.post("/api/notifications/send-task-reminder", requireNextAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.auth!.userId;
       const { taskId } = req.body;
       
       if (!taskId) {
@@ -566,7 +568,7 @@ Keep it warm, professional, and include clear next steps.`;
         return res.status(400).json({ error: "User email not found" });
       }
 
-      const tasks = await storage.getUserTasks(userId);
+      const tasks = await storage.getTasks(userId);
       const task = tasks.find((t: any) => t.id === taskId);
       
       if (!task) {
@@ -592,9 +594,9 @@ Keep it warm, professional, and include clear next steps.`;
     }
   });
 
-  app.post("/api/notifications/send-focus-alert", isAuthenticated, async (req: any, res) => {
+  app.post("/api/notifications/send-focus-alert", requireNextAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.auth!.userId;
       const { focusBlock } = req.body;
       
       const user = await storage.getUser(userId);
@@ -620,7 +622,7 @@ Keep it warm, professional, and include clear next steps.`;
     }
   });
 
-  app.post("/api/plan", isAuthenticated, async (req: any, res) => {
+  app.post("/api/plan", requireNextAuth, async (req: any, res) => {
     try {
       const { tasks } = req.body;
 
