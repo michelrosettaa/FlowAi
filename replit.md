@@ -16,7 +16,9 @@ The frontend is built with Next.js 15.1.6 (App Router) and React 18.3.1, styled 
 
 ### Backend Architecture
 
-A custom Express server runs alongside Next.js, handling protected API routes with NextAuth v5 JWT authentication. Key protected routes include `/api/ask-flowai` (AI chat with Google Calendar integration), `/api/email/generate` and `/api/email/send`, `/api/mentor`, `/api/tasks`, and `/api/preferences`. A hybrid authentication system supports local calendar CRUD operations (`/api/app-calendar/events`) for both authenticated (via `userId`) and unauthenticated (via `sessionId` and Express sessions) users.
+A custom Express server runs alongside Next.js, handling protected API routes with NextAuth v5 JWT authentication. Key protected routes include `/api/ask-flowai` (AI chat with Google Calendar integration), `/api/email/generate`, `/api/email/send`, `/api/email/inbox`, `/api/email/reply`, `/api/mentor`, `/api/tasks`, and `/api/preferences`. A hybrid authentication system supports local calendar CRUD operations (`/api/app-calendar/events`) for both authenticated (via `userId`) and unauthenticated (via `sessionId` and Express sessions) users.
+
+**Universal Email Support**: FlowAI implements provider-agnostic email integration using IMAP/SMTP protocols via `nodemailer` and `imap` libraries. Users can connect ANY email provider (Gmail, Outlook, Yahoo, iCloud, ProtonMail, corporate email) by entering credentials in Settings. Email passwords are encrypted using AES-256-CBC with a required `ENCRYPTION_KEY` environment variable before database storage. Auto-detection provides optimal IMAP/SMTP settings for popular providers, with TLS certificate validation enabled for security.
 
 ### AI Integration
 
@@ -43,15 +45,18 @@ PostgreSQL (Neon-backed) is the primary database, managed with Drizzle ORM. The 
 ### Third-Party Services
 
 -   **OpenAI API**: For core AI functionalities.
--   **Gmail API**: For sending emails via per-user OAuth tokens.
 -   **Google Calendar API**: For calendar synchronization via per-user OAuth tokens.
+-   **Universal Email Support (IMAP/SMTP)**: Direct protocol integration supporting Gmail, Outlook, Yahoo, iCloud, ProtonMail, and any custom provider.
 -   **PostgreSQL (Neon)**: Database backend.
 -   **Vercel Analytics**: For application analytics.
 -   **Random User API**: For demo profile images.
 
 ### Integration Libraries
 
--   **googleapis**: Official client for Gmail and Calendar API integration.
+-   **googleapis**: Official client for Google Calendar API integration.
+-   **nodemailer**: Universal SMTP email sending for any provider.
+-   **imap**: IMAP protocol client for inbox fetching from any provider.
+-   **mailparser**: Email parsing and HTML content extraction.
 -   **Drizzle ORM**: Type-safe database queries.
 -   **@neondatabase/serverless**: PostgreSQL connection pooling.
 -   **next-auth**: Multi-provider OAuth authentication.
@@ -63,9 +68,24 @@ PostgreSQL (Neon-backed) is the primary database, managed with Drizzle ORM. The 
 ### Deployment Configuration
 
 -   **Target Platform**: Replit.
--   **Environment Variables**: Requires `OPENAI_API_KEY`, `DATABASE_URL`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, and optionally Microsoft/Apple OAuth credentials.
+-   **Environment Variables**: Requires `OPENAI_API_KEY`, `DATABASE_URL`, `ENCRYPTION_KEY` (32-character random key for email password encryption), `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, and optionally Microsoft/Apple OAuth credentials.
 
 ## Recent Changes
+
+### November 14, 2025 - Universal Email Support (Production-Ready)
+- **Provider-Agnostic Email Integration**: Migrated from Gmail API to universal IMAP/SMTP protocols supporting ANY email provider
+- **Supported Providers**: Gmail, Outlook, Yahoo, iCloud, ProtonMail, and any custom corporate email server
+- **Email Settings Page**: Built comprehensive UI at `/app/settings/email` for users to add and manage email accounts
+- **Auto-Detection System**: Created intelligent provider detection in `server/email-providers.ts` that automatically configures optimal IMAP/SMTP settings for popular providers
+- **Secure Password Encryption**: Implemented AES-256-CBC encryption using `crypto-utils.ts` with required `ENCRYPTION_KEY` environment variable
+- **Database Schema**: Added `email_accounts` table with encrypted credentials storage via Drizzle ORM
+- **IMAP Service**: Built `server/imap-service.ts` for fetching inbox from any provider with proper TLS certificate validation
+- **SMTP Service**: Created `server/smtp-service.ts` using nodemailer for universal email sending
+- **Security Hardening**: Enabled TLS certificate validation, removed default encryption key fallback, enforced `ENCRYPTION_KEY` requirement at startup
+- **Email Helper Integration**: Updated UI to detect when no email account is configured and prompt users to Settings
+- **API Endpoints**: Updated `/api/email/inbox`, `/api/email/send`, and `/api/email/reply` to use universal IMAP/SMTP services
+- **Production-Ready**: Architect confirmed all security gaps closed and implementation ready for production deployment
+- **Libraries Added**: `nodemailer`, `imap`, `mailparser` for universal email protocol support
 
 ### November 14, 2025 - Interactive Features, Professional Calendar & Email Intelligence
 - **Toast Notification System**: Integrated Sonner library for real-time user feedback on actions throughout the app
