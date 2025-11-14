@@ -3,6 +3,9 @@ import {
   tasks,
   userPreferences,
   calendarEvents,
+  subscriptionPlans,
+  userSubscriptions,
+  usageRecords,
   type User,
   type UpsertUser,
   type Task,
@@ -11,9 +14,14 @@ import {
   type InsertUserPreferences,
   type CalendarEvent,
   type InsertCalendarEvent,
+  type SubscriptionPlan,
+  type UserSubscription,
+  type InsertUserSubscription,
+  type UsageRecord,
+  type InsertUsageRecord,
 } from "../lib/db/schema";
 import { db } from "./db";
-import { eq, or, and, gte, lte } from "drizzle-orm";
+import { eq, or, and, gte, lte, desc } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -31,6 +39,18 @@ export interface IStorage {
   getCalendarEvents(userIdOrSessionId: string, startDate?: Date, endDate?: Date): Promise<CalendarEvent[]>;
   createCalendarEvent(event: InsertCalendarEvent): Promise<CalendarEvent>;
   deleteCalendarEvent(id: string, userIdOrSessionId: string): Promise<boolean>;
+  
+  getAllPlans(): Promise<SubscriptionPlan[]>;
+  getPlanBySlug(slug: string): Promise<SubscriptionPlan | undefined>;
+  getPlanById(id: string): Promise<SubscriptionPlan | undefined>;
+  
+  getUserSubscription(userId: string): Promise<(UserSubscription & { plan: SubscriptionPlan }) | undefined>;
+  createUserSubscription(subscription: InsertUserSubscription): Promise<UserSubscription>;
+  updateUserSubscription(userId: string, updates: Partial<InsertUserSubscription>): Promise<UserSubscription | undefined>;
+  
+  getUsageForPeriod(userId: string, feature: string, periodStart: Date, periodEnd: Date): Promise<UsageRecord | undefined>;
+  incrementUsage(userId: string, feature: string, amount?: number): Promise<UsageRecord>;
+  getCurrentUsage(userId: string): Promise<{ ai_messages: number; email_sends: number; calendar_sync: number }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -174,6 +194,149 @@ export class DatabaseStorage implements IStorage {
 
     await db.delete(calendarEvents).where(eq(calendarEvents.id, id));
     return true;
+  }
+
+  async getAllPlans(): Promise<SubscriptionPlan[]> {
+    return await db
+      .select()
+      .from(subscriptionPlans)
+      .where(eq(subscriptionPlans.isActive, true))
+      .orderBy(subscriptionPlans.sortOrder);
+  }
+
+  async getPlanBySlug(slug: string): Promise<SubscriptionPlan | undefined> {
+    const [plan] = await db
+      .select()
+      .from(subscriptionPlans)
+      .where(eq(subscriptionPlans.slug, slug))
+      .limit(1);
+    return plan;
+  }
+
+  async getPlanById(id: string): Promise<SubscriptionPlan | undefined> {
+    const [plan] = await db
+      .select()
+      .from(subscriptionPlans)
+      .where(eq(subscriptionPlans.id, id))
+      .limit(1);
+    return plan;
+  }
+
+  async getUserSubscription(userId: string): Promise<(UserSubscription & { plan: SubscriptionPlan }) | undefined> {
+    const result = await db
+      .select()
+      .from(userSubscriptions)
+      .leftJoin(subscriptionPlans, eq(userSubscriptions.planId, subscriptionPlans.id))
+      .where(eq(userSubscriptions.userId, userId))
+      .limit(1);
+
+    if (!result[0] || !result[0].subscription_plans) {
+      return undefined;
+    }
+
+    return {
+      ...result[0].user_subscriptions,
+      plan: result[0].subscription_plans,
+    };
+  }
+
+  async createUserSubscription(subscriptionData: InsertUserSubscription): Promise<UserSubscription> {
+    const [subscription] = await db
+      .insert(userSubscriptions)
+      .values(subscriptionData)
+      .onConflictDoUpdate({
+        target: userSubscriptions.userId,
+        set: {
+          ...subscriptionData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return subscription;
+  }
+
+  async updateUserSubscription(userId: string, updates: Partial<InsertUserSubscription>): Promise<UserSubscription | undefined> {
+    const [updated] = await db
+      .update(userSubscriptions)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(userSubscriptions.userId, userId))
+      .returning();
+    return updated;
+  }
+
+  async getUsageForPeriod(
+    userId: string,
+    feature: string,
+    periodStart: Date,
+    periodEnd: Date
+  ): Promise<UsageRecord | undefined> {
+    const [usage] = await db
+      .select()
+      .from(usageRecords)
+      .where(
+        and(
+          eq(usageRecords.userId, userId),
+          eq(usageRecords.feature, feature as any),
+          eq(usageRecords.periodStart, periodStart)
+        )
+      )
+      .limit(1);
+    return usage;
+  }
+
+  async incrementUsage(userId: string, feature: string, amount: number = 1): Promise<UsageRecord> {
+    const now = new Date();
+    const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const existing = await this.getUsageForPeriod(userId, feature, periodStart, periodEnd);
+
+    if (existing) {
+      const [updated] = await db
+        .update(usageRecords)
+        .set({
+          count: existing.count + amount,
+          lastIncrementAt: now,
+          updatedAt: now,
+        })
+        .where(eq(usageRecords.id, existing.id))
+        .returning();
+      return updated;
+    }
+
+    const [newRecord] = await db
+      .insert(usageRecords)
+      .values({
+        userId,
+        feature: feature as any,
+        count: amount,
+        periodStart,
+        periodEnd,
+        lastIncrementAt: now,
+      })
+      .returning();
+    return newRecord;
+  }
+
+  async getCurrentUsage(userId: string): Promise<{ ai_messages: number; email_sends: number; calendar_sync: number }> {
+    const now = new Date();
+    const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const usage = await db
+      .select()
+      .from(usageRecords)
+      .where(
+        and(
+          eq(usageRecords.userId, userId),
+          eq(usageRecords.periodStart, periodStart)
+        )
+      );
+
+    return {
+      ai_messages: usage.find((u) => u.feature === "ai_messages")?.count || 0,
+      email_sends: usage.find((u) => u.feature === "email_sends")?.count || 0,
+      calendar_sync: usage.find((u) => u.feature === "calendar_sync")?.count || 0,
+    };
   }
 }
 
