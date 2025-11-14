@@ -19,6 +19,7 @@ interface CalendarEvent {
 interface CalendarWeekViewProps {
   onEventCreate?: () => void;
   readOnly?: boolean;
+  refetchTrigger?: number;
 }
 
 export function useCalendarEvents() {
@@ -80,6 +81,65 @@ export function useCalendarEvents() {
   return { events, weekStart, loading, error, refetch: fetchEvents, isAuthenticated };
 }
 
+export function useCalendarEventsWithRefetch(refetchTrigger?: number) {
+  const { isAuthenticated } = useAuth();
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [weekStart, setWeekStart] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const appCalendarPromise = fetch("/api/app-calendar/events");
+      
+      const googleCalendarPromise = isAuthenticated 
+        ? fetch("/api/calendar/events").catch(err => {
+            console.warn("Google Calendar fetch failed, continuing with app calendar only:", err);
+            return null;
+          })
+        : Promise.resolve(null);
+
+      const [appResponse, googleResponse] = await Promise.all([
+        appCalendarPromise,
+        googleCalendarPromise
+      ]);
+
+      let appEvents: CalendarEvent[] = [];
+      if (appResponse.ok) {
+        const appData = await appResponse.json();
+        appEvents = transformAppEventsToCalendarEvents(appData.events || []);
+      }
+
+      let googleEvents: CalendarEvent[] = [];
+      let weekStartDate = "";
+      if (googleResponse && googleResponse.ok) {
+        const googleData = await googleResponse.json();
+        googleEvents = googleData.events || [];
+        weekStartDate = googleData.weekStart || "";
+      }
+
+      const mergedEvents = [...googleEvents, ...appEvents];
+      
+      setEvents(mergedEvents);
+      setWeekStart(weekStartDate);
+    } catch (err: any) {
+      console.error("Error fetching calendar:", err);
+      setError(err.message || "Failed to load calendar");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, [isAuthenticated, refetchTrigger]);
+
+  return { events, weekStart, loading, error, refetch: fetchEvents, isAuthenticated };
+}
+
 function transformAppEventsToCalendarEvents(appEvents: any[]): CalendarEvent[] {
   const getMonday = (d: Date) => {
     const day = d.getDay();
@@ -111,7 +171,7 @@ function transformAppEventsToCalendarEvents(appEvents: any[]): CalendarEvent[] {
         daySegments: [{
           dayCol,
           startRow: 0,
-          span: 24,
+          span: 1,
           color: "bg-emerald-500/90",
           allDay: true
         }]
@@ -146,15 +206,12 @@ function transformAppEventsToCalendarEvents(appEvents: any[]): CalendarEvent[] {
   });
 }
 
-export default function CalendarWeekView({ onEventCreate, readOnly = false }: CalendarWeekViewProps) {
+export default function CalendarWeekView({ onEventCreate, readOnly = false, refetchTrigger }: CalendarWeekViewProps) {
   const hours = Array.from({ length: 24 }, (_, i) => {
-    if (i === 0) return "12am";
-    if (i < 12) return `${i}am`;
-    if (i === 12) return "12pm";
-    return `${i - 12}pm`;
+    return `${String(i).padStart(2, '0')}:00`;
   });
   
-  const { events, weekStart, loading, error, isAuthenticated } = useCalendarEvents();
+  const { events, weekStart, loading, error, isAuthenticated } = useCalendarEventsWithRefetch(refetchTrigger);
 
   const getWeekDays = () => {
     if (!weekStart) {
@@ -186,6 +243,15 @@ export default function CalendarWeekView({ onEventCreate, readOnly = false }: Ca
   const timedEvents = events.flatMap(event => 
     event.daySegments.filter(seg => !seg.allDay).map(segment => ({
       title: event.title,
+      id: event.id,
+      ...segment
+    }))
+  );
+
+  const allDayEvents = events.flatMap(event =>
+    event.daySegments.filter(seg => seg.allDay).map(segment => ({
+      title: event.title,
+      id: event.id,
       ...segment
     }))
   );
@@ -290,6 +356,31 @@ export default function CalendarWeekView({ onEventCreate, readOnly = false }: Ca
               );
             })}
           </div>
+
+          {/* All-day events row */}
+          {allDayEvents.length > 0 && (
+            <div className="grid grid-cols-[60px_repeat(7,1fr)] gap-0 mb-3">
+              <div className="text-[10px] pr-2 text-right" style={{ color: 'var(--app-text-muted)', paddingTop: '4px' }}>
+                All day
+              </div>
+              {[0, 1, 2, 3, 4, 5, 6].map((col) => {
+                const dayEvents = allDayEvents.filter(e => e.dayCol === col);
+                return (
+                  <div key={col} className="px-1">
+                    {dayEvents.map((event, i) => (
+                      <div
+                        key={i}
+                        className={`${event.color} border border-white/20 text-[11px] font-medium rounded-md px-2 py-1 mb-1 truncate`}
+                        style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.1)' }}
+                      >
+                        <div className="text-white truncate">{event.title}</div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* Time grid */}
           <div 
