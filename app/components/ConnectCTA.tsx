@@ -20,7 +20,7 @@ export default function ConnectCTA() {
                 Connect your email
               </h3>
               <p className="text-slate-600 text-sm leading-relaxed mt-1">
-                FlowAI can summarize long threads, draft replies in your tone,
+                FlowAI can summarise long threads, draft replies in your tone,
                 and remind you about follow-ups.
               </p>
             </div>

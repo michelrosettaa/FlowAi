@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { useAuth } from "@/app/hooks/useAuth";
 
 interface CalendarEvent {
@@ -33,10 +33,8 @@ export function useCalendarEvents() {
       setLoading(true);
       setError(null);
 
-      // Always fetch app calendar events (works for both authenticated and unauthenticated)
       const appCalendarPromise = fetch("/api/app-calendar/events");
       
-      // Conditionally fetch Google Calendar events for authenticated users
       const googleCalendarPromise = isAuthenticated 
         ? fetch("/api/calendar/events").catch(err => {
             console.warn("Google Calendar fetch failed, continuing with app calendar only:", err);
@@ -49,14 +47,12 @@ export function useCalendarEvents() {
         googleCalendarPromise
       ]);
 
-      // Parse app calendar events
       let appEvents: CalendarEvent[] = [];
       if (appResponse.ok) {
         const appData = await appResponse.json();
         appEvents = transformAppEventsToCalendarEvents(appData.events || []);
       }
 
-      // Parse Google Calendar events (if authenticated and successful)
       let googleEvents: CalendarEvent[] = [];
       let weekStartDate = "";
       if (googleResponse && googleResponse.ok) {
@@ -65,7 +61,6 @@ export function useCalendarEvents() {
         weekStartDate = googleData.weekStart || "";
       }
 
-      // Merge events (Google events first, then app events)
       const mergedEvents = [...googleEvents, ...appEvents];
       
       setEvents(mergedEvents);
@@ -101,7 +96,7 @@ function transformAppEventsToCalendarEvents(appEvents: any[]): CalendarEvent[] {
   return appEvents.filter(event => {
     const start = new Date(event.startDate);
     const daysDiff = Math.floor((start.getTime() - weekStart.getTime()) / (1000 * 60 * 60 * 24));
-    return daysDiff >= 0 && daysDiff <= 4;
+    return daysDiff >= 0 && daysDiff <= 6;
   }).map(event => {
     const start = new Date(event.startDate);
     const end = new Date(event.endDate);
@@ -116,7 +111,7 @@ function transformAppEventsToCalendarEvents(appEvents: any[]): CalendarEvent[] {
         daySegments: [{
           dayCol,
           startRow: 0,
-          span: 9,
+          span: 24,
           color: "bg-emerald-500/90",
           allDay: true
         }]
@@ -126,11 +121,11 @@ function transformAppEventsToCalendarEvents(appEvents: any[]): CalendarEvent[] {
     const startHour = start.getHours() + start.getMinutes() / 60;
     const endHour = end.getHours() + end.getMinutes() / 60;
     
-    const startRow = Math.max(0, Math.floor((startHour - 9) * 1));
-    const endRow = Math.min(9, Math.ceil((endHour - 9) * 1));
+    const startRow = Math.max(0, Math.floor(startHour));
+    const endRow = Math.min(24, Math.ceil(endHour));
     const span = Math.max(1, endRow - startRow);
 
-    if (startRow < 0 || startRow >= 9) {
+    if (startRow < 0 || startRow >= 24) {
       return {
         id: event.id,
         title: event.title,
@@ -145,15 +140,48 @@ function transformAppEventsToCalendarEvents(appEvents: any[]): CalendarEvent[] {
         dayCol,
         startRow,
         span,
-        color: "bg-emerald-500/90"
+        color: "bg-blue-500/90"
       }]
     };
   });
 }
 
 export default function CalendarWeekView({ onEventCreate, readOnly = false }: CalendarWeekViewProps) {
-  const hours = ["9am", "10am", "11am", "12pm", "1pm", "2pm", "3pm", "4pm", "5pm"];
+  const hours = Array.from({ length: 24 }, (_, i) => {
+    if (i === 0) return "12am";
+    if (i < 12) return `${i}am`;
+    if (i === 12) return "12pm";
+    return `${i - 12}pm`;
+  });
+  
   const { events, weekStart, loading, error, isAuthenticated } = useCalendarEvents();
+
+  const getWeekDays = () => {
+    if (!weekStart) {
+      const today = new Date();
+      const day = today.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      const monday = new Date(today);
+      monday.setDate(today.getDate() + diff);
+      
+      return Array.from({ length: 7 }, (_, i) => {
+        const date = new Date(monday);
+        date.setDate(monday.getDate() + i);
+        return date;
+      });
+    }
+    
+    const startDate = new Date(weekStart + 'T00:00:00');
+    return Array.from({ length: 7 }, (_, i) => {
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + i);
+      return date;
+    });
+  };
+
+  const weekDays = getWeekDays();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
   const timedEvents = events.flatMap(event => 
     event.daySegments.filter(seg => !seg.allDay).map(segment => ({
@@ -163,35 +191,40 @@ export default function CalendarWeekView({ onEventCreate, readOnly = false }: Ca
   );
 
   return (
-    <>
+    <div className="flex flex-col h-full">
       {/* HEADER */}
-      <header className="px-8 py-6" style={{ 
-        borderBottom: '1px solid var(--app-border)',
+      <header className="px-6 py-4 border-b" style={{ 
+        borderColor: 'var(--app-border)',
         background: 'var(--app-surface)'
       }}>
         <div className="flex justify-between items-center">
-          <div>
-            <div className="text-xs font-medium mb-1" style={{ color: 'var(--app-text-muted)' }}>
-              {weekStart ? `Week of ${new Date(weekStart + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : 'My Calendar'}
-            </div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--app-text)' }}>
-              My Calendar
+          <div className="flex items-center gap-4">
+            <h1 className="text-xl font-semibold" style={{ color: 'var(--app-text)' }}>
+              {weekDays[0].toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}
             </h1>
+            <div className="flex items-center gap-2">
+              <button className="p-1.5 hover:bg-white/5 rounded-lg transition-colors" style={{ color: 'var(--app-text-muted)' }}>
+                <ChevronLeft size={18} />
+              </button>
+              <button className="p-1.5 hover:bg-white/5 rounded-lg transition-colors" style={{ color: 'var(--app-text-muted)' }}>
+                <ChevronRight size={18} />
+              </button>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             {loading && (
               <div className="flex items-center gap-2" style={{ color: 'var(--app-text-muted)' }}>
-                <Loader2 size={18} className="animate-spin" />
-                <span className="text-sm">Loading calendar...</span>
+                <Loader2 size={16} className="animate-spin" />
+                <span className="text-xs">Loading...</span>
               </div>
             )}
             {!readOnly && onEventCreate && (
               <button
                 onClick={onEventCreate}
-                className="premium-btn flex items-center gap-2"
+                className="premium-btn flex items-center gap-2 text-sm"
               >
-                <Plus size={18} />
-                Add Block
+                <Plus size={16} />
+                New Event
               </button>
             )}
           </div>
@@ -200,11 +233,17 @@ export default function CalendarWeekView({ onEventCreate, readOnly = false }: Ca
 
       {/* UNAUTHENTICATED INFO */}
       {!isAuthenticated && (
-        <div className="mx-8 mt-6 p-4 premium-card border-l-4" style={{ borderLeftColor: 'var(--app-accent)' }}>
-          <div className="font-semibold mb-1" style={{ color: 'var(--app-text)' }}>
+        <div className="mx-6 mt-4 p-3 rounded-lg border-l-4" style={{ 
+          background: 'var(--app-surface)',
+          borderLeftColor: 'var(--app-accent)',
+          borderTop: '1px solid var(--app-border)',
+          borderRight: '1px solid var(--app-border)',
+          borderBottom: '1px solid var(--app-border)'
+        }}>
+          <div className="font-semibold text-sm mb-0.5" style={{ color: 'var(--app-text)' }}>
             📅 Local Calendar
           </div>
-          <div className="text-sm" style={{ color: 'var(--app-text-muted)' }}>
+          <div className="text-xs" style={{ color: 'var(--app-text-muted)' }}>
             You're using the local calendar. Events are saved to your browser session. Sign in with Google to sync with Google Calendar and access your events across devices.
           </div>
         </div>
@@ -212,86 +251,112 @@ export default function CalendarWeekView({ onEventCreate, readOnly = false }: Ca
 
       {/* ERROR MESSAGE */}
       {error && isAuthenticated && (
-        <div className="mx-8 mt-6 p-4 premium-card border-l-4" style={{ borderLeftColor: 'var(--app-error)' }}>
-          <div className="font-semibold mb-1" style={{ color: 'var(--app-error)' }}>
+        <div className="mx-6 mt-4 p-3 rounded-lg border-l-4" style={{ 
+          background: 'var(--app-surface)',
+          borderLeftColor: 'var(--app-error)',
+          borderTop: '1px solid var(--app-border)',
+          borderRight: '1px solid var(--app-border)',
+          borderBottom: '1px solid var(--app-border)'
+        }}>
+          <div className="font-semibold text-sm mb-0.5" style={{ color: 'var(--app-error)' }}>
             Calendar Error
           </div>
-          <div className="text-sm" style={{ color: 'var(--app-text-muted)' }}>
+          <div className="text-xs" style={{ color: 'var(--app-text-muted)' }}>
             {error}
-          </div>
-          <div className="text-xs mt-2" style={{ color: 'var(--app-text-dim)' }}>
-            Try signing out and back in to refresh your Google Calendar connection.
           </div>
         </div>
       )}
 
       {/* CALENDAR GRID */}
-      <div className="flex-1 p-8">
-        {/* Days header */}
-        <div className="grid grid-cols-[90px_repeat(5,1fr)] text-sm mb-4" style={{ color: 'var(--app-text-dim)' }}>
-          <div></div>
-          <div className="text-left font-semibold pl-4" style={{ color: 'var(--app-text)' }}>Monday</div>
-          <div className="text-left font-semibold pl-4" style={{ color: 'var(--app-text)' }}>Tuesday</div>
-          <div className="text-left font-semibold pl-4" style={{ color: 'var(--app-text)' }}>Wednesday</div>
-          <div className="text-left font-semibold pl-4" style={{ color: 'var(--app-text)' }}>Thursday</div>
-          <div className="text-left font-semibold pl-4" style={{ color: 'var(--app-text)' }}>Friday</div>
-        </div>
+      <div className="flex-1 overflow-auto">
+        <div className="p-6">
+          {/* Days header */}
+          <div className="grid grid-cols-[60px_repeat(7,1fr)] gap-0 mb-2">
+            <div className="text-xs" style={{ color: 'var(--app-text-muted)' }}>GMT</div>
+            {weekDays.map((date, i) => {
+              const isToday = date.getTime() === today.getTime();
+              return (
+                <div key={i} className="text-center">
+                  <div className="text-xs font-medium mb-1" style={{ color: 'var(--app-text-muted)' }}>
+                    {date.toLocaleDateString('en-GB', { weekday: 'short' })} {date.getDate()}
+                  </div>
+                  {isToday && (
+                    <div className="w-6 h-6 mx-auto rounded-full flex items-center justify-center text-white text-xs font-semibold" 
+                      style={{ background: 'var(--app-accent)' }}>
+                      {date.getDate()}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
 
-        {/* Time rows - Using CSS Grid for proper alignment */}
-        <div 
-          className="premium-card overflow-hidden grid"
-          style={{
-            gridTemplateColumns: '90px repeat(5, 1fr)',
-            gridTemplateRows: `repeat(${hours.length}, 5rem)`
-          }}
-        >
-          {/* Hour labels and day cells */}
-          {hours.map((h, rowIdx) => (
-            <React.Fragment key={h}>
-              {/* Time label */}
-              <div 
-                className="p-3 text-right pr-4 text-xs font-medium"
-                style={{ 
-                  color: 'var(--app-text-muted)',
-                  borderBottom: '1px solid var(--app-border)',
-                  gridColumn: 1,
-                  gridRow: rowIdx + 1
+          {/* Time grid */}
+          <div 
+            className="relative grid"
+            style={{
+              gridTemplateColumns: '60px repeat(7, 1fr)',
+              gridTemplateRows: `repeat(24, 3.5rem)`,
+              borderTop: '1px solid var(--app-border)',
+              borderLeft: '1px solid var(--app-border)'
+            }}
+          >
+            {/* Hour labels and cells */}
+            {hours.map((h, rowIdx) => (
+              <React.Fragment key={h}>
+                {/* Time label */}
+                <div 
+                  className="pr-2 text-right text-[11px]"
+                  style={{ 
+                    color: 'var(--app-text-muted)',
+                    borderBottom: '1px solid var(--app-border)',
+                    gridColumn: 1,
+                    gridRow: rowIdx + 1,
+                    paddingTop: '2px'
+                  }}
+                >
+                  {h}
+                </div>
+                {/* Day cells */}
+                {[0, 1, 2, 3, 4, 5, 6].map((col) => {
+                  const cellDate = weekDays[col];
+                  const isToday = cellDate && cellDate.getTime() === today.getTime();
+                  
+                  return (
+                    <div
+                      key={col}
+                      className="transition-colors hover:bg-white/5"
+                      style={{ 
+                        borderRight: '1px solid var(--app-border)',
+                        borderBottom: '1px solid var(--app-border)',
+                        gridColumn: col + 2,
+                        gridRow: rowIdx + 1,
+                        background: isToday ? 'rgba(99, 102, 241, 0.05)' : 'transparent'
+                      }}
+                    />
+                  );
+                })}
+              </React.Fragment>
+            ))}
+
+            {/* Events */}
+            {timedEvents.map((block, i) => (
+              <div
+                key={i}
+                className={`${block.color} border border-white/20 text-[11px] font-medium rounded-md px-2 py-1 leading-tight cursor-pointer transition-all hover:scale-105 m-0.5 overflow-hidden`}
+                style={{
+                  gridColumn: `${block.dayCol + 2} / ${block.dayCol + 3}`,
+                  gridRow: `${block.startRow + 1} / span ${block.span}`,
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                  minHeight: '20px'
                 }}
               >
-                {h}
+                <div className="text-white truncate">{block.title}</div>
               </div>
-              {/* Day cells */}
-              {[0, 1, 2, 3, 4].map((col) => (
-                <div
-                  key={col}
-                  className="transition-colors hover:bg-white/5"
-                  style={{ 
-                    borderLeft: '1px solid var(--app-border)',
-                    borderBottom: '1px solid var(--app-border)',
-                    gridColumn: col + 2,
-                    gridRow: rowIdx + 1
-                  }}
-                />
-              ))}
-            </React.Fragment>
-          ))}
-
-          {/* Events - positioned using grid-column and grid-row */}
-          {timedEvents.map((block, i) => (
-            <div
-              key={i}
-              className={`${block.color} border text-xs font-semibold rounded-xl p-3 leading-snug cursor-pointer transition-all hover:scale-105 m-1`}
-              style={{
-                gridColumn: `${block.dayCol + 2} / ${block.dayCol + 3}`,
-                gridRow: `${block.startRow + 1} / span ${block.span}`,
-                boxShadow: 'var(--app-shadow-lg)'
-              }}
-            >
-              {block.title}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

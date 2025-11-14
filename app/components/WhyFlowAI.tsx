@@ -55,7 +55,7 @@ export default function WhyFlowAISection() {
                   Does the admin work
                 </div>
                 <div className="text-slate-600 text-[13px] leading-relaxed">
-                  Drafts emails, summarizes calls, and reminds you of follow-ups
+                  Drafts emails, summarises calls, and reminds you of follow-ups
                   so nothing slips.
                 </div>
               </div>

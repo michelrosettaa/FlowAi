@@ -21,7 +21,7 @@ const features = [
   {
     icon: "✉️",
     title: "Email Automation",
-    desc: "Drafts, summarizes, and schedules your emails for you — so your focus never breaks.",
+    desc: "Drafts, summarises, and schedules your emails for you — so your focus never breaks.",
     preview: "/dashboard/email-ai.svg",
     gradient: "from-pink-400 to-red-500",
   },
@@ -35,7 +35,7 @@ const features = [
   {
     icon: "📞",
     title: "AI Call Summariser",
-    desc: "Instantly summarizes meetings into action plans and next steps — powered by AI.",
+    desc: "Instantly summarises meetings into action plans and next steps — powered by AI.",
     preview: "/dashboard/call-summary.svg",
     gradient: "from-yellow-400 to-orange-500",
   },
@@ -61,7 +61,7 @@ export default function FeatureShowcase() {
         Built for focus, powered by AI.
       </h2>
       <p className="text-gray-600 max-w-2xl mb-14">
-        Every feature in FlowAI works together to plan, protect, and optimize your time —
+        Every feature in FlowAI works together to plan, protect, and optimise your time —
         automatically.
       </p>
 
