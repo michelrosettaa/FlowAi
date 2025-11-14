@@ -6,6 +6,7 @@ import {
   subscriptionPlans,
   userSubscriptions,
   usageRecords,
+  emailAccounts,
   type User,
   type UpsertUser,
   type Task,
@@ -19,6 +20,8 @@ import {
   type InsertUserSubscription,
   type UsageRecord,
   type InsertUsageRecord,
+  type EmailAccount,
+  type InsertEmailAccount,
 } from "../lib/db/schema";
 import { db } from "./db";
 import { eq, or, and, gte, lte, desc, sql } from "drizzle-orm";
@@ -39,6 +42,11 @@ export interface IStorage {
   getCalendarEvents(userIdOrSessionId: string, startDate?: Date, endDate?: Date): Promise<CalendarEvent[]>;
   createCalendarEvent(event: InsertCalendarEvent): Promise<CalendarEvent>;
   deleteCalendarEvent(id: string, userIdOrSessionId: string): Promise<boolean>;
+  
+  getEmailAccounts(userId: string): Promise<EmailAccount[]>;
+  getPrimaryEmailAccount(userId: string): Promise<EmailAccount | undefined>;
+  createEmailAccount(account: InsertEmailAccount): Promise<EmailAccount>;
+  deleteEmailAccount(id: string, userId: string): Promise<boolean>;
   
   getAllPlans(): Promise<SubscriptionPlan[]>;
   getPlanBySlug(slug: string): Promise<SubscriptionPlan | undefined>;
@@ -193,6 +201,35 @@ export class DatabaseStorage implements IStorage {
     }
 
     await db.delete(calendarEvents).where(eq(calendarEvents.id, id));
+    return true;
+  }
+
+  async getEmailAccounts(userId: string): Promise<EmailAccount[]> {
+    return await db.select().from(emailAccounts).where(eq(emailAccounts.userId, userId));
+  }
+
+  async getPrimaryEmailAccount(userId: string): Promise<EmailAccount | undefined> {
+    const [account] = await db
+      .select()
+      .from(emailAccounts)
+      .where(and(eq(emailAccounts.userId, userId), eq(emailAccounts.isPrimary, true)))
+      .limit(1);
+    return account;
+  }
+
+  async createEmailAccount(accountData: InsertEmailAccount): Promise<EmailAccount> {
+    const [account] = await db.insert(emailAccounts).values(accountData).returning();
+    return account;
+  }
+
+  async deleteEmailAccount(id: string, userId: string): Promise<boolean> {
+    const account = await db.select().from(emailAccounts).where(eq(emailAccounts.id, id)).limit(1);
+    
+    if (!account[0] || account[0].userId !== userId) {
+      return false;
+    }
+    
+    await db.delete(emailAccounts).where(eq(emailAccounts.id, id));
     return true;
   }
 

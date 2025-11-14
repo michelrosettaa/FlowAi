@@ -7,6 +7,10 @@ import { getGmailClient } from "../lib/integrations/gmail";
 import { getCalendarClient } from "../lib/integrations/calendar";
 import { sendNotificationEmail, emailTemplates } from "./notifications";
 import { fromZonedTime, toZonedTime, format } from "date-fns-tz";
+import { createImapService } from "./imap-service";
+import { createSmtpService } from "./smtp-service";
+import { EMAIL_PROVIDERS, detectProvider } from "./email-providers";
+import { encryptPassword } from "./crypto-utils";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -133,34 +137,24 @@ Be concise, helpful, and actionable. Provide specific suggestions when possible.
         return res.status(400).json({ error: "Recipient, subject, and email body are required" });
       }
 
-      const gmail = await getGmailClient(userId);
+      const emailAccount = await storage.getPrimaryEmailAccount(userId);
+      if (!emailAccount) {
+        return res.status(400).json({ error: "No email account configured. Please add an email account in settings." });
+      }
 
-      const email = [
-        `To: ${recipient}`,
-        `Subject: ${subject}`,
-        "Content-Type: text/html; charset=utf-8",
-        "",
-        emailBody,
-      ].join("\n");
-
-      const encodedEmail = Buffer.from(email)
-        .toString("base64")
-        .replace(/\+/g, "-")
-        .replace(/\//g, "_")
-        .replace(/=+$/, "");
-
-      await gmail.users.messages.send({
-        userId: "me",
-        requestBody: {
-          raw: encodedEmail,
-        },
+      const smtpService = createSmtpService(emailAccount);
+      await smtpService.sendEmail({
+        to: recipient,
+        subject,
+        text: emailBody,
+        html: emailBody.replace(/\n/g, "<br>"),
       });
 
-      console.log("✅ Email sent successfully via Gmail");
+      console.log("✅ Email sent successfully via SMTP");
       res.json({ ok: true, message: "Email sent successfully" });
     } catch (err: any) {
       console.error("Email send error:", err);
-      res.status(500).json({ error: err.message || "Failed to send email" });
+      res.status(500).json({ error: err.message || "Failed to send email. Please check your email settings." });
     }
   });
 
@@ -199,76 +193,19 @@ Keep it warm, professional, and include clear next steps.`;
   app.get("/api/email/inbox", requireNextAuth, async (req: any, res) => {
     try {
       const userId = req.auth!.userId;
-      const gmail = await getGmailClient(userId);
+      const emailAccount = await storage.getPrimaryEmailAccount(userId);
+      
+      if (!emailAccount) {
+        return res.status(400).json({ error: "No email account configured. Please add an email account in settings." });
+      }
 
-      const response = await gmail.users.messages.list({
-        userId: "me",
-        maxResults: 20,
-        q: "in:inbox",
-      });
+      const imapService = createImapService(emailAccount);
+      const emails = await imapService.fetchInbox(20);
 
-      const messages = response.data.messages || [];
-      const emailDetails = await Promise.all(
-        messages.map(async (msg: any) => {
-          const detail = await gmail.users.messages.get({
-            userId: "me",
-            id: msg.id,
-            format: "full",
-          });
-
-          const headers = detail.data.payload?.headers || [];
-          const subject = headers.find((h: any) => h.name === "Subject")?.value || "(No Subject)";
-          const from = headers.find((h: any) => h.name === "From")?.value || "Unknown";
-          const date = headers.find((h: any) => h.name === "Date")?.value || "";
-          
-          let body = "";
-          
-          const extractBody = (parts: any[]): string => {
-            for (const part of parts) {
-              if (part.mimeType === "text/plain" && part.body?.data) {
-                return Buffer.from(part.body.data, "base64").toString("utf-8");
-              }
-              if (part.mimeType === "text/html" && part.body?.data && !body) {
-                const htmlBody = Buffer.from(part.body.data, "base64").toString("utf-8");
-                body = htmlBody.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
-              }
-              if (part.parts) {
-                const nestedBody = extractBody(part.parts);
-                if (nestedBody) return nestedBody;
-              }
-            }
-            return body;
-          };
-          
-          if (detail.data.payload?.parts) {
-            body = extractBody(detail.data.payload.parts);
-          } else if (detail.data.payload?.body?.data) {
-            const rawBody = Buffer.from(detail.data.payload.body.data, "base64").toString("utf-8");
-            if (detail.data.payload.mimeType === "text/html") {
-              body = rawBody.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
-            } else {
-              body = rawBody;
-            }
-          }
-
-          const snippet = detail.data.snippet || "";
-          
-          return {
-            id: msg.id,
-            threadId: detail.data.threadId,
-            subject,
-            from,
-            date,
-            snippet,
-            body: body.substring(0, 2000) || snippet,
-          };
-        })
-      );
-
-      res.json({ emails: emailDetails });
+      res.json({ emails });
     } catch (err: any) {
       console.error("Inbox fetch error:", err);
-      res.status(500).json({ error: err.message || "Failed to fetch inbox" });
+      res.status(500).json({ error: err.message || "Failed to fetch inbox. Please check your email settings." });
     }
   });
 
@@ -308,6 +245,81 @@ Write a helpful, warm reply that addresses their message. Keep it brief and prof
     } catch (err: any) {
       console.error("Reply generation error:", err);
       res.status(500).json({ error: err.message || "Failed to generate reply" });
+    }
+  });
+
+  app.get("/api/email/providers", (req, res) => {
+    res.json({ providers: EMAIL_PROVIDERS });
+  });
+
+  app.get("/api/email/accounts", requireNextAuth, async (req: any, res) => {
+    try {
+      const userId = req.auth!.userId;
+      const accounts = await storage.getEmailAccounts(userId);
+      res.json({ accounts });
+    } catch (err: any) {
+      console.error("Get email accounts error:", err);
+      res.status(500).json({ error: err.message || "Failed to fetch email accounts" });
+    }
+  });
+
+  app.post("/api/email/accounts", requireNextAuth, async (req: any, res) => {
+    try {
+      const userId = req.auth!.userId;
+      const { emailAddress, password, provider: providerKey } = req.body;
+
+      if (!emailAddress || !password) {
+        return res.status(400).json({ error: "Email address and password are required" });
+      }
+
+      const detectedProvider = detectProvider(emailAddress);
+      const providerConfig = providerKey ? EMAIL_PROVIDERS[providerKey] : detectedProvider;
+
+      if (!providerConfig) {
+        return res.status(400).json({ error: "Could not detect email provider. Please select manually." });
+      }
+
+      const encryptedPassword = encryptPassword(password);
+
+      const existingAccounts = await storage.getEmailAccounts(userId);
+      const isPrimary = existingAccounts.length === 0;
+
+      const account = await storage.createEmailAccount({
+        userId,
+        emailAddress,
+        password: encryptedPassword,
+        provider: providerConfig.provider,
+        imapHost: providerConfig.imap.host,
+        imapPort: providerConfig.imap.port,
+        imapSecure: providerConfig.imap.secure,
+        smtpHost: providerConfig.smtp.host,
+        smtpPort: providerConfig.smtp.port,
+        smtpSecure: providerConfig.smtp.secure,
+        isPrimary,
+        isVerified: false,
+      });
+
+      res.json({ ok: true, account });
+    } catch (err: any) {
+      console.error("Create email account error:", err);
+      res.status(500).json({ error: err.message || "Failed to create email account" });
+    }
+  });
+
+  app.delete("/api/email/accounts/:id", requireNextAuth, async (req: any, res) => {
+    try {
+      const userId = req.auth!.userId;
+      const { id } = req.params;
+
+      const deleted = await storage.deleteEmailAccount(id, userId);
+      if (!deleted) {
+        return res.status(404).json({ error: "Email account not found" });
+      }
+
+      res.json({ ok: true, message: "Email account deleted successfully" });
+    } catch (err: any) {
+      console.error("Delete email account error:", err);
+      res.status(500).json({ error: err.message || "Failed to delete email account" });
     }
   });
 

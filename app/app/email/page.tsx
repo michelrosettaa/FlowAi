@@ -36,11 +36,32 @@ export default function EmailAssistantPage() {
   const [sending, setSending] = useState(false);
   const [sendStatus, setSendStatus] = useState("");
 
+  const [hasEmailAccount, setHasEmailAccount] = useState<boolean | null>(null);
+
   useEffect(() => {
-    if (isAuthenticated && activeTab === "inbox") {
+    if (isAuthenticated) {
+      checkEmailAccount();
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (isAuthenticated && activeTab === "inbox" && hasEmailAccount) {
       fetchInbox();
     }
-  }, [isAuthenticated, activeTab]);
+  }, [isAuthenticated, activeTab, hasEmailAccount]);
+
+  const checkEmailAccount = async () => {
+    try {
+      const response = await fetch("/api/email/accounts");
+      if (response.ok) {
+        const data = await response.json();
+        setHasEmailAccount(data.accounts && data.accounts.length > 0);
+      }
+    } catch (err) {
+      console.error("Failed to check email accounts:", err);
+      setHasEmailAccount(false);
+    }
+  };
 
   const fetchInbox = async () => {
     setLoadingInbox(true);
@@ -210,9 +231,45 @@ export default function EmailAssistantPage() {
             Email Helper
           </h2>
           <p className="mb-6" style={{ color: 'var(--app-text-muted)' }}>
-            Sign in with Google to access your inbox and get AI-powered email assistance
+            Sign in to access your inbox and get AI-powered email assistance
           </p>
         </div>
+      </div>
+    );
+  }
+
+  if (hasEmailAccount === false) {
+    return (
+      <div className="flex-1 flex items-center justify-center px-6">
+        <div className="text-center max-w-md">
+          <div 
+            className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center"
+            style={{ background: 'var(--app-accent)' }}
+          >
+            <Mail className="w-10 h-10 text-white" />
+          </div>
+          <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--app-text)' }}>
+            Connect Your Email
+          </h2>
+          <p className="mb-6" style={{ color: 'var(--app-text-muted)' }}>
+            Add your email account to start using AI-powered email features with any provider (Gmail, Outlook, Yahoo, iCloud, etc.)
+          </p>
+          <a
+            href="/app/settings/email"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-semibold text-white transition-all hover:scale-105"
+            style={{ background: 'var(--app-accent)' }}
+          >
+            Add Email Account
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  if (hasEmailAccount === null) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'var(--app-accent)' }} />
       </div>
     );
   }
