@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
+import { useAuth } from "@/hooks/useAuth";
 import {
   LayoutDashboard,
   Mail,
@@ -44,9 +45,31 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
-
-  // pulled from ThemeContext
+  const { user, isLoading, isAuthenticated } = useAuth();
   const { toggleTheme } = useTheme();
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      window.location.href = "/api/login";
+    }
+  }, [isLoading, isAuthenticated]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--app-bg)' }}>
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 text-white text-2xl font-bold flex items-center justify-center shadow-lg animate-pulse">
+            F
+          </div>
+          <p style={{ color: 'var(--app-text-muted)' }}>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const navSections = [
     {
@@ -267,9 +290,40 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
             {!collapsed && <span>Help</span>}
           </button>
 
-          {/* SIGN OUT → /login */}
+          {/* USER INFO */}
+          {!collapsed && user && (
+            <div className="px-2 py-3 mt-2 rounded-lg" style={{ 
+              background: 'var(--app-surface)',
+              border: '1px solid var(--app-border)'
+            }}>
+              <div className="flex items-center gap-2">
+                {user.profileImageUrl ? (
+                  <img 
+                    src={user.profileImageUrl} 
+                    alt={user.email || 'User'}
+                    className="w-8 h-8 rounded-full object-cover"
+                    style={{ border: '2px solid var(--app-accent)' }}
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xs font-bold flex items-center justify-center">
+                    {user.email?.[0]?.toUpperCase() || 'U'}
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-semibold truncate" style={{ color: 'var(--app-text)' }}>
+                    {user.firstName || user.email?.split('@')[0] || 'User'}
+                  </div>
+                  <div className="text-[10px] truncate" style={{ color: 'var(--app-text-muted)' }}>
+                    {user.email}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* SIGN OUT */}
           <button
-            onClick={() => router.push("/login")}
+            onClick={() => window.location.href = "/api/logout"}
             className={`flex items-center ${
               collapsed ? "justify-center" : "gap-2"
             } text-left text-sm rounded-xl px-3 py-2 transition-all mt-2`}
