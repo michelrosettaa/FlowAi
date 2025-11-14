@@ -6,35 +6,35 @@ import { useRouter } from "next/navigation";
 const steps = [
   {
     title: "What brings you to FlowAI?",
-    subtitle: "We'll customise your planning experience.",
+    subtitle: "I'll personalize your experience to help you stay productive.",
     options: [
-      "I'm overwhelmed / need structure",
-      "I want to protect deep work time",
-      "I need help with follow-ups & emails",
+      "I need help staying organized",
+      "I want to protect my focus time",
+      "I need assistance with emails and follow-ups",
+      "All of the above!",
     ],
-    key: "reason",
+    key: "goal",
   },
   {
-    title: "What best describes your role?",
-    subtitle: "This helps us shape scheduling + communication tone.",
+    title: "How do you prefer to work?",
+    subtitle: "This helps me understand your workflow style.",
     options: [
-      "Founder / Exec",
-      "Operator / PM / Marketing / Biz",
-      "Freelancer / Solo Builder",
-      "Student / Personal Use",
+      "I thrive with structure and schedules",
+      "I prefer flexibility and spontaneity",
+      "A mix of both - it depends on the day",
     ],
-    key: "role",
+    key: "workStyle",
   },
   {
-    title: "How do you mostly work?",
-    subtitle:
-      "We'll nudge you in a way that matches your flow.",
+    title: "What's your biggest time challenge?",
+    subtitle: "I'll focus on helping you overcome this first.",
     options: [
-      "Lots of meetings",
-      "Mostly deep work",
-      "Chaos / reactive / always context switching",
+      "Too many meetings interrupt my day",
+      "Email and messages are overwhelming",
+      "I struggle to prioritize what matters most",
+      "I lose track of tasks and follow-ups",
     ],
-    key: "style",
+    key: "challenge",
   },
 ];
 
@@ -45,107 +45,155 @@ export default function OnboardingPage() {
 
   const step = steps[stepIndex];
 
-  const selectOption = (opt: string) => {
-    // store answer
-    setAnswers((prev) => ({ ...prev, [step.key]: opt }));
+  const selectOption = async (opt: string) => {
+    const newAnswers = { ...answers, [step.key]: opt };
+    setAnswers(newAnswers);
 
-    // if last step -> /loading
+    // if last step -> save to database and go to loading
     if (stepIndex === steps.length - 1) {
-      // save mock prefs
-      localStorage.setItem("flowai_onboarding", JSON.stringify({ ...answers, [step.key]: opt }));
-      router.push("/loading");
+      try {
+        // Save preferences to database
+        await fetch('/api/preferences', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            onboardingComplete: true,
+            ...newAnswers 
+          }),
+        });
+        router.push("/loading");
+      } catch (error) {
+        console.error("Error saving preferences:", error);
+        // Continue to loading even if save fails
+        router.push("/loading");
+      }
     } else {
       setStepIndex(stepIndex + 1);
     }
   };
 
   return (
-    <main className="min-h-screen flex flex-col md:flex-row bg-[#EEF0FF]">
+    <main className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* LEFT PANE (question) */}
-      <section className="w-full md:w-1/2 bg-white flex flex-col justify-center px-8 py-12 md:px-16">
-        <div className="max-w-md">
-          <h2 className="text-2xl font-semibold text-slate-900">
+      <section className="w-full md:w-1/2 bg-white flex flex-col justify-center px-8 py-12 md:px-20 shadow-2xl">
+        <div className="max-w-lg">
+          {/* Logo & Welcome */}
+          <div className="mb-12">
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 text-white text-xl font-bold flex items-center justify-center shadow-lg mb-4">
+              F
+            </div>
+            <p className="text-sm text-slate-500">Let's personalize your experience</p>
+          </div>
+
+          <h2 className="text-3xl font-bold text-slate-900 leading-tight mb-3">
             {step.title}
           </h2>
-          <p className="text-slate-600 text-sm mt-2 leading-relaxed">
+          <p className="text-slate-600 text-base leading-relaxed mb-8">
             {step.subtitle}
           </p>
 
-          <div className="mt-8 flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
             {step.options.map((opt) => (
               <button
                 key={opt}
                 onClick={() => selectOption(opt)}
-                className="text-left w-full border border-slate-300 bg-white rounded-xl px-4 py-4 text-sm text-slate-800 hover:border-indigo-500 hover:shadow-md hover:bg-indigo-50 transition flex items-start gap-3"
+                className="group text-left w-full border-2 border-slate-200 bg-white rounded-xl px-5 py-4 text-base text-slate-800 hover:border-indigo-500 hover:shadow-xl hover:scale-[1.02] transition-all duration-200 flex items-start gap-4"
               >
-                <div className="w-4 h-4 rounded-full border border-slate-400 mt-[2px]"></div>
-                <div className="flex-1 leading-relaxed">{opt}</div>
+                <div className="w-5 h-5 rounded-full border-2 border-slate-300 mt-[2px] group-hover:border-indigo-500 group-hover:bg-indigo-50 transition-all flex items-center justify-center">
+                  <div className="w-2 h-2 rounded-full bg-transparent group-hover:bg-indigo-500 transition-all"></div>
+                </div>
+                <div className="flex-1 leading-relaxed font-medium">{opt}</div>
               </button>
             ))}
           </div>
 
           {/* progress bar */}
-          <div className="mt-10">
-            <div className="w-full h-[3px] bg-slate-200 rounded">
+          <div className="mt-12">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-xs font-medium text-slate-600">
+                Step {stepIndex + 1} of {steps.length}
+              </div>
+              <div className="text-xs text-slate-500">
+                {Math.round(((stepIndex + 1) / steps.length) * 100)}% complete
+              </div>
+            </div>
+            <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
               <div
-                className="h-[3px] bg-indigo-500 rounded transition-all"
+                className="h-2 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 rounded-full transition-all duration-500 ease-out"
                 style={{
                   width: `${((stepIndex + 1) / steps.length) * 100}%`,
                 }}
               />
             </div>
-            <div className="text-[11px] text-slate-500 mt-2">
-              Step {stepIndex + 1} of {steps.length}
-            </div>
           </div>
         </div>
       </section>
 
-      {/* RIGHT PANE (preview calendar mock) */}
-      <section className="w-full md:w-1/2 flex items-center justify-center px-8 py-12">
-        <div className="bg-white rounded-xl shadow-xl border border-slate-200 w-full max-w-md p-6 text-slate-800 text-sm">
-          <div className="font-semibold text-slate-900 mb-4">
-            Your Focus Week
-          </div>
-          <div className="grid grid-cols-3 gap-4 text-[11px] text-slate-600">
-            <div className="rounded-md bg-slate-100 h-20 border border-slate-200 p-2 flex flex-col justify-between">
-              <div className="text-[10px] uppercase tracking-wide text-slate-400">
-                MON
+      {/* RIGHT PANE (preview) */}
+      <section className="w-full md:w-1/2 flex items-center justify-center px-8 py-16 md:py-12">
+        <div className="w-full max-w-lg space-y-6">
+          {/* Preview Card */}
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
               </div>
-              <div className="text-[11px] text-indigo-600 font-medium">
-                Deep Work
+              <div>
+                <h3 className="font-bold text-slate-900">Your Optimized Week</h3>
+                <p className="text-xs text-slate-500">AI-planned for maximum productivity</p>
               </div>
-              <div className="text-[10px] text-slate-500">10-12</div>
             </div>
-            <div className="rounded-md bg-[#C7F0D2] h-20 border border-emerald-300 p-2 flex flex-col justify-between">
-              <div className="text-[10px] uppercase tracking-wide text-slate-500">
-                TUE
+            
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              <div className="rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 p-3 flex flex-col justify-between h-24">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-blue-600">MON</div>
+                <div className="text-xs text-blue-900 font-semibold">Deep Work</div>
+                <div className="text-[10px] text-blue-600">10am - 12pm</div>
               </div>
-              <div className="text-[11px] text-emerald-700 font-medium">
-                Focus Time 💡
+              <div className="rounded-lg bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-300 p-3 flex flex-col justify-between h-24">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">TUE</div>
+                <div className="text-xs text-emerald-900 font-semibold">Focus Time 💡</div>
+                <div className="text-[10px] text-emerald-600">2pm - 4pm</div>
               </div>
-              <div className="text-[10px] text-emerald-600">2-4</div>
+              <div className="rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 p-3 flex flex-col justify-between h-24">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-purple-600">WED</div>
+                <div className="text-xs text-purple-900 font-semibold">Email Draft</div>
+                <div className="text-[10px] text-purple-600">Follow-ups</div>
+              </div>
             </div>
-            <div className="rounded-md bg-slate-100 h-20 border border-slate-200 p-2 flex flex-col justify-between">
-              <div className="text-[10px] uppercase tracking-wide text-slate-400">
-                WED
-              </div>
-              <div className="text-[11px] text-indigo-600 font-medium">
-                Pitch follow-up
-              </div>
-              <div className="text-[10px] text-slate-500">send email</div>
+
+            <div className="rounded-xl bg-gradient-to-br from-slate-50 to-blue-50 border border-slate-200 p-5">
+              <h4 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
+                <span className="text-lg">✨</span>
+                FlowAI helps you:
+              </h4>
+              <ul className="text-sm text-slate-700 space-y-2">
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-500 font-bold">•</span>
+                  <span>Automatically block focus time on your calendar</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-indigo-500 font-bold">•</span>
+                  <span>Draft professional follow-up emails instantly</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-purple-500 font-bold">•</span>
+                  <span>Get personalized mentoring to stay on track</span>
+                </li>
+              </ul>
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white mt-6 p-4 text-[11px] leading-relaxed">
-            <div className="text-slate-900 font-semibold mb-1">
-              FlowAI will:
-            </div>
-            <ul className="text-slate-600 list-disc pl-4 space-y-1">
-              <li>Block deep work on your calendar</li>
-              <li>Draft follow-up emails for you</li>
-              <li>Send tiny mentor nudges to keep you on track</li>
-            </ul>
+          {/* Trust indicator */}
+          <div className="text-center text-sm text-slate-600">
+            <p className="flex items-center justify-center gap-2">
+              <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              Your data is private and secure
+            </p>
           </div>
         </div>
       </section>
