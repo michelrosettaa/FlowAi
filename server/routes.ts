@@ -193,6 +193,159 @@ Keep it warm, professional, and include clear next steps.`;
     }
   });
 
+  app.get("/api/calendar/events", isAuthenticated, async (req: any, res) => {
+    try {
+      const calendar = await getCalendarClient();
+      
+      const calendarInfo = await calendar.calendars.get({ calendarId: 'primary' });
+      const userTimezone = calendarInfo.data.timeZone || 'UTC';
+
+      const now = new Date();
+      const nowInUserTz = toZonedTime(now, userTimezone);
+      
+      const currentDayOfWeek = nowInUserTz.getDay();
+      const daysFromMonday = currentDayOfWeek === 0 ? 6 : currentDayOfWeek - 1;
+      
+      const mondayDate = new Date(nowInUserTz);
+      mondayDate.setDate(mondayDate.getDate() - daysFromMonday);
+      
+      const fridayDate = new Date(mondayDate);
+      fridayDate.setDate(mondayDate.getDate() + 4);
+      
+      const mondayStr = format(mondayDate, 'yyyy-MM-dd', { timeZone: userTimezone });
+      const saturdayStr = format(fridayDate, 'yyyy-MM-dd', { timeZone: userTimezone });
+      const saturdayDate = new Date(fridayDate);
+      saturdayDate.setDate(fridayDate.getDate() + 1);
+      const saturdaySt = format(saturdayDate, 'yyyy-MM-dd', { timeZone: userTimezone });
+      
+      const weekStart = fromZonedTime(`${mondayStr} 00:00:00`, userTimezone);
+      const weekEnd = fromZonedTime(`${saturdaySt} 00:00:00`, userTimezone);
+
+      const response = await calendar.events.list({
+        calendarId: 'primary',
+        timeMin: weekStart.toISOString(),
+        timeMax: weekEnd.toISOString(),
+        singleEvents: true,
+        orderBy: 'startTime',
+        timeZone: userTimezone,
+      });
+
+      const events = response.data.items || [];
+      
+      const normalizedEvents = events.map((event: any) => {
+        const isAllDay = !event.start?.dateTime;
+        
+        if (isAllDay) {
+          const startDate = new Date(event.start.date + 'T00:00:00');
+          const endDate = new Date(event.end.date + 'T00:00:00');
+          
+          const daySegments = [];
+          const currentDate = new Date(startDate);
+          
+          while (currentDate < endDate) {
+            const dayOfWeek = currentDate.getDay();
+            const dayCol = dayOfWeek === 0 ? -1 : dayOfWeek - 1;
+            
+            if (dayCol >= 0 && dayCol <= 4) {
+              daySegments.push({
+                dayCol,
+                startRow: -1,
+                span: 1,
+                allDay: true,
+                color: 'bg-purple-400/30 border-purple-400/50 text-purple-200'
+              });
+            }
+            
+            currentDate.setDate(currentDate.getDate() + 1);
+          }
+          
+          return {
+            id: event.id,
+            title: event.summary || 'Untitled',
+            start: event.start.date,
+            end: event.end.date,
+            allDay: true,
+            daySegments
+          };
+        }
+        
+        const start = new Date(event.start.dateTime);
+        const end = new Date(event.end.dateTime);
+        
+        const startInUserTz = toZonedTime(start, userTimezone);
+        const endInUserTz = toZonedTime(end, userTimezone);
+        
+        const daySegments = [];
+        let currentDayStart = new Date(startInUserTz);
+        currentDayStart.setHours(0, 0, 0, 0);
+        
+        while (currentDayStart <= endInUserTz) {
+          const dayOfWeek = currentDayStart.getDay();
+          const dayCol = dayOfWeek === 0 ? -1 : dayOfWeek - 1;
+          
+          if (dayCol >= 0 && dayCol <= 4) {
+            const dayEnd = new Date(currentDayStart);
+            dayEnd.setHours(23, 59, 59, 999);
+            
+            const isStartDay = format(currentDayStart, 'yyyy-MM-dd', { timeZone: userTimezone }) === format(startInUserTz, 'yyyy-MM-dd', { timeZone: userTimezone });
+            const isEndDay = format(currentDayStart, 'yyyy-MM-dd', { timeZone: userTimezone }) === format(endInUserTz, 'yyyy-MM-dd', { timeZone: userTimezone });
+            
+            const segmentStart = isStartDay ? startInUserTz : fromZonedTime(`${format(currentDayStart, 'yyyy-MM-dd', { timeZone: userTimezone })} 09:00:00`, userTimezone);
+            const segmentEnd = isEndDay ? endInUserTz : fromZonedTime(`${format(currentDayStart, 'yyyy-MM-dd', { timeZone: userTimezone })} 17:00:00`, userTimezone);
+            
+            const segmentStartInTz = toZonedTime(segmentStart, userTimezone);
+            const segmentEndInTz = toZonedTime(segmentEnd, userTimezone);
+            
+            const startHour = parseInt(format(segmentStartInTz, 'HH', { timeZone: userTimezone }));
+            const endHour = parseInt(format(segmentEndInTz, 'HH', { timeZone: userTimezone }));
+            const endMinutes = parseInt(format(segmentEndInTz, 'mm', { timeZone: userTimezone }));
+            
+            const clampedStartHour = Math.max(9, Math.min(17, startHour));
+            const clampedEndHour = Math.max(9, Math.min(17, endHour + (endMinutes > 0 ? 1 : 0)));
+            
+            if (clampedEndHour > clampedStartHour && clampedStartHour < 17) {
+              const startRow = clampedStartHour - 9;
+              const span = clampedEndHour - clampedStartHour;
+              
+              daySegments.push({
+                dayCol,
+                startRow,
+                span: Math.max(1, span),
+                allDay: false,
+                color: 'bg-indigo-400/30 border-indigo-400/50 text-indigo-200'
+              });
+            }
+          }
+          
+          currentDayStart.setDate(currentDayStart.getDate() + 1);
+          currentDayStart.setHours(0, 0, 0, 0);
+        }
+        
+        if (daySegments.length === 0) {
+          return null;
+        }
+        
+        return {
+          id: event.id,
+          title: event.summary || 'Untitled',
+          start: event.start.dateTime,
+          end: event.end.dateTime,
+          allDay: false,
+          daySegments
+        };
+      }).filter(e => e !== null);
+      
+      res.json({ 
+        events: normalizedEvents,
+        weekStart: mondayStr,
+        timezone: userTimezone
+      });
+    } catch (err: any) {
+      console.error("Calendar events error:", err);
+      res.status(500).json({ error: err.message || "Failed to fetch calendar events" });
+    }
+  });
+
   app.post("/api/mentor", isAuthenticated, async (req: any, res) => {
     try {
       const { text, voice } = req.body;

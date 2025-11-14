@@ -1,48 +1,65 @@
 "use client";
 
-import React from "react";
-import { Calendar as CalendarIcon } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Calendar as CalendarIcon, Loader2 } from "lucide-react";
+
+interface CalendarEvent {
+  id: string;
+  title: string;
+  start: string;
+  end: string;
+  allDay: boolean;
+  daySegments: Array<{
+    dayCol: number;
+    startRow: number;
+    span: number;
+    color: string;
+    allDay?: boolean;
+  }>;
+}
 
 export default function CalendarPage() {
   const hours = ["9am", "10am", "11am", "12pm", "1pm", "2pm", "3pm", "4pm", "5pm"];
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [weekStart, setWeekStart] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const events = [
-    {
-      title: "Deep Work — Pitch Deck",
-      dayCol: 0,
-      startRow: 0,
-      span: 2,
-      color: "bg-emerald-400/30 border-emerald-400/60 text-emerald-200",
-    },
-    {
-      title: "Investor Follow-up Email",
-      dayCol: 1,
-      startRow: 2,
-      span: 1,
-      color: "bg-indigo-400/30 border-indigo-400/50 text-indigo-200",
-    },
-    {
-      title: "Team Sync (Meet)",
-      dayCol: 2,
-      startRow: 1,
-      span: 1,
-      color: "bg-blue-400/30 border-blue-400/50 text-blue-200",
-    },
-    {
-      title: "Client Call / Next Steps",
-      dayCol: 3,
-      startRow: 3,
-      span: 1,
-      color: "bg-pink-400/30 border-pink-400/50 text-pink-200",
-    },
-    {
-      title: "Prep Outreach / Follow Ups",
-      dayCol: 4,
-      startRow: 4,
-      span: 2,
-      color: "bg-yellow-400/30 border-yellow-400/50 text-yellow-200",
-    },
-  ];
+  useEffect(() => {
+    async function fetchEvents() {
+      try {
+        setLoading(true);
+        const response = await fetch("/api/calendar/events");
+        if (!response.ok) {
+          throw new Error("Failed to fetch calendar events");
+        }
+        const data = await response.json();
+        setEvents(data.events || []);
+        setWeekStart(data.weekStart || "");
+        setError("");
+      } catch (err: any) {
+        console.error("Error fetching calendar:", err);
+        setError(err.message || "Failed to load calendar");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchEvents();
+  }, []);
+
+  const allDayEvents = events.flatMap(event => 
+    event.daySegments.filter(seg => seg.allDay).map(segment => ({
+      title: event.title,
+      ...segment
+    }))
+  );
+
+  const timedEvents = events.flatMap(event => 
+    event.daySegments.filter(seg => !seg.allDay).map(segment => ({
+      title: event.title,
+      ...segment
+    }))
+  );
 
   return (
     <>
@@ -54,23 +71,18 @@ export default function CalendarPage() {
         <div className="flex justify-between items-center">
           <div>
             <div className="text-xs font-medium mb-1" style={{ color: 'var(--app-text-muted)' }}>
-              Week of Oct 27
+              {weekStart ? `Week of ${new Date(weekStart + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : 'My Calendar'}
             </div>
             <h1 className="text-2xl font-bold" style={{ color: 'var(--app-text)' }}>
               Calendar
             </h1>
           </div>
-          <div className="flex items-center gap-3">
-            <button 
-              className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:scale-105 shadow-lg"
-              style={{
-                background: 'linear-gradient(to right, var(--app-accent), var(--app-accent-hover))',
-                color: 'white'
-              }}
-            >
-              + New Event
-            </button>
-          </div>
+          {loading && (
+            <div className="flex items-center gap-2" style={{ color: 'var(--app-text-muted)' }}>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span className="text-sm">Loading events...</span>
+            </div>
+          )}
         </div>
       </header>
 
@@ -85,6 +97,30 @@ export default function CalendarPage() {
           <div className="text-left font-semibold pl-4" style={{ color: 'var(--app-text)' }}>Thursday</div>
           <div className="text-left font-semibold pl-4" style={{ color: 'var(--app-text)' }}>Friday</div>
         </div>
+
+        {/* All-day events banner */}
+        {allDayEvents.length > 0 && (
+          <div className="grid grid-cols-[90px_repeat(5,1fr)] mb-4 premium-card" style={{ gridTemplateRows: '3rem' }}>
+            <div className="p-3 text-right pr-4 text-xs font-medium" style={{ color: 'var(--app-text-muted)' }}>
+              All day
+            </div>
+            {[0, 1, 2, 3, 4].map((col) => (
+              <div key={col} className="relative" style={{ borderLeft: '1px solid var(--app-border)' }}>
+                {allDayEvents
+                  .filter(event => event.dayCol === col)
+                  .map((event, i) => (
+                    <div
+                      key={i}
+                      className={`${event.color} border text-xs font-semibold rounded-lg p-2 m-1 leading-snug cursor-pointer transition-all hover:scale-105`}
+                      style={{ boxShadow: 'var(--app-shadow-lg)' }}
+                    >
+                      {event.title}
+                    </div>
+                  ))}
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Time rows - Using CSS Grid */}
         <div 
@@ -126,7 +162,7 @@ export default function CalendarPage() {
           ))}
 
           {/* Events - positioned using grid-column and grid-row */}
-          {events.map((event, i) => (
+          {!loading && timedEvents.map((event, i) => (
             <div
               key={i}
               className={`${event.color} border text-xs font-semibold rounded-xl p-3 leading-snug cursor-pointer transition-all hover:scale-105 m-1`}
@@ -143,9 +179,15 @@ export default function CalendarPage() {
       </div>
 
       <div className="px-8 py-4 text-center">
-        <p className="text-xs" style={{ color: 'var(--app-text-muted)' }}>
-          ✨ Google Calendar sync is live — connect your calendar for real-time updates.
-        </p>
+        {error ? (
+          <p className="text-xs" style={{ color: 'var(--app-accent)' }}>
+            ⚠️ {error} - Please try refreshing the page
+          </p>
+        ) : (
+          <p className="text-xs" style={{ color: 'var(--app-text-muted)' }}>
+            ✨ Connected to Google Calendar - Showing your real events for this week
+          </p>
+        )}
       </div>
     </>
   );
