@@ -2,7 +2,6 @@ import NextAuth, { type DefaultSession } from "next-auth";
 import Google from "next-auth/providers/google";
 import Microsoft from "next-auth/providers/microsoft-entra-id";
 import Apple from "next-auth/providers/apple";
-import Resend from "next-auth/providers/resend";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "./db/client";
 import { authAccounts, authSessions, authVerificationTokens, users } from "./db/schema";
@@ -47,10 +46,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Apple({
       clientId: process.env.AUTH_APPLE_ID!,
       clientSecret: process.env.AUTH_APPLE_SECRET!,
-    }),
-    Resend({
-      apiKey: process.env.RESEND_API_KEY,
-      from: "FlowAI <onboarding@flowai.app>",
     }),
   ],
   callbacks: {
