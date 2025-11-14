@@ -80,7 +80,7 @@ Preferred communication style: Simple, everyday language.
 - Uses Passport.js with OpenID Connect for Replit Auth
 
 **Protected API Routes** (server/routes.ts - All require authentication):
-- `/api/ask-flowai` - ✅ **PROTECTED** - Real-time AI chat assistant powered by OpenAI
+- `/api/ask-flowai` - ✅ **PROTECTED** - Real-time AI chat assistant powered by OpenAI with live Google Calendar integration
 - `/api/email/generate` - ✅ **PROTECTED** - Drafts emails using AI
 - `/api/email/send` - ✅ **PROTECTED** - Sends real emails via Gmail API
 - `/api/mentor` - ✅ **PROTECTED** - Provides motivational feedback with voice synthesis
@@ -122,7 +122,12 @@ Preferred communication style: Simple, everyday language.
 2. **Email Automation**: Summarizes threads and drafts replies in user's tone
 3. **Meeting Summarization**: Extracts action items and next steps from transcripts
 4. **AI Mentor**: Provides motivational coaching with voice output (alloy, verse, sol, echo voices)
-5. ✅ **Ask FlowAI**: Real-time conversational AI assistant for productivity questions
+5. ✅ **Ask FlowAI with Calendar Integration**: Real-time conversational AI assistant that:
+   - Fetches user's Google Calendar events for today
+   - Uses `date-fns-tz` for DST-safe timezone handling
+   - Includes calendar context in AI responses
+   - Answers schedule questions accurately ("What's on my schedule today?")
+   - Handles all-day events and formats times in user's timezone
 
 **Design Pattern**: Server-side API routes handle all OpenAI calls to protect API keys and enable server-side streaming if needed
 
@@ -142,6 +147,7 @@ Preferred communication style: Simple, everyday language.
 - **@neondatabase/serverless**: PostgreSQL connection pooling
 - **passport** + **openid-client**: OpenID Connect authentication
 - **express-session** + **connect-pg-simple**: Session management with PostgreSQL storage
+- **date-fns** + **date-fns-tz**: Timezone-aware date handling for calendar integration (DST-safe)
 
 **Icon Library**: Lucide React for consistent, modern iconography
 
