@@ -12,8 +12,20 @@ const handle = app.getRequestHandler();
 app.prepare().then(async () => {
   const server = express();
   
-  server.use(express.json());
-  server.use(express.urlencoded({ extended: true }));
+  // Don't parse body for NextAuth routes - let Next.js handle them
+  server.use((req, res, next) => {
+    if (req.url?.startsWith('/api/auth')) {
+      return next();
+    }
+    express.json()(req, res, next);
+  });
+  
+  server.use((req, res, next) => {
+    if (req.url?.startsWith('/api/auth')) {
+      return next();
+    }
+    express.urlencoded({ extended: true })(req, res, next);
+  });
 
   const httpServer = await registerRoutes(server);
 
