@@ -354,6 +354,13 @@ Keep it warm, professional, and include clear next steps.`;
         return res.status(400).json({ error: "Title, start, and end times are required" });
       }
 
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+
+      if (startDate >= endDate) {
+        return res.status(400).json({ error: "End time must be after start time" });
+      }
+
       const calendar = await getCalendarClient();
       
       const calendarInfo = await calendar.calendars.get({ calendarId: 'primary' });
@@ -363,11 +370,11 @@ Keep it warm, professional, and include clear next steps.`;
         summary: title,
         description: description || '',
         start: {
-          dateTime: start,
+          dateTime: startDate.toISOString(),
           timeZone: userTimezone,
         },
         end: {
-          dateTime: end,
+          dateTime: endDate.toISOString(),
           timeZone: userTimezone,
         },
       };
