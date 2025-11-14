@@ -10,11 +10,11 @@ FlowAI is a Next.js-based AI productivity platform that helps users manage their
 
 **Major Upgrades - All Features Now Live:**
 1. ✅ **Ask FlowAI** - Upgraded from mock responses to real OpenAI-powered intelligent chat
-2. ✅ **Gmail Integration** - Email sending now uses real Gmail API via Replit connector
-3. ✅ **Google Calendar Integration** - Calendar sync now live with read/write access via Replit connector
+2. ✅ **Gmail Integration** - Email sending now uses real Gmail API via per-user OAuth tokens
+3. ✅ **Google Calendar Integration** - Calendar sync now live with read/write access via per-user OAuth tokens
 4. ✅ **PostgreSQL Database** - Infrastructure set up with Drizzle ORM (schema ready for migration from localStorage)
 5. ✅ **Replit Migration** - Fully migrated from Vercel to Replit environment
-6. ✅ **Replit Auth System** - **NEW** Production-ready authentication with OpenID Connect, PostgreSQL session storage, and protected API routes
+6. ✅ **NextAuth Multi-Provider OAuth** - **LATEST** Production-ready authentication with Google/Microsoft/Apple login, per-user token management, JWT sessions, and Superhuman-style login page
 7. ✅ **Email Notification System** - **NEW** Three types of beautiful HTML emails (daily digest, task reminders, focus alerts)
 8. ✅ **Premium Loading Page** - **NEW** Refined loading experience with animated icons, progress tracking, and smooth transitions
 9. ✅ **Premium Design Upgrade** - Complete platform redesign with premium aesthetics:
@@ -76,8 +76,8 @@ Preferred communication style: Simple, everyday language.
 
 **Express Server** (server/index.ts):
 - Custom Express server running on port 5000 alongside Next.js
-- Handles authentication, sessions, and protected API routes
-- Uses Passport.js with OpenID Connect for Replit Auth
+- Handles protected API routes with NextAuth JWT authentication
+- Integrates with NextAuth v5 for OAuth token verification
 
 **Protected API Routes** (server/routes.ts - All require authentication):
 - `/api/ask-flowai` - ✅ **PROTECTED** - Real-time AI chat assistant powered by OpenAI with live Google Calendar integration
@@ -95,18 +95,20 @@ Preferred communication style: Simple, everyday language.
 - `/api/signup` - Handles user trial registration (to be migrated)
 - `/api/calendar/events` - Fetch and create Google Calendar events (to be migrated)
 
-**Authentication**: ✅ **PRODUCTION-READY** Replit Auth with OpenID Connect
-- **Implementation**: Passport.js + openid-client for secure OAuth flow
-- **Session Storage**: PostgreSQL-backed sessions (connect-pg-simple)
-- **Security**: HttpOnly cookies, automatic token refresh, 401 handling
-- **Client Integration**: useAuth hook provides authentication state across the app
-- **Protected Routes**: isAuthenticated middleware guards all sensitive endpoints
-- **User Experience**: Auto-redirect to login, user info display in sidebar, logout functionality
+**Authentication**: ✅ **PRODUCTION-READY** NextAuth v5 Multi-Provider OAuth
+- **Providers**: Google, Microsoft, and Apple Sign-In with beautiful Superhuman-style login page
+- **Implementation**: NextAuth.js v5 with Drizzle adapter for database integration
+- **Session Strategy**: JWT-based sessions with signed tokens (NEXTAUTH_SECRET)
+- **Token Management**: Per-user OAuth tokens stored in `auth_accounts` table with automatic refresh for Google and Microsoft
+- **Security**: HttpOnly cookies, JWT signing, provider token refresh before 60s expiry
+- **Client Integration**: SessionProvider wraps app, Next.js middleware protects /app routes
+- **Express Integration**: requireNextAuth middleware validates JWTs on all protected API routes
+- **User Experience**: One-click OAuth login, auto-redirect to dashboard, seamless logout
 
 **Data Storage**:
 - ✅ **PostgreSQL Database** (Neon-backed) - Fully operational with Drizzle ORM
-- **Schema**: Users, tasks, user preferences, and sessions tables
-- **Status**: ✅ **LIVE** - All critical features (tasks, preferences) now use database storage
+- **Schema**: Users, tasks, user preferences, and NextAuth tables (auth_accounts, auth_sessions, auth_verification_tokens)
+- **Status**: ✅ **LIVE** - All critical features (tasks, preferences, OAuth tokens) now use database storage
 - **User Isolation**: All data queries filtered by authenticated user ID for security
 - **Migration**: localStorage completely replaced with PostgreSQL for all protected features
 
@@ -135,8 +137,8 @@ Preferred communication style: Simple, everyday language.
 
 **Third-Party Services**:
 - **OpenAI API**: Core AI functionality (requires `OPENAI_API_KEY` environment variable)
-- ✅ **Gmail API**: Email sending via Replit connector (google-mail integration)
-- ✅ **Google Calendar API**: Calendar sync via Replit connector (google-calendar integration)
+- ✅ **Gmail API**: Email sending via per-user OAuth tokens (Google and Microsoft providers)
+- ✅ **Google Calendar API**: Calendar sync via per-user OAuth tokens (Google and Microsoft providers)
 - ✅ **PostgreSQL (Neon)**: Database backend via Replit
 - **Vercel Analytics**: Built-in analytics tracking (`@vercel/analytics`)
 - **Random User API**: Demo profile images for testimonials (randomuser.me)
@@ -145,8 +147,8 @@ Preferred communication style: Simple, everyday language.
 - **googleapis** (v148+): Official Google API client for Gmail and Calendar
 - **Drizzle ORM** (v0.44+): Type-safe database queries
 - **@neondatabase/serverless**: PostgreSQL connection pooling
-- **passport** + **openid-client**: OpenID Connect authentication
-- **express-session** + **connect-pg-simple**: Session management with PostgreSQL storage
+- **next-auth** (v5+): Multi-provider OAuth authentication with JWT sessions
+- **@auth/drizzle-adapter**: Database adapter for NextAuth with Drizzle ORM
 - **date-fns** + **date-fns-tz**: Timezone-aware date handling for calendar integration (DST-safe)
 
 **Icon Library**: Lucide React for consistent, modern iconography
@@ -165,17 +167,21 @@ Preferred communication style: Simple, everyday language.
 - Node.js 20+
 - `OPENAI_API_KEY` - OpenAI API access
 - `DATABASE_URL` - PostgreSQL connection string (auto-configured by Replit)
-- Replit connector tokens - Auto-managed for Gmail and Calendar access
+- `AUTH_GOOGLE_ID` + `AUTH_GOOGLE_SECRET` - Google OAuth credentials (required)
+- `AUTH_MICROSOFT_ID` + `AUTH_MICROSOFT_SECRET` - Microsoft OAuth credentials (optional)
+- `AUTH_APPLE_ID` + `AUTH_APPLE_SECRET` - Apple OAuth credentials (optional)
+- `NEXTAUTH_SECRET` - Random secret for JWT signing (required)
+- `NEXTAUTH_URL` - Replit app URL for OAuth callbacks (required)
 
 ### Key Architectural Decisions
 
 1. **Database-First Migration**: ✅ Migrated from localStorage to PostgreSQL with Drizzle ORM for production-grade persistence. Schema supports users, tasks, and preferences with proper relations and cascading deletes.
 
-2. **Replit Auth Integration**: ✅ Production-ready authentication using Replit's OpenID Connect provider. Sessions stored in PostgreSQL for scalability. All sensitive endpoints (OpenAI, Gmail, tasks) require authentication with automatic user isolation.
+2. **NextAuth Multi-Provider OAuth**: ✅ Production-ready authentication using NextAuth v5 with Google, Microsoft, and Apple providers. JWT sessions for scalability. All sensitive endpoints (OpenAI, Gmail, Calendar, tasks) require authentication with automatic user isolation. Per-user OAuth tokens stored in database with automatic refresh.
 
-3. **Hybrid Express + Next.js Architecture**: Critical API routes run through Express with authentication middleware, while public routes remain on Next.js. This allows fine-grained security control while maintaining Next.js benefits for frontend.
+3. **Hybrid Express + Next.js Architecture**: Critical API routes run through Express with NextAuth JWT middleware, while public routes remain on Next.js. This allows fine-grained security control while maintaining Next.js benefits for frontend.
 
-4. **Replit Connectors**: ✅ Using managed OAuth connectors for Gmail and Calendar eliminates manual token management and provides automatic refresh, making integrations more reliable and secure.
+4. **Per-User OAuth Tokens**: ✅ Each user's Gmail and Calendar access uses their own OAuth tokens stored in the database. Tokens automatically refresh when expiring (60s buffer). Supports both Google and Microsoft providers for email and calendar integrations.
 
 5. **Client-Heavy Routing**: Most interactivity happens client-side with "use client" directives, trading server component benefits for simpler state management during MVP phase.
 
@@ -188,10 +194,12 @@ Preferred communication style: Simple, everyday language.
 ### Database Schema
 
 **Tables**:
-- `users`: User accounts with profile information
+- `users`: User accounts with profile information (linked to NextAuth)
 - `tasks`: User tasks with completion status
 - `user_preferences`: JSON preferences per user
-- `sessions`: Session storage for authentication
+- `auth_accounts`: Per-user OAuth tokens for Google, Microsoft, Apple (access_token, refresh_token, expires_at)
+- `auth_sessions`: NextAuth session storage (unused with JWT strategy but required by adapter)
+- `auth_verification_tokens`: Email verification tokens for passwordless flows
 
 **ORM**: Drizzle with Neon PostgreSQL
 **Migrations**: `npm run db:push` for schema synchronization
