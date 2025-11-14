@@ -171,6 +171,29 @@ export const usageRecords = pgTable("usage_records", {
   uniqueIndex("usage_records_user_feature_period_unique").on(table.userId, table.feature, table.periodStart),
 ]);
 
+export const emailAccounts = pgTable("email_accounts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  emailAddress: varchar("email_address").notNull(),
+  provider: varchar("provider").$type<"gmail" | "outlook" | "yahoo" | "icloud" | "protonmail" | "custom">().notNull(),
+  password: text("password").notNull(),
+  imapHost: varchar("imap_host").notNull(),
+  imapPort: integer("imap_port").notNull(),
+  imapSecure: boolean("imap_secure").default(true).notNull(),
+  smtpHost: varchar("smtp_host").notNull(),
+  smtpPort: integer("smtp_port").notNull(),
+  smtpSecure: boolean("smtp_secure").default(true).notNull(),
+  isPrimary: boolean("is_primary").default(false).notNull(),
+  isVerified: boolean("is_verified").default(false).notNull(),
+  lastSyncedAt: timestamp("last_synced_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  uniqueIndex("email_accounts_user_email_unique").on(table.userId, table.emailAddress),
+]);
+
 export const usersRelations = relations(users, ({ many, one }) => ({
   tasks: many(tasks),
   calendarEvents: many(calendarEvents),
@@ -183,6 +206,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
     references: [userSubscriptions.userId],
   }),
   usageRecords: many(usageRecords),
+  emailAccounts: many(emailAccounts),
 }));
 
 export const subscriptionPlansRelations = relations(subscriptionPlans, ({ many }) => ({
@@ -228,6 +252,13 @@ export const userPreferencesRelations = relations(userPreferences, ({ one }) => 
   }),
 }));
 
+export const emailAccountsRelations = relations(emailAccounts, ({ one }) => ({
+  user: one(users, {
+    fields: [emailAccounts.userId],
+    references: [users.id],
+  }),
+}));
+
 export type User = typeof users.$inferSelect;
 export type UpsertUser = typeof users.$inferInsert;
 export type Task = typeof tasks.$inferSelect;
@@ -242,3 +273,5 @@ export type UserSubscription = typeof userSubscriptions.$inferSelect;
 export type InsertUserSubscription = typeof userSubscriptions.$inferInsert;
 export type UsageRecord = typeof usageRecords.$inferSelect;
 export type InsertUsageRecord = typeof usageRecords.$inferInsert;
+export type EmailAccount = typeof emailAccounts.$inferSelect;
+export type InsertEmailAccount = typeof emailAccounts.$inferInsert;
