@@ -1,11 +1,9 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Send, Loader2, Sparkles, ArrowLeft, User, Bot } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Send, Loader2, Sparkles, User, Bot } from "lucide-react";
 
 export default function AskFlowAIPage() {
-  const router = useRouter();
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
   const [loading, setLoading] = useState(false);
@@ -60,54 +58,58 @@ export default function AskFlowAIPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#0A0F1C] via-[#101a2e] to-[#1a2b46] text-slate-100 flex flex-col relative overflow-hidden">
-      {/* Animated background orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-700" />
-      </div>
-
+    <div className="p-6 max-w-5xl mx-auto">
       {/* HEADER */}
-      <header className="relative border-b border-white/10 bg-white/5 backdrop-blur-xl">
-        <div className="max-w-4xl mx-auto flex justify-between items-center px-6 py-5">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => router.push("/app")}
-              className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors group"
-            >
-              <div className="p-2 rounded-lg bg-white/5 border border-white/10 group-hover:bg-white/10 transition-all">
-                <ArrowLeft className="w-4 h-4" />
-              </div>
-            </button>
-            <div>
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-gradient-to-br from-indigo-500 to-blue-600 shadow-lg shadow-indigo-500/30">
-                  <Sparkles className="w-4 h-4 text-white" />
-                </div>
-                <h1 className="text-xl font-bold text-white">Ask FlowAI</h1>
-              </div>
-              <p className="text-xs text-slate-400 mt-1 ml-12">Your AI productivity assistant</p>
-            </div>
+      <header className="mb-6">
+        <div className="flex items-center gap-3 mb-2">
+          <div 
+            className="p-2.5 rounded-xl shadow-lg flex items-center justify-center"
+            style={{ background: 'var(--app-accent)' }}
+          >
+            <Sparkles className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--app-text)' }}>
+              Ask FlowAI
+            </h1>
+            <p className="text-sm" style={{ color: 'var(--app-text-muted)' }}>
+              Your AI productivity assistant
+            </p>
           </div>
         </div>
       </header>
 
-      {/* CHAT INTERFACE */}
-      <section className="relative flex-1 flex flex-col max-w-4xl mx-auto w-full p-6">
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto mb-6 space-y-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+      {/* CHAT CONTAINER */}
+      <div 
+        className="rounded-2xl p-6 shadow-xl border backdrop-blur-xl"
+        style={{ 
+          background: 'var(--app-surface)',
+          borderColor: 'var(--app-border)',
+          minHeight: '600px',
+          maxHeight: '70vh',
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+      >
+        {/* Messages Area */}
+        <div className="flex-1 overflow-y-auto mb-6 space-y-4 pr-2" style={{ 
+          scrollbarWidth: 'thin',
+          scrollbarColor: 'rgba(255,255,255,0.1) transparent'
+        }}>
           {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center space-y-6 mt-20">
-              <div className="relative">
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-500 via-blue-500 to-indigo-500 blur-2xl opacity-30 animate-pulse" />
-                <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-2xl">
-                  <Sparkles className="w-10 h-10 text-white" />
-                </div>
+            <div className="flex flex-col items-center justify-center h-full text-center space-y-6 py-12">
+              <div 
+                className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg"
+                style={{ background: 'var(--app-accent)' }}
+              >
+                <Sparkles className="w-10 h-10 text-white" />
               </div>
               
               <div>
-                <h2 className="text-2xl font-bold text-white mb-2">How can I help you today?</h2>
-                <p className="text-slate-400 max-w-md">
+                <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--app-text)' }}>
+                  How can I help you today?
+                </h2>
+                <p className="max-w-md" style={{ color: 'var(--app-text-muted)' }}>
                   Ask me anything about your tasks, schedule, emails, or productivity tips.
                 </p>
               </div>
@@ -122,9 +124,22 @@ export default function AskFlowAIPage() {
                   <button
                     key={i}
                     onClick={() => setInput(suggestion)}
-                    className="p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-left text-sm text-slate-300 hover:text-white group"
+                    className="p-4 rounded-xl border transition-all text-left text-sm group hover:shadow-md"
+                    style={{ 
+                      background: 'var(--app-background)',
+                      borderColor: 'var(--app-border)',
+                      color: 'var(--app-text-muted)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--app-accent)';
+                      e.currentTarget.style.color = 'var(--app-text)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--app-border)';
+                      e.currentTarget.style.color = 'var(--app-text-muted)';
+                    }}
                   >
-                    <span className="inline-block mr-2 text-indigo-400 group-hover:scale-110 transition-transform">✨</span>
+                    <span style={{ color: 'var(--app-accent)' }} className="inline-block mr-2 group-hover:scale-110 transition-transform">✨</span>
                     {suggestion}
                   </button>
                 ))}
@@ -134,26 +149,37 @@ export default function AskFlowAIPage() {
             messages.map((msg, i) => (
               <div
                 key={i}
-                className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"} animate-fade-in`}
+                className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                style={{
+                  animation: 'fadeIn 0.3s ease-out'
+                }}
               >
                 {msg.role === "assistant" && (
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                  <div 
+                    className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center shadow-md"
+                    style={{ background: 'var(--app-accent)' }}
+                  >
                     <Bot className="w-4 h-4 text-white" />
                   </div>
                 )}
                 
                 <div
-                  className={`max-w-[70%] px-5 py-3 rounded-2xl shadow-xl ${
-                    msg.role === "user"
-                      ? "bg-gradient-to-br from-indigo-600 to-blue-600 text-white shadow-indigo-500/30"
-                      : "bg-white/10 backdrop-blur-xl border border-white/10 text-slate-100"
+                  className={`max-w-[70%] px-5 py-3 rounded-2xl shadow-md ${
+                    msg.role === "user" ? "" : "border backdrop-blur-sm"
                   }`}
+                  style={msg.role === "user" 
+                    ? { background: 'var(--app-accent)', color: 'white' }
+                    : { background: 'var(--app-background)', borderColor: 'var(--app-border)', color: 'var(--app-text)' }
+                  }
                 >
                   <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                 </div>
 
                 {msg.role === "user" && (
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center shadow-lg">
+                  <div 
+                    className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center shadow-md"
+                    style={{ background: 'linear-gradient(135deg, #64748b 0%, #475569 100%)' }}
+                  >
                     <User className="w-4 h-4 text-white" />
                   </div>
                 )}
@@ -162,12 +188,18 @@ export default function AskFlowAIPage() {
           )}
 
           {loading && (
-            <div className="flex gap-3 justify-start animate-fade-in">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+            <div className="flex gap-3 justify-start" style={{ animation: 'fadeIn 0.3s ease-out' }}>
+              <div 
+                className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center shadow-md"
+                style={{ background: 'var(--app-accent)' }}
+              >
                 <Bot className="w-4 h-4 text-white" />
               </div>
-              <div className="px-5 py-3 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/10 shadow-xl">
-                <div className="flex items-center gap-2 text-slate-300">
+              <div 
+                className="px-5 py-3 rounded-2xl backdrop-blur-sm border shadow-md"
+                style={{ background: 'var(--app-background)', borderColor: 'var(--app-border)' }}
+              >
+                <div className="flex items-center gap-2" style={{ color: 'var(--app-text-muted)' }}>
                   <Loader2 className="w-4 h-4 animate-spin" />
                   <span className="text-sm">FlowAI is thinking...</span>
                 </div>
@@ -180,7 +212,10 @@ export default function AskFlowAIPage() {
 
         {/* Input Area */}
         <div className="relative">
-          <div className="relative flex items-end gap-3 p-4 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl">
+          <div 
+            className="relative flex items-end gap-3 p-4 rounded-xl border backdrop-blur-sm shadow-md"
+            style={{ background: 'var(--app-background)', borderColor: 'var(--app-border)' }}
+          >
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -192,25 +227,30 @@ export default function AskFlowAIPage() {
               }}
               placeholder="Ask FlowAI anything..."
               rows={1}
-              className="flex-1 bg-transparent text-slate-100 placeholder:text-slate-500 focus:outline-none resize-none text-sm leading-relaxed max-h-32"
-              style={{ minHeight: "24px" }}
+              className="flex-1 bg-transparent focus:outline-none resize-none text-sm leading-relaxed max-h-32"
+              style={{ 
+                minHeight: "24px",
+                color: 'var(--app-text)',
+                caretColor: 'var(--app-accent)'
+              }}
             />
             <button
               onClick={handleAskFlowAI}
               disabled={loading || !input.trim()}
-              className="flex-shrink-0 p-3 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 text-white shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:scale-105 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="flex-shrink-0 p-3 rounded-lg text-white shadow-md hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{ background: 'var(--app-accent)' }}
             >
               <Send className="w-5 h-5" />
             </button>
           </div>
-          <p className="text-xs text-slate-500 text-center mt-3">
+          <p className="text-xs text-center mt-3" style={{ color: 'var(--app-text-muted)' }}>
             Press Enter to send • Shift + Enter for new line
           </p>
         </div>
-      </section>
+      </div>
 
       <style jsx>{`
-        @keyframes fade-in {
+        @keyframes fadeIn {
           from {
             opacity: 0;
             transform: translateY(10px);
@@ -221,31 +261,28 @@ export default function AskFlowAIPage() {
           }
         }
 
-        .animate-fade-in {
-          animation: fade-in 0.3s ease-out;
-        }
-
-        .delay-700 {
-          animation-delay: 700ms;
-        }
-
-        .scrollbar-thin::-webkit-scrollbar {
+        div::-webkit-scrollbar {
           width: 6px;
         }
 
-        .scrollbar-thin::-webkit-scrollbar-track {
+        div::-webkit-scrollbar-track {
           background: transparent;
         }
 
-        .scrollbar-thin::-webkit-scrollbar-thumb {
+        div::-webkit-scrollbar-thumb {
           background: rgba(255, 255, 255, 0.1);
           border-radius: 3px;
         }
 
-        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+        div::-webkit-scrollbar-thumb:hover {
           background: rgba(255, 255, 255, 0.2);
         }
+
+        textarea::placeholder {
+          color: var(--app-text-muted);
+          opacity: 0.6;
+        }
       `}</style>
-    </main>
+    </div>
   );
 }
