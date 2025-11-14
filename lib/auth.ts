@@ -34,19 +34,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         },
       },
     }),
-    Microsoft({
-      clientId: process.env.AUTH_MICROSOFT_ID!,
-      clientSecret: process.env.AUTH_MICROSOFT_SECRET!,
-      authorization: {
-        params: {
-          scope: "openid email profile offline_access Calendars.ReadWrite Mail.Send Mail.ReadWrite",
-        },
-      },
-    }),
-    Apple({
-      clientId: process.env.AUTH_APPLE_ID!,
-      clientSecret: process.env.AUTH_APPLE_SECRET!,
-    }),
+    // Only enable Microsoft if credentials are provided
+    ...(process.env.AUTH_MICROSOFT_ID && process.env.AUTH_MICROSOFT_SECRET
+      ? [Microsoft({
+          clientId: process.env.AUTH_MICROSOFT_ID,
+          clientSecret: process.env.AUTH_MICROSOFT_SECRET,
+          authorization: {
+            params: {
+              scope: "openid email profile offline_access Calendars.ReadWrite Mail.Send Mail.ReadWrite",
+            },
+          },
+        })]
+      : []),
+    // Only enable Apple if credentials are provided
+    ...(process.env.AUTH_APPLE_ID && process.env.AUTH_APPLE_SECRET
+      ? [Apple({
+          clientId: process.env.AUTH_APPLE_ID,
+          clientSecret: process.env.AUTH_APPLE_SECRET,
+        })]
+      : []),
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
