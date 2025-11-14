@@ -1,11 +1,60 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import { useState } from "react";
 
 export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+
   const handleOAuthSignIn = (provider: string) => {
-    signIn(provider, { callbackUrl: "/app" });
+    signIn(provider, { callbackUrl: "/onboarding" });
   };
+
+  const handleEmailSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    
+    setLoading(true);
+    try {
+      await signIn("resend", {
+        email,
+        redirect: false,
+        callbackUrl: "/onboarding",
+      });
+      setEmailSent(true);
+    } catch (error) {
+      console.error("Email sign in error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (emailSent) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-blue-50 px-6">
+        <div className="w-full max-w-md bg-white rounded-2xl p-8 shadow-xl border border-slate-200 text-center">
+          <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-3xl mx-auto mb-4">
+            ✓
+          </div>
+          <h1 className="text-2xl font-semibold text-slate-900 mb-2">Check your email</h1>
+          <p className="text-slate-600 mb-4">
+            We've sent a magic link to <strong>{email}</strong>
+          </p>
+          <p className="text-sm text-slate-500">
+            Click the link in your email to sign in. The link expires in 24 hours.
+          </p>
+          <button
+            onClick={() => setEmailSent(false)}
+            className="mt-6 text-indigo-600 hover:text-indigo-700 text-sm font-medium"
+          >
+            ← Back to sign in
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-blue-50 px-6">
@@ -17,8 +66,37 @@ export default function LoginPage() {
           </div>
           <h1 className="text-2xl font-semibold text-slate-900">Continue to FlowAI</h1>
           <p className="text-sm text-slate-600 text-center mt-2">
-            Sign in using your Google, Microsoft, or Apple account
+            Sign in with your email or provider
           </p>
+        </div>
+
+        {/* Email Form */}
+        <form onSubmit={handleEmailSignIn} className="mb-6">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
+            disabled={loading}
+            className="w-full px-4 py-3 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent mb-3"
+            required
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-3 rounded-lg transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? "Sending magic link..." : "Continue with Email"}
+          </button>
+        </form>
+
+        <div className="relative mb-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-slate-300"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-4 bg-white text-slate-500">Or continue with</span>
+          </div>
         </div>
 
         {/* OAuth Buttons */}

@@ -31,6 +31,8 @@ export const users = pgTable("users", {
   name: varchar("name"),
   emailVerified: timestamp("email_verified", { mode: "date" }),
   image: varchar("image"),
+  onboardingCompleted: boolean("onboarding_completed").default(false),
+  onboardingData: jsonb("onboarding_data"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

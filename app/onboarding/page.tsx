@@ -52,18 +52,17 @@ export default function OnboardingPage() {
     // if last step -> save to database and go to loading
     if (stepIndex === steps.length - 1) {
       try {
-        // Save preferences to database
-        await fetch('/api/preferences', {
+        // Save onboarding data to database
+        await fetch('/api/onboarding', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
-            onboardingComplete: true,
-            ...newAnswers 
+            answers: newAnswers 
           }),
         });
         router.push("/loading");
       } catch (error) {
-        console.error("Error saving preferences:", error);
+        console.error("Error saving onboarding:", error);
         // Continue to loading even if save fails
         router.push("/loading");
       }

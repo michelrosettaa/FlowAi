@@ -501,6 +501,23 @@ Keep it warm, professional, and include clear next steps.`;
     }
   });
 
+  app.post("/api/onboarding", requireNextAuth, async (req: any, res) => {
+    try {
+      const userId = req.auth!.userId;
+      const { answers } = req.body;
+
+      await storage.updateUser(userId, {
+        onboardingCompleted: true,
+        onboardingData: answers,
+      });
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error saving onboarding:", error);
+      res.status(500).json({ message: "Failed to save onboarding" });
+    }
+  });
+
   app.post("/api/preferences", requireNextAuth, async (req: any, res) => {
     try {
       const userId = req.auth!.userId;
