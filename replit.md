@@ -64,4 +64,22 @@ PostgreSQL (Neon-backed) is the primary database, managed with Drizzle ORM. The 
 
 -   **Target Platform**: Replit.
 -   **Environment Variables**: Requires `OPENAI_API_KEY`, `DATABASE_URL`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, and optionally Microsoft/Apple OAuth credentials.
+
+## Recent Changes
+
+### November 14, 2025 - Interactive Features Enhancement
+- **Toast Notification System**: Integrated Sonner library for real-time user feedback on actions throughout the app
+- **Command Palette (⌘K)**: Global keyboard shortcut providing quick access to create tasks, schedule events, ask AI, and navigate between features
+- **Interactive Dashboard**: Animated statistics cards with loading states, smooth <400ms transitions, removed infinite animations per UX guidelines
+- **Floating Quick Action Button**: Added keyboard shortcut hint button without distracting infinite animations
+- **Quick Actions Banner**: Dismissible educational banner to teach users about ⌘K functionality
+- **British Localisation**: Completed conversion of all text to British spelling (personalise, organise, prioritise, cancelled) including database schema updates
+- **Performance Optimisation**: All animations kept under 400ms, infinite loops removed from primary surfaces, dynamic imports for client-side components
+- **UX Improvements**: Reserved toast notifications for actionable confirmations/errors to prevent alert fatigue
+
+### Interactive Components Added
+- `app/components/Toaster.tsx` - Global toast notification provider
+- `app/components/CommandPalette.tsx` - Keyboard-driven quick actions palette
+- `app/components/InteractiveDashboard.tsx` - Animated stats dashboard with loading states
+- `app/components/GlobalComponents.tsx` - Dynamic import wrapper for client-side components
 ```
