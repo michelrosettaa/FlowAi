@@ -17,7 +17,7 @@ interface CalendarEvent {
 }
 
 interface CalendarWeekViewProps {
-  onEventCreate?: () => void;
+  onEventCreate?: (initialDate?: string, initialTime?: string) => void;
   readOnly?: boolean;
   refetchTrigger?: number;
 }
@@ -460,7 +460,7 @@ export default function CalendarWeekView({ onEventCreate, readOnly = false, refe
                   return (
                     <div
                       key={idx}
-                      className="transition-colors hover:bg-white/5"
+                      className="transition-colors hover:bg-blue-500/10 cursor-pointer"
                       style={{ 
                         borderRight: '1px solid var(--app-border)',
                         borderBottom: '1px solid var(--app-border)',
@@ -468,6 +468,14 @@ export default function CalendarWeekView({ onEventCreate, readOnly = false, refe
                         gridRow: rowIdx + 1,
                         background: isToday ? 'rgba(99, 102, 241, 0.05)' : 'transparent'
                       }}
+                      onClick={() => {
+                        if (!readOnly && onEventCreate) {
+                          const dateStr = day.toISOString().split('T')[0];
+                          const timeStr = h;
+                          onEventCreate(dateStr, timeStr);
+                        }
+                      }}
+                      title={!readOnly ? "Click to add event" : ""}
                     />
                   );
                 })}

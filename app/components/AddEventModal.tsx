@@ -7,16 +7,32 @@ interface AddEventModalProps {
   isOpen: boolean;
   onClose: () => void;
   onEventCreated: () => void;
+  initialDate?: string;
+  initialTime?: string;
 }
 
-export default function AddEventModal({ isOpen, onClose, onEventCreated }: AddEventModalProps) {
+export default function AddEventModal({ isOpen, onClose, onEventCreated, initialDate, initialTime }: AddEventModalProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState("");
-  const [startTime, setStartTime] = useState("");
+  const [date, setDate] = useState(initialDate || "");
+  const [startTime, setStartTime] = useState(initialTime || "");
   const [endTime, setEndTime] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Update date/time when modal opens with new values
+  React.useEffect(() => {
+    if (isOpen) {
+      setDate(initialDate || "");
+      setStartTime(initialTime || "");
+      // Set end time to 1 hour after start time if start time is provided
+      if (initialTime) {
+        const [hours, minutes] = initialTime.split(':');
+        const endHour = (parseInt(hours) + 1) % 24;
+        setEndTime(`${String(endHour).padStart(2, '0')}:${minutes}`);
+      }
+    }
+  }, [isOpen, initialDate, initialTime]);
 
   if (!isOpen) return null;
 
