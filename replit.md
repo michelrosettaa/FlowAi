@@ -14,10 +14,17 @@ FlowAI is a Next.js-based AI productivity platform that helps users manage their
 3. ✅ **Google Calendar Integration** - Calendar sync now live with read/write access via per-user OAuth tokens
 4. ✅ **PostgreSQL Database** - Infrastructure set up with Drizzle ORM (schema ready for migration from localStorage)
 5. ✅ **Replit Migration** - Fully migrated from Vercel to Replit environment
-6. ✅ **NextAuth Multi-Provider OAuth** - **LATEST** Production-ready authentication with Google/Microsoft/Apple login, per-user token management, JWT sessions, and Superhuman-style login page
-7. ✅ **Email Notification System** - **NEW** Three types of beautiful HTML emails (daily digest, task reminders, focus alerts)
-8. ✅ **Premium Loading Page** - **NEW** Refined loading experience with animated icons, progress tracking, and smooth transitions
-9. ✅ **Premium Design Upgrade** - Complete platform redesign with premium aesthetics:
+6. ✅ **NextAuth Multi-Provider OAuth** - Production-ready authentication with Google/Microsoft/Apple login, per-user token management, JWT sessions, and Superhuman-style login page
+7. ✅ **Email Notification System** - Three types of beautiful HTML emails (daily digest, task reminders, focus alerts)
+8. ✅ **Premium Loading Page** - Refined loading experience with animated icons, progress tracking, and smooth transitions
+9. ✅ **Premium Design Upgrade** - Complete platform redesign with premium aesthetics
+10. ✅ **Calendar UI Refactor** - **LATEST** Reusable calendar components with event creation, shared across dashboard and calendar pages:
+   - **CalendarWeekView Component**: Reusable weekly calendar grid with CSS Grid layout, loading/error states, useCalendarEvents hook
+   - **AddEventModal Component**: Full event creation modal with title, description, date, time range, and error handling
+   - **Calendar Page**: Full-featured page with "Add Block" button and event creation flow
+   - **Dashboard Integration**: Uses shared CalendarWeekView in read-only mode for consistency
+   - **API Integration**: Connects to Express /api/calendar/events endpoints (GET/POST) with proper authentication
+   - **Deleted**: Removed duplicate broken Next.js API route at /app/api/calendar/events/route.ts
    
    **Landing Page:**
    - Upgraded typography (6xl-7xl headlines with tighter tracking)
