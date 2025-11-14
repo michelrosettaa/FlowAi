@@ -196,6 +196,121 @@ Keep it warm, professional, and include clear next steps.`;
     }
   });
 
+  app.get("/api/email/inbox", requireNextAuth, async (req: any, res) => {
+    try {
+      const userId = req.auth!.userId;
+      const gmail = await getGmailClient(userId);
+
+      const response = await gmail.users.messages.list({
+        userId: "me",
+        maxResults: 20,
+        q: "in:inbox",
+      });
+
+      const messages = response.data.messages || [];
+      const emailDetails = await Promise.all(
+        messages.map(async (msg: any) => {
+          const detail = await gmail.users.messages.get({
+            userId: "me",
+            id: msg.id,
+            format: "full",
+          });
+
+          const headers = detail.data.payload?.headers || [];
+          const subject = headers.find((h: any) => h.name === "Subject")?.value || "(No Subject)";
+          const from = headers.find((h: any) => h.name === "From")?.value || "Unknown";
+          const date = headers.find((h: any) => h.name === "Date")?.value || "";
+          
+          let body = "";
+          
+          const extractBody = (parts: any[]): string => {
+            for (const part of parts) {
+              if (part.mimeType === "text/plain" && part.body?.data) {
+                return Buffer.from(part.body.data, "base64").toString("utf-8");
+              }
+              if (part.mimeType === "text/html" && part.body?.data && !body) {
+                const htmlBody = Buffer.from(part.body.data, "base64").toString("utf-8");
+                body = htmlBody.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+              }
+              if (part.parts) {
+                const nestedBody = extractBody(part.parts);
+                if (nestedBody) return nestedBody;
+              }
+            }
+            return body;
+          };
+          
+          if (detail.data.payload?.parts) {
+            body = extractBody(detail.data.payload.parts);
+          } else if (detail.data.payload?.body?.data) {
+            const rawBody = Buffer.from(detail.data.payload.body.data, "base64").toString("utf-8");
+            if (detail.data.payload.mimeType === "text/html") {
+              body = rawBody.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+            } else {
+              body = rawBody;
+            }
+          }
+
+          const snippet = detail.data.snippet || "";
+          
+          return {
+            id: msg.id,
+            threadId: detail.data.threadId,
+            subject,
+            from,
+            date,
+            snippet,
+            body: body.substring(0, 2000) || snippet,
+          };
+        })
+      );
+
+      res.json({ emails: emailDetails });
+    } catch (err: any) {
+      console.error("Inbox fetch error:", err);
+      res.status(500).json({ error: err.message || "Failed to fetch inbox" });
+    }
+  });
+
+  app.post("/api/email/reply", requireNextAuth, async (req: any, res) => {
+    try {
+      const { originalFrom, originalSubject, originalBody } = req.body;
+
+      if (!originalFrom || !originalBody) {
+        return res.status(400).json({ error: "Missing original email details" });
+      }
+
+      const prompt = `Generate a professional, concise email reply to the following email:
+
+FROM: ${originalFrom}
+SUBJECT: ${originalSubject}
+
+ORIGINAL EMAIL:
+${originalBody}
+
+Write a helpful, warm reply that addresses their message. Keep it brief and professional.`;
+
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: "You write professional, friendly email replies. Be concise, helpful, and maintain a warm tone.",
+          },
+          { role: "user", content: prompt },
+        ],
+        temperature: 0.7,
+        max_tokens: 400,
+      });
+
+      const replyText = completion.choices?.[0]?.message?.content || "Unable to generate reply.";
+      res.json({ reply: replyText });
+    } catch (err: any) {
+      console.error("Reply generation error:", err);
+      res.status(500).json({ error: err.message || "Failed to generate reply" });
+    }
+  });
+
   app.get("/api/calendar/events", requireNextAuth, async (req: any, res) => {
     try {
       const userId = req.auth!.userId;

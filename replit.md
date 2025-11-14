@@ -67,7 +67,7 @@ PostgreSQL (Neon-backed) is the primary database, managed with Drizzle ORM. The 
 
 ## Recent Changes
 
-### November 14, 2025 - Interactive Features & Professional Calendar
+### November 14, 2025 - Interactive Features, Professional Calendar & Email Intelligence
 - **Toast Notification System**: Integrated Sonner library for real-time user feedback on actions throughout the app
 - **Command Palette (⌘K)**: Global keyboard shortcut providing quick access to create tasks, schedule events, ask AI, and navigate between features
 - **Interactive Dashboard**: Animated statistics cards with loading states, smooth <400ms transitions, removed infinite animations per UX guidelines
@@ -81,6 +81,12 @@ PostgreSQL (Neon-backed) is the primary database, managed with Drizzle ORM. The 
 - **Week Navigation**: Fully functional Previous/Next/Today buttons to navigate across weeks and months, with weekOffset state propagating through event fetching and transformation logic
 - **Day/Week View Toggle**: Reclaim.ai-style view switcher allowing users to toggle between single-day and 7-day week views
 - **Calendar Height Constraint**: Added maxHeight to prevent calendar grid from extending to page bottom, with proper scroll behavior
+- **Click-to-Create Events**: Calendar time slots are now clickable - click any hour to instantly create events with pre-filled date and time
+- **Ask FlowAI Universal Access**: Made AI assistant accessible to all users (authenticated and unauthenticated), with authenticated users getting calendar-aware responses
+- **Email Inbox Integration**: Added Gmail inbox view with real-time email fetching via `/api/email/inbox` endpoint
+- **AI-Powered Email Replies**: Implemented context-aware reply generation via `/api/email/reply` with HTML email parsing and 2000-character body extraction
+- **Email Helper Redesign**: Professional glassmorphism UI with Inbox/Compose tabs, full error handling, and retry affordances
+- **Comprehensive Error States**: All API failures (inbox fetch, reply generation, email send) surface in UI with clear error messages and retry buttons
 
 ### Calendar Components Added/Updated
 - `app/components/CalendarWeekView.tsx` - Professional weekly calendar with 24-hour format, 7-day grid, all-day events row, week navigation, view toggle, height constraint
