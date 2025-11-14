@@ -33,7 +33,7 @@ app.prepare().then(async () => {
     return handle(req, res);
   });
 
-  httpServer.listen(port, () => {
+  httpServer.listen(port, hostname, () => {
     console.log(`> Ready on http://${hostname}:${port}`);
   });
 });
