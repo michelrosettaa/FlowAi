@@ -67,19 +67,20 @@ PostgreSQL (Neon-backed) is the primary database, managed with Drizzle ORM. The 
 
 ## Recent Changes
 
-### November 14, 2025 - Interactive Features Enhancement
+### November 14, 2025 - Interactive Features & Professional Calendar
 - **Toast Notification System**: Integrated Sonner library for real-time user feedback on actions throughout the app
 - **Command Palette (⌘K)**: Global keyboard shortcut providing quick access to create tasks, schedule events, ask AI, and navigate between features
 - **Interactive Dashboard**: Animated statistics cards with loading states, smooth <400ms transitions, removed infinite animations per UX guidelines
 - **Floating Quick Action Button**: Added keyboard shortcut hint button without distracting infinite animations
 - **Quick Actions Banner**: Dismissible educational banner to teach users about ⌘K functionality
-- **British Localisation**: Completed conversion of all text to British spelling (personalise, organise, prioritise, cancelled) including database schema updates
+- **British Localisation**: Completed conversion of all text to British spelling (personalise, organise, prioritise, cancelled, analyse, optimise, summarise) throughout entire codebase
 - **Performance Optimisation**: All animations kept under 400ms, infinite loops removed from primary surfaces, dynamic imports for client-side components
 - **UX Improvements**: Reserved toast notifications for actionable confirmations/errors to prevent alert fatigue
+- **Professional Weekly Calendar**: Replaced AI planner with Reclaim.ai-style calendar featuring 24-hour time format (00:00-23:00), 7-day week view, GMT timezone indicator, all-day events row, and real-time event creation with immediate refetch
+- **Real-Time Event Updates**: Implemented `useCalendarEventsWithRefetch` hook that watches refetch triggers and immediately displays newly created events from `/api/app-calendar/events`
 
-### Interactive Components Added
-- `app/components/Toaster.tsx` - Global toast notification provider
-- `app/components/CommandPalette.tsx` - Keyboard-driven quick actions palette
-- `app/components/InteractiveDashboard.tsx` - Animated stats dashboard with loading states
-- `app/components/GlobalComponents.tsx` - Dynamic import wrapper for client-side components
+### Calendar Components Added/Updated
+- `app/components/CalendarWeekView.tsx` - Professional weekly calendar with 24-hour format, 7-day grid, all-day events row
+- `app/components/AddEventModal.tsx` - Event creation modal with refetch integration
+- `app/app/planner/page.tsx` - Replaced AI text generation with interactive calendar view
 ```
