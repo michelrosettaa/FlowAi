@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import OpenAI from "openai";
 import { getGmailClient } from "../lib/integrations/gmail";
+import { sendNotificationEmail, emailTemplates } from "./notifications";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -245,6 +246,113 @@ Keep it warm, professional, and include clear next steps.`;
     } catch (error) {
       console.error("Error saving preferences:", error);
       res.status(500).json({ message: "Failed to save preferences" });
+    }
+  });
+
+  // Notification endpoints
+  app.post("/api/notifications/send-daily-digest", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.email) {
+        return res.status(400).json({ error: "User email not found" });
+      }
+
+      // Get user's tasks and events
+      const tasks = await storage.getUserTasks(userId);
+      const todayTasks = tasks.filter((t: any) => !t.completed);
+      
+      // Mock events for now - in the future, integrate with Google Calendar
+      const events = [
+        { title: "Team Standup", time: "9:00 AM" },
+        { title: "Focus Work Block", time: "2:00 PM" }
+      ];
+
+      const html = emailTemplates.dailyDigest(
+        user.firstName || user.email.split('@')[0],
+        todayTasks.slice(0, 5),  // Top 5 tasks
+        events
+      );
+
+      await sendNotificationEmail({
+        to: user.email,
+        subject: "☀️ Your Daily FlowAI Digest",
+        html
+      });
+
+      res.json({ success: true, message: "Daily digest sent" });
+    } catch (error: any) {
+      console.error("Error sending daily digest:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/notifications/send-task-reminder", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { taskId } = req.body;
+      
+      if (!taskId) {
+        return res.status(400).json({ error: "Task ID required" });
+      }
+
+      const user = await storage.getUser(userId);
+      if (!user?.email) {
+        return res.status(400).json({ error: "User email not found" });
+      }
+
+      const tasks = await storage.getUserTasks(userId);
+      const task = tasks.find((t: any) => t.id === taskId);
+      
+      if (!task) {
+        return res.status(404).json({ error: "Task not found" });
+      }
+
+      const html = emailTemplates.taskReminder(
+        user.firstName || user.email.split('@')[0],
+        task,
+        "Today"
+      );
+
+      await sendNotificationEmail({
+        to: user.email,
+        subject: `⏰ Reminder: ${task.title}`,
+        html
+      });
+
+      res.json({ success: true, message: "Task reminder sent" });
+    } catch (error: any) {
+      console.error("Error sending task reminder:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/notifications/send-focus-alert", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { focusBlock } = req.body;
+      
+      const user = await storage.getUser(userId);
+      if (!user?.email) {
+        return res.status(400).json({ error: "User email not found" });
+      }
+
+      const html = emailTemplates.focusTimeAlert(
+        user.firstName || user.email.split('@')[0],
+        focusBlock || { title: "Deep Work Session", time: "In 15 minutes" }
+      );
+
+      await sendNotificationEmail({
+        to: user.email,
+        subject: "🧠 Focus Time Starting Soon",
+        html
+      });
+
+      res.json({ success: true, message: "Focus alert sent" });
+    } catch (error: any) {
+      console.error("Error sending focus alert:", error);
+      res.status(500).json({ error: error.message });
     }
   });
 
