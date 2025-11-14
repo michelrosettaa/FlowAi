@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Sparkles, MessageSquare, Calendar, Mail, Brain, Zap, Menu, X } from "lucide-react";
 
@@ -391,8 +392,23 @@ export default function LandingPage() {
       <StickyCTA />
 
       {/* === FOOTER === */}
-      <footer className="relative z-10 text-slate-400 text-sm mt-24 mb-20 text-center">
-        © {new Date().getFullYear()} FlowAI — Focus, clarity, momentum.
+      <footer className="relative z-10 text-slate-500 text-sm mt-24 mb-20">
+        <div className="text-center mb-6 flex flex-wrap items-center justify-center gap-4">
+          <Link href="/privacy" className="hover:text-slate-900 transition-colors">
+            Privacy Policy
+          </Link>
+          <span className="text-slate-300">•</span>
+          <Link href="/terms" className="hover:text-slate-900 transition-colors">
+            Terms of Service
+          </Link>
+          <span className="text-slate-300">•</span>
+          <Link href="/app/settings" className="hover:text-slate-900 transition-colors">
+            Settings
+          </Link>
+        </div>
+        <div className="text-center text-slate-400">
+          © {new Date().getFullYear()} FlowAI — Focus, clarity, momentum.
+        </div>
       </footer>
 
       {/* === DEMO MODAL === */}

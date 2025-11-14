@@ -160,7 +160,7 @@ export const usageRecords = pgTable("usage_records", {
   userId: varchar("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  feature: varchar("feature").$type<"ai_messages" | "email_sends" | "calendar_sync">().notNull(),
+  feature: varchar("feature").$type<"ai_messages" | "email_sends" | "calendar_sync" | "tasks">().notNull(),
   count: integer("count").default(0).notNull(),
   periodStart: timestamp("period_start", { withTimezone: true }).notNull(),
   periodEnd: timestamp("period_end", { withTimezone: true }).notNull(),

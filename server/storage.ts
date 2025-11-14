@@ -56,9 +56,9 @@ export interface IStorage {
   createUserSubscription(subscription: InsertUserSubscription): Promise<UserSubscription>;
   updateUserSubscription(userId: string, updates: Partial<InsertUserSubscription>): Promise<UserSubscription | undefined>;
   
-  getUsageForPeriod(userId: string, feature: string, periodStart: Date, periodEnd: Date): Promise<UsageRecord | undefined>;
-  incrementUsage(userId: string, feature: string, amount?: number): Promise<UsageRecord>;
-  getCurrentUsage(userId: string): Promise<{ ai_messages: number; email_sends: number; calendar_sync: number }>;
+  getUsageForPeriod(userId: string, feature: "ai_messages" | "email_sends" | "calendar_sync" | "tasks", periodStart: Date, periodEnd: Date): Promise<UsageRecord | undefined>;
+  incrementUsage(userId: string, feature: "ai_messages" | "email_sends" | "calendar_sync" | "tasks", amount?: number): Promise<UsageRecord>;
+  getCurrentUsage(userId: string): Promise<{ ai_messages: number; email_sends: number; calendar_sync: number; tasks: number }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -303,7 +303,7 @@ export class DatabaseStorage implements IStorage {
 
   async getUsageForPeriod(
     userId: string,
-    feature: string,
+    feature: "ai_messages" | "email_sends" | "calendar_sync" | "tasks",
     periodStart: Date,
     periodEnd: Date
   ): Promise<UsageRecord | undefined> {
@@ -313,7 +313,7 @@ export class DatabaseStorage implements IStorage {
       .where(
         and(
           eq(usageRecords.userId, userId),
-          eq(usageRecords.feature, feature as any),
+          eq(usageRecords.feature, feature),
           eq(usageRecords.periodStart, periodStart)
         )
       )
@@ -321,7 +321,7 @@ export class DatabaseStorage implements IStorage {
     return usage;
   }
 
-  async incrementUsage(userId: string, feature: string, amount: number = 1): Promise<UsageRecord> {
+  async incrementUsage(userId: string, feature: "ai_messages" | "email_sends" | "calendar_sync" | "tasks", amount: number = 1): Promise<UsageRecord> {
     const now = new Date();
     const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
@@ -330,7 +330,7 @@ export class DatabaseStorage implements IStorage {
       .insert(usageRecords)
       .values({
         userId,
-        feature: feature as any,
+        feature,
         count: amount,
         periodStart,
         periodEnd,
@@ -348,7 +348,7 @@ export class DatabaseStorage implements IStorage {
     return record;
   }
 
-  async getCurrentUsage(userId: string): Promise<{ ai_messages: number; email_sends: number; calendar_sync: number }> {
+  async getCurrentUsage(userId: string): Promise<{ ai_messages: number; email_sends: number; calendar_sync: number; tasks: number }> {
     const now = new Date();
     const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
@@ -366,6 +366,7 @@ export class DatabaseStorage implements IStorage {
       ai_messages: usage.find((u) => u.feature === "ai_messages")?.count || 0,
       email_sends: usage.find((u) => u.feature === "email_sends")?.count || 0,
       calendar_sync: usage.find((u) => u.feature === "calendar_sync")?.count || 0,
+      tasks: usage.find((u) => u.feature === "tasks")?.count || 0,
     };
   }
 }

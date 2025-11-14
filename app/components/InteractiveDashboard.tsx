@@ -2,22 +2,41 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, Zap, Target, TrendingUp, Flame } from "lucide-react";
+import { CheckCircle2, Zap, Target, TrendingUp, Flame, Mail } from "lucide-react";
+
+interface UsageData {
+  usage: {
+    ai_messages: number;
+    email_sends: number;
+    tasks: number;
+  };
+  limits: {
+    ai_messages: number;
+    email_sends: number;
+  };
+  plan: {
+    name: string;
+    slug: string;
+  };
+}
 
 export default function InteractiveDashboard() {
   const [loading, setLoading] = useState(true);
   const [tasksCompleted, setTasksCompleted] = useState(0);
   const [streak, setStreak] = useState(0);
   const [focusHours, setFocusHours] = useState(0);
+  const [usageData, setUsageData] = useState<UsageData | null>(null);
 
   // Load real data from API
   useEffect(() => {
-    // Simulating API call - replace with real endpoint when available
     const loadData = async () => {
       try {
-        // TODO: Replace with real API calls:
-        // const tasks = await fetch('/api/tasks/stats').then(r => r.json());
-        // For now, show demo data after short delay
+        const usageRes = await fetch('/api/billing/usage').catch(() => null);
+        if (usageRes?.ok) {
+          const data = await usageRes.json();
+          setUsageData(data);
+        }
+        
         setTimeout(() => {
           setTasksCompleted(12);
           setStreak(7);

@@ -12,6 +12,7 @@ import { createSmtpService } from "./smtp-service";
 import { EMAIL_PROVIDERS, detectProvider } from "./email-providers";
 import { encryptPassword } from "./crypto-utils";
 import { fetchGmailInbox, sendGmailEmail, checkGmailConnection } from "./gmail-api-service";
+import { checkUsageLimit, trackUsage, getUpgradeMessage } from "./usage-limits";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -36,6 +37,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!messages || !Array.isArray(messages)) {
         return res.status(400).json({ error: "Messages array is required" });
+      }
+
+      if (userId) {
+        try {
+          const usageCheck = await checkUsageLimit(userId, 'ai_messages');
+          if (!usageCheck.allowed) {
+            return res.status(403).json({ 
+              error: "Usage limit exceeded", 
+              message: getUpgradeMessage('ai_messages', usageCheck.planName),
+              upgradeRequired: true,
+              currentUsage: usageCheck.currentUsage,
+              limit: usageCheck.limit
+            });
+          }
+        } catch (usageError) {
+          console.error("Usage check error (allowing request):", usageError);
+        }
       }
 
       let calendarContext = "";
@@ -122,6 +140,15 @@ Be concise, helpful, and actionable. Provide specific suggestions when possible.
       });
 
       const reply = completion.choices[0]?.message?.content || "I'm not sure how to help with that.";
+      
+      if (userId) {
+        try {
+          await trackUsage(userId, 'ai_messages');
+        } catch (trackError) {
+          console.error("Usage tracking error (continuing):", trackError);
+        }
+      }
+      
       res.json({ reply });
     } catch (err: any) {
       console.error("Ask FlowAI error:", err);
@@ -138,10 +165,30 @@ Be concise, helpful, and actionable. Provide specific suggestions when possible.
         return res.status(400).json({ error: "Recipient, subject, and email body are required" });
       }
 
+      try {
+        const usageCheck = await checkUsageLimit(userId, 'email_sends');
+        if (!usageCheck.allowed) {
+          return res.status(403).json({ 
+            error: "Usage limit exceeded", 
+            message: getUpgradeMessage('email_sends', usageCheck.planName),
+            upgradeRequired: true,
+            currentUsage: usageCheck.currentUsage,
+            limit: usageCheck.limit
+          });
+        }
+      } catch (usageError) {
+        console.error("Usage check error (allowing request):", usageError);
+      }
+
       const isGmailConnected = await checkGmailConnection();
       
       if (isGmailConnected) {
         await sendGmailEmail(recipient, subject, emailBody);
+        try {
+          await trackUsage(userId, 'email_sends');
+        } catch (trackError) {
+          console.error("Usage tracking error (continuing):", trackError);
+        }
         console.log("✅ Email sent successfully via Gmail API");
         return res.json({ ok: true, message: "Email sent successfully" });
       }
@@ -159,6 +206,11 @@ Be concise, helpful, and actionable. Provide specific suggestions when possible.
         html: emailBody.replace(/\n/g, "<br>"),
       });
 
+      try {
+        await trackUsage(userId, 'email_sends');
+      } catch (trackError) {
+        console.error("Usage tracking error (continuing):", trackError);
+      }
       console.log("✅ Email sent successfully via SMTP");
       res.json({ ok: true, message: "Email sent successfully" });
     } catch (err: any) {
