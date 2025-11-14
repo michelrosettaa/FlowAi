@@ -76,7 +76,7 @@ export function useCalendarEvents(weekOffset: number = 0) {
 
   useEffect(() => {
     fetchEvents();
-  }, [isAuthenticated]);
+  }, [isAuthenticated, weekOffset]);
 
   return { events, weekStart, loading, error, refetch: fetchEvents, isAuthenticated };
 }
