@@ -37,6 +37,7 @@ export default function EmailAssistantPage() {
   const [sendStatus, setSendStatus] = useState("");
 
   const [hasEmailAccount, setHasEmailAccount] = useState<boolean | null>(null);
+  const [isGmailConnected, setIsGmailConnected] = useState<boolean>(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -55,11 +56,15 @@ export default function EmailAssistantPage() {
       const response = await fetch("/api/email/accounts");
       if (response.ok) {
         const data = await response.json();
-        setHasEmailAccount(data.accounts && data.accounts.length > 0);
+        const gmailConnected = data.isGmailConnected || false;
+        const hasAccounts = data.accounts && data.accounts.length > 0;
+        setIsGmailConnected(gmailConnected);
+        setHasEmailAccount(gmailConnected || hasAccounts);
       }
     } catch (err) {
       console.error("Failed to check email accounts:", err);
       setHasEmailAccount(false);
+      setIsGmailConnected(false);
     }
   };
 
@@ -252,14 +257,14 @@ export default function EmailAssistantPage() {
             Connect Your Email
           </h2>
           <p className="mb-6" style={{ color: 'var(--app-text-muted)' }}>
-            Add your email account to start using AI-powered email features with any provider (Gmail, Outlook, Yahoo, iCloud, etc.)
+            Connect your Gmail account via OAuth or add any email provider (Outlook, Yahoo, iCloud, ProtonMail, etc.) to start using AI-powered email features.
           </p>
           <a
             href="/app/settings/email"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-semibold text-white transition-all hover:scale-105"
             style={{ background: 'var(--app-accent)' }}
           >
-            Add Email Account
+            Connect Email Account
           </a>
         </div>
       </div>
@@ -448,7 +453,7 @@ export default function EmailAssistantPage() {
                   style={{ background: 'var(--app-accent)' }}
                 >
                   {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                  {sending ? "Sending..." : "Send via Gmail"}
+                  {sending ? "Sending..." : isGmailConnected ? "Send via Gmail" : "Send Email"}
                 </button>
                 
                 <button

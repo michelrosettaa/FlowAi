@@ -11,6 +11,7 @@ import { createImapService } from "./imap-service";
 import { createSmtpService } from "./smtp-service";
 import { EMAIL_PROVIDERS, detectProvider } from "./email-providers";
 import { encryptPassword } from "./crypto-utils";
+import { fetchGmailInbox, sendGmailEmail, checkGmailConnection } from "./gmail-api-service";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -137,9 +138,17 @@ Be concise, helpful, and actionable. Provide specific suggestions when possible.
         return res.status(400).json({ error: "Recipient, subject, and email body are required" });
       }
 
+      const isGmailConnected = await checkGmailConnection();
+      
+      if (isGmailConnected) {
+        await sendGmailEmail(recipient, subject, emailBody);
+        console.log("✅ Email sent successfully via Gmail API");
+        return res.json({ ok: true, message: "Email sent successfully" });
+      }
+
       const emailAccount = await storage.getPrimaryEmailAccount(userId);
       if (!emailAccount) {
-        return res.status(400).json({ error: "No email account configured. Please add an email account in settings." });
+        return res.status(400).json({ error: "No email account configured. Please connect your Gmail account or add an email account in settings." });
       }
 
       const smtpService = createSmtpService(emailAccount);
@@ -193,10 +202,18 @@ Keep it warm, professional, and include clear next steps.`;
   app.get("/api/email/inbox", requireNextAuth, async (req: any, res) => {
     try {
       const userId = req.auth!.userId;
+      
+      const isGmailConnected = await checkGmailConnection();
+      
+      if (isGmailConnected) {
+        const emails = await fetchGmailInbox(20);
+        return res.json({ emails });
+      }
+      
       const emailAccount = await storage.getPrimaryEmailAccount(userId);
       
       if (!emailAccount) {
-        return res.status(400).json({ error: "No email account configured. Please add an email account in settings." });
+        return res.status(400).json({ error: "No email account configured. Please connect your Gmail account or add an email account in settings." });
       }
 
       const imapService = createImapService(emailAccount);
@@ -256,7 +273,8 @@ Write a helpful, warm reply that addresses their message. Keep it brief and prof
     try {
       const userId = req.auth!.userId;
       const accounts = await storage.getEmailAccounts(userId);
-      res.json({ accounts });
+      const isGmailConnected = await checkGmailConnection();
+      res.json({ accounts, isGmailConnected });
     } catch (err: any) {
       console.error("Get email accounts error:", err);
       res.status(500).json({ error: err.message || "Failed to fetch email accounts" });
