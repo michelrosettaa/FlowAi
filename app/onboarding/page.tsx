@@ -49,10 +49,13 @@ export default function OnboardingPage() {
     const newAnswers = { ...answers, [step.key]: opt };
     setAnswers(newAnswers);
 
-    // if last step -> save to database and go to loading
+    // if last step -> save to database/localStorage and go to loading
     if (stepIndex === steps.length - 1) {
+      // Save answers to localStorage for email-only users
+      localStorage.setItem('flowai_onboarding', JSON.stringify(newAnswers));
+      
+      // Try to save to database if authenticated (will fail silently for email-only users)
       try {
-        // Save onboarding data to database
         await fetch('/api/onboarding', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -60,12 +63,12 @@ export default function OnboardingPage() {
             answers: newAnswers 
           }),
         });
-        router.push("/loading");
       } catch (error) {
-        console.error("Error saving onboarding:", error);
-        // Continue to loading even if save fails
-        router.push("/loading");
+        console.log("Not authenticated - using email-only flow");
       }
+      
+      // Always continue to loading page
+      router.push("/loading");
     } else {
       setStepIndex(stepIndex + 1);
     }
