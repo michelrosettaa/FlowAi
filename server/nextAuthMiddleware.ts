@@ -14,12 +14,18 @@ declare global {
 
 export const requireNextAuth: RequestHandler = async (req, res, next) => {
   try {
+    console.log("Auth middleware called for:", req.url);
+    console.log("Cookies:", req.headers.cookie ? "Present" : "Missing");
+    
     const token = await getToken({
       req: req as any,
       secret: process.env.NEXTAUTH_SECRET!,
     });
 
+    console.log("Token found:", token ? "Yes" : "No", token?.sub || "no sub");
+
     if (!token || !token.sub) {
+      console.log("Unauthorized: No token or sub");
       return res.status(401).json({ message: "Unauthorized" });
     }
 
