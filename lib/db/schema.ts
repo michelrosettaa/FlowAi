@@ -8,6 +8,7 @@ import {
   primaryKey,
   text,
   timestamp,
+  uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
@@ -143,12 +144,12 @@ export const userSubscriptions = pgTable("user_subscriptions", {
   stripeCustomerId: varchar("stripe_customer_id"),
   stripeSubscriptionId: varchar("stripe_subscription_id"),
   status: varchar("status").$type<"active" | "trialing" | "past_due" | "canceled" | "incomplete" | "incomplete_expired">().notNull().default("active"),
-  currentPeriodStart: timestamp("current_period_start", { mode: "date" }),
-  currentPeriodEnd: timestamp("current_period_end", { mode: "date" }),
+  currentPeriodStart: timestamp("current_period_start", { withTimezone: true }),
+  currentPeriodEnd: timestamp("current_period_end", { withTimezone: true }),
   cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false).notNull(),
-  trialEndsAt: timestamp("trial_ends_at", { mode: "date" }),
-  canceledAt: timestamp("canceled_at", { mode: "date" }),
-  endedAt: timestamp("ended_at", { mode: "date" }),
+  trialEndsAt: timestamp("trial_ends_at", { withTimezone: true }),
+  canceledAt: timestamp("canceled_at", { withTimezone: true }),
+  endedAt: timestamp("ended_at", { withTimezone: true }),
   metadata: jsonb("metadata").default(sql`'{}'::jsonb`),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -161,13 +162,13 @@ export const usageRecords = pgTable("usage_records", {
     .references(() => users.id, { onDelete: "cascade" }),
   feature: varchar("feature").$type<"ai_messages" | "email_sends" | "calendar_sync">().notNull(),
   count: integer("count").default(0).notNull(),
-  periodStart: timestamp("period_start", { mode: "date" }).notNull(),
-  periodEnd: timestamp("period_end", { mode: "date" }).notNull(),
+  periodStart: timestamp("period_start", { withTimezone: true }).notNull(),
+  periodEnd: timestamp("period_end", { withTimezone: true }).notNull(),
   lastIncrementAt: timestamp("last_increment_at").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
-  index("usage_records_user_feature_period_idx").on(table.userId, table.feature, table.periodStart),
+  uniqueIndex("usage_records_user_feature_period_unique").on(table.userId, table.feature, table.periodStart),
 ]);
 
 export const usersRelations = relations(users, ({ many, one }) => ({

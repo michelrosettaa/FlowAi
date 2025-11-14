@@ -289,22 +289,7 @@ export class DatabaseStorage implements IStorage {
     const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-    const existing = await this.getUsageForPeriod(userId, feature, periodStart, periodEnd);
-
-    if (existing) {
-      const [updated] = await db
-        .update(usageRecords)
-        .set({
-          count: existing.count + amount,
-          lastIncrementAt: now,
-          updatedAt: now,
-        })
-        .where(eq(usageRecords.id, existing.id))
-        .returning();
-      return updated;
-    }
-
-    const [newRecord] = await db
+    const [record] = await db
       .insert(usageRecords)
       .values({
         userId,
@@ -314,8 +299,16 @@ export class DatabaseStorage implements IStorage {
         periodEnd,
         lastIncrementAt: now,
       })
+      .onConflictDoUpdate({
+        target: [usageRecords.userId, usageRecords.feature, usageRecords.periodStart],
+        set: {
+          count: sql`${usageRecords.count} + ${amount}`,
+          lastIncrementAt: now,
+          updatedAt: now,
+        },
+      })
       .returning();
-    return newRecord;
+    return record;
   }
 
   async getCurrentUsage(userId: string): Promise<{ ai_messages: number; email_sends: number; calendar_sync: number }> {
