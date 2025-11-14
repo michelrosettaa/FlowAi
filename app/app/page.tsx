@@ -1,48 +1,53 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 import ReferralSection from "../components/ReferralSection";
+
+interface CalendarEvent {
+  id: string;
+  title: string;
+  daySegments: Array<{
+    dayCol: number;
+    startRow: number;
+    span: number;
+    color: string;
+    allDay?: boolean;
+  }>;
+}
 
 export default function DashboardPage() {
   const hours = ["9am", "10am", "11am", "12pm", "1pm", "2pm", "3pm", "4pm", "5pm"];
-
-  const mockBlocks = [
-    {
-      dayCol: 1,
-      startRow: 1,
-      span: 2,
-      title: "Deep Work — Pitch Deck",
-      color: "bg-emerald-400/30 border-emerald-400/60 text-emerald-200",
-    },
-    {
-      dayCol: 2,
-      startRow: 3,
-      span: 1,
-      title: "Investor Follow-up Email",
-      color: "bg-indigo-400/30 border-indigo-400/50 text-indigo-200",
-    },
-    {
-      dayCol: 3,
-      startRow: 2,
-      span: 1,
-      title: "Team Sync (Meet)",
-      color: "bg-blue-400/30 border-blue-400/50 text-blue-200",
-    },
-    {
-      dayCol: 4,
-      startRow: 4,
-      span: 1,
-      title: "Client Call / Next Steps",
-      color: "bg-pink-400/30 border-pink-400/50 text-pink-200",
-    },
-    {
-      dayCol: 5,
-      startRow: 3,
-      span: 2,
-      title: "Prep Outreach / Follow Ups",
-      color: "bg-yellow-400/30 border-yellow-400/50 text-yellow-200",
-    },
-  ];
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [weekStart, setWeekStart] = useState("");
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    async function fetchEvents() {
+      try {
+        setLoading(true);
+        const response = await fetch("/api/calendar/events");
+        if (!response.ok) {
+          throw new Error("Failed to fetch calendar events");
+        }
+        const data = await response.json();
+        setEvents(data.events || []);
+        setWeekStart(data.weekStart || "");
+      } catch (err: any) {
+        console.error("Error fetching calendar:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchEvents();
+  }, []);
+  
+  const timedEvents = events.flatMap(event => 
+    event.daySegments.filter(seg => !seg.allDay).map(segment => ({
+      title: event.title,
+      ...segment
+    }))
+  );
 
   return (
     <>
@@ -54,26 +59,18 @@ export default function DashboardPage() {
         <div className="flex justify-between items-center">
           <div>
             <div className="text-xs font-medium mb-1" style={{ color: 'var(--app-text-muted)' }}>
-              Week of Oct 27
+              {weekStart ? `Week of ${new Date(weekStart + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : 'My Calendar'}
             </div>
             <h1 className="text-2xl font-bold" style={{ color: 'var(--app-text)' }}>
               My Calendar
             </h1>
           </div>
-          <div className="flex items-center gap-3">
-            <button 
-              className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:scale-105 shadow-lg"
-              style={{
-                background: 'linear-gradient(to right, var(--app-accent), var(--app-accent-hover))',
-                color: 'white'
-              }}
-            >
-              + New Block
-            </button>
-            <div className="text-sm" style={{ color: 'var(--app-text-dim)' }}>
-              you@company.com
+          {loading && (
+            <div className="flex items-center gap-2" style={{ color: 'var(--app-text-muted)' }}>
+              <Loader2 size={18} className="animate-spin" />
+              <span className="text-sm">Loading calendar...</span>
             </div>
-          </div>
+          )}
         </div>
       </header>
 
@@ -129,13 +126,13 @@ export default function DashboardPage() {
           ))}
 
           {/* Events - positioned using grid-column and grid-row */}
-          {mockBlocks.map((block, i) => (
+          {timedEvents.map((block, i) => (
             <div
               key={i}
               className={`${block.color} border text-xs font-semibold rounded-xl p-3 leading-snug cursor-pointer transition-all hover:scale-105 m-1`}
               style={{
-                gridColumn: `${block.dayCol + 1} / ${block.dayCol + 2}`,
-                gridRow: `${block.startRow} / span ${block.span}`,
+                gridColumn: `${block.dayCol + 2} / ${block.dayCol + 3}`,
+                gridRow: `${block.startRow + 1} / span ${block.span}`,
                 boxShadow: 'var(--app-shadow-lg)'
               }}
             >
@@ -143,13 +140,6 @@ export default function DashboardPage() {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* FOOTER NOTE */}
-      <div className="px-8 py-4 text-center">
-        <p className="text-xs" style={{ color: 'var(--app-text-muted)' }}>
-          ✨ Calendar view is a demo. Real Google Calendar sync is live and ready to connect.
-        </p>
       </div>
 
       {/* REFERRAL SECTION */}

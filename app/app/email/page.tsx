@@ -1,39 +1,82 @@
 "use client";
 
 import React, { useState } from "react";
-import { Mail, Sparkles, Loader2 } from "lucide-react";
+import { Mail, Sparkles, Loader2, Send } from "lucide-react";
 
 export default function EmailAssistantPage() {
-  const [input, setInput] = useState("");
-  const [output, setOutput] = useState("");
+  const [recipient, setRecipient] = useState("");
+  const [subject, setSubject] = useState("");
+  const [context, setContext] = useState("");
+  const [draftedEmail, setDraftedEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendStatus, setSendStatus] = useState("");
 
-  const handleSummarize = () => {
-    if (!input.trim()) return;
+  const handleGenerateDraft = async () => {
+    if (!recipient.trim() || !context.trim()) {
+      alert("Please enter a recipient and what you want to say");
+      return;
+    }
+    
     setLoading(true);
-    setOutput("");
-
-    setTimeout(() => {
-      const summary =
-        input.length < 100
-          ? "🧠 This email is short and to the point. No major follow-up needed."
-          : "🧠 Summary: The sender shares updates, requests feedback, and suggests next steps.";
-      setOutput(summary);
+    setSendStatus("");
+    
+    try {
+      const response = await fetch("/api/email/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recipient, subject, context }),
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to generate email");
+      }
+      
+      const data = await response.json();
+      setDraftedEmail(data.email || "No email generated.");
+    } catch (err: any) {
+      console.error("Error generating email:", err);
+      alert("Failed to generate email. Please try again.");
+    } finally {
       setLoading(false);
-    }, 700);
+    }
   };
 
-  const handleDraftReply = () => {
-    if (!input.trim()) return;
-    setLoading(true);
-    setOutput("");
-
-    setTimeout(() => {
-      const reply =
-        "✍️ Hi there,\n\nThanks for your email — I appreciate the clarity. I'll review and follow up shortly.\n\nBest,\nFlowAI ✨";
-      setOutput(reply);
-      setLoading(false);
-    }, 800);
+  const handleSendEmail = async () => {
+    if (!recipient.trim() || !draftedEmail.trim()) {
+      alert("Please generate an email first");
+      return;
+    }
+    
+    setSending(true);
+    setSendStatus("");
+    
+    try {
+      const response = await fetch("/api/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          recipient, 
+          subject: subject || "Message from FlowAI",
+          emailBody: draftedEmail 
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to send email");
+      }
+      
+      setSendStatus("✅ Email sent successfully via Gmail!");
+      setRecipient("");
+      setSubject("");
+      setContext("");
+      setDraftedEmail("");
+    } catch (err: any) {
+      console.error("Error sending email:", err);
+      setSendStatus("❌ Failed to send email. Please try again.");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -45,37 +88,62 @@ export default function EmailAssistantPage() {
             <Mail className="w-7 h-7 text-white" />
           </div>
           <h1 className="text-3xl font-bold mb-3" style={{ color: 'var(--app-text)' }}>
-            Email Helper
+            Email Assistant
           </h1>
           <p className="text-base" style={{ color: 'var(--app-text-dim)' }}>
-            Paste an email or rough notes — AI will summarize or draft smart replies instantly.
+            AI drafts professional emails and sends them via your Gmail account.
           </p>
         </div>
 
-        {/* Input */}
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Paste an email you received, or write notes for a reply..."
-          rows={10}
-          className="w-full premium-card p-5 text-sm resize-none outline-none focus:ring-2 mb-6"
-          style={{ 
-            color: 'var(--app-text)',
-            background: 'var(--app-surface)',
-            borderColor: 'var(--app-border)',
-            focusRing: '2px solid var(--app-accent)'
-          }}
-        />
+        {/* Input Fields */}
+        <div className="space-y-4 mb-6">
+          <input
+            type="email"
+            value={recipient}
+            onChange={(e) => setRecipient(e.target.value)}
+            placeholder="Recipient email address"
+            className="w-full premium-card p-4 text-sm outline-none focus:ring-2"
+            style={{ 
+              color: 'var(--app-text)',
+              background: 'var(--app-surface)',
+              borderColor: 'var(--app-border)'
+            }}
+          />
+          
+          <input
+            type="text"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            placeholder="Subject (optional - AI will suggest one)"
+            className="w-full premium-card p-4 text-sm outline-none focus:ring-2"
+            style={{ 
+              color: 'var(--app-text)',
+              background: 'var(--app-surface)',
+              borderColor: 'var(--app-border)'
+            }}
+          />
+          
+          <textarea
+            value={context}
+            onChange={(e) => setContext(e.target.value)}
+            placeholder="What do you want to say? (e.g., 'Follow up on our meeting, ask about timeline, suggest next steps')"
+            rows={6}
+            className="w-full premium-card p-4 text-sm resize-none outline-none focus:ring-2"
+            style={{ 
+              color: 'var(--app-text)',
+              background: 'var(--app-surface)',
+              borderColor: 'var(--app-border)'
+            }}
+          />
+        </div>
 
-        {/* Buttons */}
-        <div className="flex gap-4 justify-center mb-8">
+        {/* Generate Button */}
+        <div className="flex justify-center mb-8">
           <button
-            onClick={handleSummarize}
+            onClick={handleGenerateDraft}
             disabled={loading}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold shadow-lg transition-all ${
-              loading
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:scale-105"
+            className={`flex items-center gap-2 px-8 py-3 rounded-xl text-sm font-semibold shadow-lg transition-all ${
+              loading ? "opacity-50 cursor-not-allowed" : "hover:scale-105"
             }`}
             style={{
               background: loading ? 'var(--app-surface-hover)' : 'linear-gradient(to right, var(--app-accent), var(--app-accent-hover))',
@@ -83,36 +151,60 @@ export default function EmailAssistantPage() {
             }}
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-            {loading ? "Processing..." : "Summarize Email"}
-          </button>
-
-          <button
-            onClick={handleDraftReply}
-            disabled={loading}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold shadow-lg transition-all ${
-              loading
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:scale-105"
-            }`}
-            style={{
-              background: loading ? 'var(--app-surface-hover)' : 'linear-gradient(to right, var(--app-accent), var(--app-accent-hover))',
-              color: 'white'
-            }}
-          >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
-            {loading ? "Thinking..." : "Draft Reply"}
+            {loading ? "Generating..." : "Generate Email with AI"}
           </button>
         </div>
 
-        {/* Output */}
-        {output && (
-          <div className="premium-card p-6 text-sm leading-relaxed whitespace-pre-wrap animate-in fade-in duration-300"
-            style={{ 
-              background: 'var(--app-surface-hover)',
-              color: 'var(--app-text)'
-            }}
-          >
-            {output}
+        {/* Drafted Email */}
+        {draftedEmail && (
+          <div className="space-y-4">
+            <div className="premium-card p-6 text-sm leading-relaxed whitespace-pre-wrap"
+              style={{ 
+                background: 'var(--app-surface-hover)',
+                color: 'var(--app-text)'
+              }}
+            >
+              {draftedEmail}
+            </div>
+            
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={handleSendEmail}
+                disabled={sending}
+                className={`flex items-center gap-2 px-8 py-3 rounded-xl text-sm font-semibold shadow-lg transition-all ${
+                  sending ? "opacity-50 cursor-not-allowed" : "hover:scale-105"
+                }`}
+                style={{
+                  background: sending ? 'var(--app-surface-hover)' : 'linear-gradient(to right, var(--app-accent), var(--app-accent-hover))',
+                  color: 'white'
+                }}
+              >
+                {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                {sending ? "Sending..." : "Send via Gmail"}
+              </button>
+              
+              <button
+                onClick={() => setDraftedEmail("")}
+                disabled={sending}
+                className="px-6 py-3 rounded-xl text-sm font-semibold transition-all hover:scale-105"
+                style={{
+                  background: 'var(--app-surface)',
+                  color: 'var(--app-text-dim)',
+                  border: '1px solid var(--app-border)'
+                }}
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        )}
+        
+        {/* Send Status */}
+        {sendStatus && (
+          <div className={`mt-6 p-4 rounded-xl text-center text-sm font-medium ${
+            sendStatus.includes('✅') ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'
+          }`}>
+            {sendStatus}
           </div>
         )}
       </div>
