@@ -4,7 +4,7 @@
 
 export const ACCESS_MODE: 'open' | 'allowlist' = 'open';
 
-export const ALLOWED_EMAILS = new Set([
+export const ALLOWED_EMAILS = new Set<string>([
   // Only used if ACCESS_MODE is set to 'allowlist'
   // Add your family and friends emails here:
   // "mom@example.com",
