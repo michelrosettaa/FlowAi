@@ -19,33 +19,23 @@ export default function AIPlanner() {
     setTimeline([]);
 
     try {
-      const fakePlan = `Here's your AI-generated plan for today:
+      const response = await fetch("/api/plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tasks }),
+      });
 
-1. 9:00 AM - Review proposals and send updates.
-2. 10:30 AM - Team sync (30 min)
-3. 11:00 AM - Deep work: Pitch deck finalisation
-4. 1:00 PM - Lunch & mental reset
-5. 2:00 PM - Respond to emails
-6. 3:00 PM - Gym or personal break
-7. 4:00 PM - Wrap up + review tomorrow's goals`;
+      if (!response.ok) {
+        throw new Error("Failed to generate plan");
+      }
 
-      const fakeTimeline = [
-        { time: "9:00 AM", label: "Review proposals" },
-        { time: "10:30 AM", label: "Team sync (30 min)" },
-        { time: "11:00 AM", label: "Deep work: Pitch deck" },
-        { time: "1:00 PM", label: "Lunch & reset" },
-        { time: "2:00 PM", label: "Emails & outreach" },
-        { time: "3:00 PM", label: "Gym break" },
-        { time: "4:00 PM", label: "Wrap up" },
-      ];
-
-      setTimeout(() => {
-        setPlan(fakePlan);
-        setTimeline(fakeTimeline);
-        setLoading(false);
-      }, 1200);
+      const data = await response.json();
+      setPlan(data.plan || "No plan generated.");
+      setTimeline(data.timeline || []);
     } catch (err) {
+      console.error("Error generating plan:", err);
       setPlan("Error generating plan. Please try again later.");
+    } finally {
       setLoading(false);
     }
   };

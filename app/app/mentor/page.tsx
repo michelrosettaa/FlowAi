@@ -15,19 +15,39 @@ export default function MentorPage() {
 
   const [draft, setDraft] = useState("");
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!draft.trim()) return;
 
     const userMsg = { from: "you" as const, text: draft.trim() };
-
-    const replyMsg = {
-      from: "mentor" as const,
-      text:
-        "I hear you. Let's lock in one win today. Pick ONE thing that moves you forward, and I'll help you protect time for it. 💪",
-    };
-
-    setMessages((prev) => [...prev, userMsg, replyMsg]);
+    setMessages((prev) => [...prev, userMsg]);
     setDraft("");
+
+    try {
+      const response = await fetch("/api/mentor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: userMsg.text, voice: "coach" }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to get mentor response");
+      }
+
+      const data = await response.json();
+      const replyMsg = {
+        from: "mentor" as const,
+        text: data.summary || "I'm here to help you stay focused!",
+      };
+
+      setMessages((prev) => [...prev, replyMsg]);
+    } catch (err) {
+      console.error("Error getting mentor response:", err);
+      const errorMsg = {
+        from: "mentor" as const,
+        text: "Sorry, I'm having trouble connecting right now. Please try again.",
+      };
+      setMessages((prev) => [...prev, errorMsg]);
+    }
   };
 
   return (
