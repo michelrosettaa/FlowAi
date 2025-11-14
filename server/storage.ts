@@ -21,7 +21,7 @@ import {
   type InsertUsageRecord,
 } from "../lib/db/schema";
 import { db } from "./db";
-import { eq, or, and, gte, lte, desc } from "drizzle-orm";
+import { eq, or, and, gte, lte, desc, sql } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
