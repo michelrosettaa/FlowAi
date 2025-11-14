@@ -211,32 +211,31 @@ export default function CalendarWeekView({ onEventCreate, readOnly = false, refe
     return `${String(i).padStart(2, '0')}:00`;
   });
   
+  const [weekOffset, setWeekOffset] = useState(0);
+  const [viewMode, setViewMode] = useState<'week' | 'day'>('week');
+  
   const { events, weekStart, loading, error, isAuthenticated } = useCalendarEventsWithRefetch(refetchTrigger);
 
+  const navigateWeek = (direction: 'prev' | 'next') => {
+    setWeekOffset(prev => direction === 'prev' ? prev - 1 : prev + 1);
+  };
+
   const getWeekDays = () => {
-    if (!weekStart) {
-      const today = new Date();
-      const day = today.getDay();
-      const diff = day === 0 ? -6 : 1 - day;
-      const monday = new Date(today);
-      monday.setDate(today.getDate() + diff);
-      
-      return Array.from({ length: 7 }, (_, i) => {
-        const date = new Date(monday);
-        date.setDate(monday.getDate() + i);
-        return date;
-      });
-    }
+    const today = new Date();
+    const day = today.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+    const monday = new Date(today);
+    monday.setDate(today.getDate() + diff + (weekOffset * 7));
     
-    const startDate = new Date(weekStart + 'T00:00:00');
     return Array.from({ length: 7 }, (_, i) => {
-      const date = new Date(startDate);
-      date.setDate(startDate.getDate() + i);
+      const date = new Date(monday);
+      date.setDate(monday.getDate() + i);
       return date;
     });
   };
 
   const weekDays = getWeekDays();
+  const displayDays = viewMode === 'day' ? [weekDays[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1]] : weekDays;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -269,15 +268,59 @@ export default function CalendarWeekView({ onEventCreate, readOnly = false, refe
               {weekDays[0].toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}
             </h1>
             <div className="flex items-center gap-2">
-              <button className="p-1.5 hover:bg-white/5 rounded-lg transition-colors" style={{ color: 'var(--app-text-muted)' }}>
+              <button 
+                onClick={() => navigateWeek('prev')}
+                className="p-1.5 hover:bg-white/5 rounded-lg transition-colors" 
+                style={{ color: 'var(--app-text-muted)' }}
+                title="Previous week"
+              >
                 <ChevronLeft size={18} />
               </button>
-              <button className="p-1.5 hover:bg-white/5 rounded-lg transition-colors" style={{ color: 'var(--app-text-muted)' }}>
+              <button 
+                onClick={() => setWeekOffset(0)}
+                className="px-3 py-1 text-xs hover:bg-white/5 rounded-lg transition-colors" 
+                style={{ color: 'var(--app-text-muted)' }}
+                title="Go to today"
+              >
+                Today
+              </button>
+              <button 
+                onClick={() => navigateWeek('next')}
+                className="p-1.5 hover:bg-white/5 rounded-lg transition-colors" 
+                style={{ color: 'var(--app-text-muted)' }}
+                title="Next week"
+              >
                 <ChevronRight size={18} />
               </button>
             </div>
           </div>
           <div className="flex items-center gap-3">
+            {/* View Toggle */}
+            <div className="flex items-center gap-1 p-1 rounded-lg" style={{ background: 'var(--app-surface-secondary)' }}>
+              <button
+                onClick={() => setViewMode('day')}
+                className={`px-3 py-1 text-xs rounded transition-all ${
+                  viewMode === 'day' 
+                    ? 'text-white' 
+                    : 'hover:bg-white/5'
+                }`}
+                style={viewMode === 'day' ? { background: 'var(--app-accent)' } : { color: 'var(--app-text-muted)' }}
+              >
+                Day
+              </button>
+              <button
+                onClick={() => setViewMode('week')}
+                className={`px-3 py-1 text-xs rounded transition-all ${
+                  viewMode === 'week' 
+                    ? 'text-white' 
+                    : 'hover:bg-white/5'
+                }`}
+                style={viewMode === 'week' ? { background: 'var(--app-accent)' } : { color: 'var(--app-text-muted)' }}
+              >
+                Week
+              </button>
+            </div>
+            
             {loading && (
               <div className="flex items-center gap-2" style={{ color: 'var(--app-text-muted)' }}>
                 <Loader2 size={16} className="animate-spin" />
@@ -334,12 +377,12 @@ export default function CalendarWeekView({ onEventCreate, readOnly = false, refe
       )}
 
       {/* CALENDAR GRID */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto" style={{ maxHeight: 'calc(100vh - 250px)' }}>
         <div className="p-6">
           {/* Days header */}
-          <div className="grid grid-cols-[60px_repeat(7,1fr)] gap-0 mb-2">
+          <div className={`grid gap-0 mb-2`} style={{ gridTemplateColumns: `60px repeat(${displayDays.length}, 1fr)` }}>
             <div className="text-xs" style={{ color: 'var(--app-text-muted)' }}>GMT</div>
-            {weekDays.map((date, i) => {
+            {displayDays.map((date, i) => {
               const isToday = date.getTime() === today.getTime();
               return (
                 <div key={i} className="text-center">
@@ -359,14 +402,15 @@ export default function CalendarWeekView({ onEventCreate, readOnly = false, refe
 
           {/* All-day events row */}
           {allDayEvents.length > 0 && (
-            <div className="grid grid-cols-[60px_repeat(7,1fr)] gap-0 mb-3">
+            <div className="grid gap-0 mb-3" style={{ gridTemplateColumns: `60px repeat(${displayDays.length}, 1fr)` }}>
               <div className="text-[10px] pr-2 text-right" style={{ color: 'var(--app-text-muted)', paddingTop: '4px' }}>
                 All day
               </div>
-              {[0, 1, 2, 3, 4, 5, 6].map((col) => {
-                const dayEvents = allDayEvents.filter(e => e.dayCol === col);
+              {displayDays.map((day, idx) => {
+                const dayCol = weekDays.findIndex(d => d.getTime() === day.getTime());
+                const dayEvents = allDayEvents.filter(e => e.dayCol === dayCol);
                 return (
-                  <div key={col} className="px-1">
+                  <div key={idx} className="px-1">
                     {dayEvents.map((event, i) => (
                       <div
                         key={i}
@@ -386,7 +430,7 @@ export default function CalendarWeekView({ onEventCreate, readOnly = false, refe
           <div 
             className="relative grid"
             style={{
-              gridTemplateColumns: '60px repeat(7, 1fr)',
+              gridTemplateColumns: `60px repeat(${displayDays.length}, 1fr)`,
               gridTemplateRows: `repeat(24, 3.5rem)`,
               borderTop: '1px solid var(--app-border)',
               borderLeft: '1px solid var(--app-border)'
@@ -409,18 +453,18 @@ export default function CalendarWeekView({ onEventCreate, readOnly = false, refe
                   {h}
                 </div>
                 {/* Day cells */}
-                {[0, 1, 2, 3, 4, 5, 6].map((col) => {
-                  const cellDate = weekDays[col];
-                  const isToday = cellDate && cellDate.getTime() === today.getTime();
+                {displayDays.map((day, idx) => {
+                  const isToday = day && day.getTime() === today.getTime();
+                  const dayColInWeek = weekDays.findIndex(d => d.getTime() === day.getTime());
                   
                   return (
                     <div
-                      key={col}
+                      key={idx}
                       className="transition-colors hover:bg-white/5"
                       style={{ 
                         borderRight: '1px solid var(--app-border)',
                         borderBottom: '1px solid var(--app-border)',
-                        gridColumn: col + 2,
+                        gridColumn: idx + 2,
                         gridRow: rowIdx + 1,
                         background: isToday ? 'rgba(99, 102, 241, 0.05)' : 'transparent'
                       }}
@@ -431,20 +475,29 @@ export default function CalendarWeekView({ onEventCreate, readOnly = false, refe
             ))}
 
             {/* Events */}
-            {timedEvents.map((block, i) => (
-              <div
-                key={i}
-                className={`${block.color} border border-white/20 text-[11px] font-medium rounded-md px-2 py-1 leading-tight cursor-pointer transition-all hover:scale-105 m-0.5 overflow-hidden`}
-                style={{
-                  gridColumn: `${block.dayCol + 2} / ${block.dayCol + 3}`,
-                  gridRow: `${block.startRow + 1} / span ${block.span}`,
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                  minHeight: '20px'
-                }}
-              >
-                <div className="text-white truncate">{block.title}</div>
-              </div>
-            ))}
+            {timedEvents.map((block, i) => {
+              const dayIndexInDisplay = displayDays.findIndex(d => {
+                const dayCol = weekDays.findIndex(wd => wd.getTime() === d.getTime());
+                return dayCol === block.dayCol;
+              });
+              
+              if (dayIndexInDisplay === -1) return null;
+              
+              return (
+                <div
+                  key={i}
+                  className={`${block.color} border border-white/20 text-[11px] font-medium rounded-md px-2 py-1 leading-tight cursor-pointer transition-all hover:scale-105 m-0.5 overflow-hidden`}
+                  style={{
+                    gridColumn: `${dayIndexInDisplay + 2} / ${dayIndexInDisplay + 3}`,
+                    gridRow: `${block.startRow + 1} / span ${block.span}`,
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                    minHeight: '20px'
+                  }}
+                >
+                  <div className="text-white truncate">{block.title}</div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
