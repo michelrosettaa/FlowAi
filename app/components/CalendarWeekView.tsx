@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Loader2, Plus } from "lucide-react";
+import { useAuth } from "@/app/hooks/useAuth";
 
 interface CalendarEvent {
   id: string;
@@ -21,12 +22,20 @@ interface CalendarWeekViewProps {
 }
 
 export function useCalendarEvents() {
+  const { isAuthenticated } = useAuth();
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [weekStart, setWeekStart] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchEvents = async () => {
+    // Skip fetching for unauthenticated users
+    if (!isAuthenticated) {
+      setLoading(false);
+      setEvents([]);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
@@ -50,14 +59,14 @@ export function useCalendarEvents() {
 
   useEffect(() => {
     fetchEvents();
-  }, []);
+  }, [isAuthenticated]);
 
-  return { events, weekStart, loading, error, refetch: fetchEvents };
+  return { events, weekStart, loading, error, refetch: fetchEvents, isAuthenticated };
 }
 
 export default function CalendarWeekView({ onEventCreate, readOnly = false }: CalendarWeekViewProps) {
   const hours = ["9am", "10am", "11am", "12pm", "1pm", "2pm", "3pm", "4pm", "5pm"];
-  const { events, weekStart, loading, error } = useCalendarEvents();
+  const { events, weekStart, loading, error, isAuthenticated } = useCalendarEvents();
 
   const timedEvents = events.flatMap(event => 
     event.daySegments.filter(seg => !seg.allDay).map(segment => ({
@@ -102,8 +111,27 @@ export default function CalendarWeekView({ onEventCreate, readOnly = false }: Ca
         </div>
       </header>
 
+      {/* UNAUTHENTICATED MESSAGE */}
+      {!isAuthenticated && (
+        <div className="mx-8 mt-6 p-6 premium-card text-center">
+          <div className="text-4xl mb-3">📅</div>
+          <div className="font-semibold mb-2" style={{ color: 'var(--app-text)' }}>
+            Connect Your Calendar
+          </div>
+          <div className="text-sm mb-4" style={{ color: 'var(--app-text-muted)' }}>
+            Sign in with Google to sync your calendar and create time blocks.
+          </div>
+          <button
+            onClick={() => window.location.href = '/login'}
+            className="premium-btn"
+          >
+            Sign In with Google
+          </button>
+        </div>
+      )}
+
       {/* ERROR MESSAGE */}
-      {error && (
+      {error && isAuthenticated && (
         <div className="mx-8 mt-6 p-4 premium-card border-l-4" style={{ borderLeftColor: 'var(--app-error)' }}>
           <div className="font-semibold mb-1" style={{ color: 'var(--app-error)' }}>
             Calendar Error

@@ -14,7 +14,7 @@ FlowAI is a Next.js-based AI productivity platform that helps users manage their
 3. ✅ **Google Calendar Integration** - Calendar sync now live with read/write access via per-user OAuth tokens
 4. ✅ **PostgreSQL Database** - Infrastructure set up with Drizzle ORM (schema ready for migration from localStorage)
 5. ✅ **Replit Migration** - Fully migrated from Vercel to Replit environment
-6. ✅ **NextAuth Multi-Provider OAuth** - **UPDATED** Production-ready authentication with Google/Microsoft/Apple + email (non-authenticated) login, per-user token management, JWT sessions, Superhuman-style login page, and complete onboarding flow for first-time users. Email input captures email and redirects directly to onboarding questions without magic link authentication. Email-only users can access the app without authentication (answers saved to localStorage).
+6. ✅ **NextAuth Multi-Provider OAuth** - **UPDATED** Production-ready authentication with Google/Microsoft/Apple + email (non-authenticated) login, per-user token management, JWT sessions, Superhuman-style login page, and complete onboarding flow for first-time users. Email input captures email and redirects directly to onboarding questions without magic link authentication. Email-only users can access the app without authentication (answers saved to localStorage). Calendar features gracefully degrade for unauthenticated users with option to sign in.
 7. ✅ **Email Notification System** - Three types of beautiful HTML emails (daily digest, task reminders, focus alerts)
 8. ✅ **Premium Loading Page** - Refined loading experience with animated icons, progress tracking, and smooth transitions
 9. ✅ **Premium Design Upgrade** - Complete platform redesign with premium aesthetics
