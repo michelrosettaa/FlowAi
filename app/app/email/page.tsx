@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Mail, Sparkles, Loader2, Send, Inbox, RefreshCw, Reply } from "lucide-react";
+import { Mail, Sparkles, Loader2, Send, Inbox } from "lucide-react";
 import { useAuth } from "@/app/hooks/useAuth";
+import { EmailInboxView } from "@/app/components/EmailInboxView";
+import { EmailDetailModal } from "@/app/components/EmailDetailModal";
 
 interface Email {
   id: string;
@@ -217,7 +219,6 @@ export default function EmailAssistantPage() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      {/* Header */}
       <header className="mb-6">
         <div className="flex items-center gap-3 mb-4">
           <div 
@@ -236,7 +237,6 @@ export default function EmailAssistantPage() {
           </div>
         </div>
 
-        {/* Tabs */}
         <div className="flex gap-2">
           <button
             onClick={() => setActiveTab("inbox")}
@@ -261,257 +261,43 @@ export default function EmailAssistantPage() {
               : { background: 'var(--app-surface)', color: 'var(--app-text-muted)' }
             }
           >
-            <Send className="w-4 h-4 inline mr-2" />
+            <Sparkles className="w-4 h-4 inline mr-2" />
             Compose
           </button>
         </div>
       </header>
 
-      {/* Inbox Tab */}
       {activeTab === "inbox" && (
         <div>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold" style={{ color: 'var(--app-text)' }}>
-              Recent Emails
-            </h2>
-            <button
-              onClick={fetchInbox}
-              disabled={loadingInbox}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-all"
-              style={{ background: 'var(--app-surface)', color: 'var(--app-text)' }}
-            >
-              <RefreshCw className={`w-4 h-4 ${loadingInbox ? 'animate-spin' : ''}`} />
-              Refresh
-            </button>
-          </div>
+          <EmailInboxView
+            emails={emails}
+            loadingInbox={loadingInbox}
+            inboxError={inboxError}
+            onRefresh={fetchInbox}
+            onSelectEmail={setSelectedEmail}
+          />
 
-          {inboxError && (
-            <div className="mb-4 p-4 rounded-xl border-l-4 bg-red-500/10"
-              style={{ borderLeftColor: '#ef4444' }}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="font-semibold text-sm text-red-300 mb-1">Error Loading Inbox</div>
-                  <div className="text-sm text-red-200">{inboxError}</div>
-                </div>
-                <button
-                  onClick={fetchInbox}
-                  className="px-4 py-2 rounded-lg text-sm text-white transition-all"
-                  style={{ background: 'var(--app-accent)' }}
-                >
-                  Retry
-                </button>
-              </div>
-            </div>
-          )}
-
-          {loadingInbox ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'var(--app-accent)' }} />
-            </div>
-          ) : emails.length === 0 && !inboxError ? (
-            <div 
-              className="text-center py-12 rounded-xl border"
-              style={{ background: 'var(--app-surface)', borderColor: 'var(--app-border)' }}
-            >
-              <p style={{ color: 'var(--app-text-muted)' }}>No emails found</p>
-            </div>
-          ) : !inboxError ? (
-            <div className="grid gap-3">
-              {emails.map((email) => (
-                <div
-                  key={email.id}
-                  className="p-4 rounded-xl border cursor-pointer hover:shadow-md transition-all"
-                  style={{ background: 'var(--app-surface)', borderColor: 'var(--app-border)' }}
-                  onClick={() => {
-                    setSelectedEmail(email);
-                    setAiReply("");
-                    setSendStatus("");
-                  }}
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex-1">
-                      <div className="font-semibold text-sm mb-1" style={{ color: 'var(--app-text)' }}>
-                        {email.from}
-                      </div>
-                      <div className="font-medium text-sm" style={{ color: 'var(--app-text)' }}>
-                        {email.subject}
-                      </div>
-                    </div>
-                    <div className="text-xs" style={{ color: 'var(--app-text-muted)' }}>
-                      {new Date(email.date).toLocaleDateString()}
-                    </div>
-                  </div>
-                  <p className="text-sm line-clamp-2" style={{ color: 'var(--app-text-muted)' }}>
-                    {email.snippet}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Selected Email Detail */}
           {selectedEmail && (
-            <div 
-              className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
-              onClick={() => setSelectedEmail(null)}
-            >
-              <div 
-                className="max-w-3xl w-full max-h-[90vh] overflow-y-auto rounded-2xl p-6 shadow-2xl"
-                style={{ background: 'var(--app-background)' }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="mb-4">
-                  <div className="text-xs mb-2" style={{ color: 'var(--app-text-muted)' }}>
-                    From: {selectedEmail.from}
-                  </div>
-                  <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--app-text)' }}>
-                    {selectedEmail.subject}
-                  </h3>
-                  <div className="text-xs mb-4" style={{ color: 'var(--app-text-muted)' }}>
-                    {new Date(selectedEmail.date).toLocaleString()}
-                  </div>
-                  <div 
-                    className="p-4 rounded-xl mb-4 whitespace-pre-wrap text-sm"
-                    style={{ background: 'var(--app-surface)', color: 'var(--app-text)' }}
-                  >
-                    {selectedEmail.body || selectedEmail.snippet}
-                  </div>
-                </div>
-
-                {replyError && (
-                  <div className="mb-4 p-4 rounded-xl border-l-4 bg-red-500/10"
-                    style={{ borderLeftColor: '#ef4444' }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="font-semibold text-sm text-red-300 mb-1">Error Generating Reply</div>
-                        <div className="text-sm text-red-200">{replyError}</div>
-                      </div>
-                      <button
-                        onClick={() => handleGenerateReply(selectedEmail)}
-                        className="px-4 py-2 rounded-lg text-sm text-white transition-all flex items-center gap-2"
-                        style={{ background: 'var(--app-accent)' }}
-                      >
-                        <RefreshCw className="w-4 h-4" />
-                        Retry
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {!replyError && (
-                  <button
-                    onClick={() => handleGenerateReply(selectedEmail)}
-                    disabled={generatingReply}
-                    className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white mb-4 transition-all"
-                    style={{ background: 'var(--app-accent)' }}
-                  >
-                    {generatingReply ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Generating AI Reply...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-4 h-4" />
-                        Generate AI Reply
-                      </>
-                    )}
-                  </button>
-                )}
-
-                {aiReply && (
-                  <div>
-                    <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--app-text)' }}>
-                      AI-Generated Reply:
-                    </h4>
-                    <textarea
-                      value={aiReply}
-                      onChange={(e) => setAiReply(e.target.value)}
-                      rows={8}
-                      className="w-full p-4 rounded-xl text-sm mb-4 resize-none"
-                      style={{ 
-                        background: 'var(--app-surface)', 
-                        color: 'var(--app-text)',
-                        border: '1px solid var(--app-border)'
-                      }}
-                    />
-                    <div className="flex gap-3">
-                      <button
-                        onClick={handleSendReply}
-                        disabled={sendingReply}
-                        className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white transition-all"
-                        style={{ background: 'var(--app-accent)' }}
-                      >
-                        {sendingReply ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            Sending...
-                          </>
-                        ) : (
-                          <>
-                            <Send className="w-4 h-4" />
-                            Send Reply
-                          </>
-                        )}
-                      </button>
-                      <button
-                        onClick={() => {
-                          setSelectedEmail(null);
-                          setAiReply("");
-                        }}
-                        className="px-6 py-3 rounded-xl text-sm font-semibold transition-all"
-                        style={{ background: 'var(--app-surface)', color: 'var(--app-text-muted)' }}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {sendStatus && (
-                  <div className={`mt-4 p-4 rounded-xl border-l-4 ${
-                    sendStatus.includes('✅') 
-                      ? 'bg-green-500/10 border-green-500' 
-                      : 'bg-red-500/10'
-                  }`}
-                    style={sendStatus.includes('✅') ? {} : { borderLeftColor: '#ef4444' }}
-                  >
-                    {sendStatus.includes('✅') ? (
-                      <div className="text-sm text-green-300 text-center">{sendStatus}</div>
-                    ) : (
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="font-semibold text-sm text-red-300 mb-1">Error Sending Email</div>
-                          <div className="text-sm text-red-200">{sendStatus.replace('❌ ', '')}</div>
-                        </div>
-                        <button
-                          onClick={handleSendReply}
-                          disabled={sendingReply}
-                          className="px-4 py-2 rounded-lg text-sm text-white transition-all flex items-center gap-2"
-                          style={{ background: 'var(--app-accent)' }}
-                        >
-                          {sendingReply ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <>
-                              <RefreshCw className="w-4 h-4" />
-                              Retry
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
+            <EmailDetailModal
+              email={selectedEmail}
+              aiReply={aiReply}
+              generatingReply={generatingReply}
+              replyError={replyError}
+              sendingReply={sendingReply}
+              sendStatus={sendStatus}
+              onClose={() => {
+                setSelectedEmail(null);
+                setAiReply("");
+                setSendStatus("");
+              }}
+              onGenerateReply={handleGenerateReply}
+              onAiReplyChange={setAiReply}
+              onSendReply={handleSendReply}
+            />
           )}
         </div>
       )}
 
-      {/* Compose Tab */}
       {activeTab === "compose" && (
         <div className="max-w-3xl">
           <div className="space-y-4 mb-6">
@@ -545,8 +331,8 @@ export default function EmailAssistantPage() {
               value={context}
               onChange={(e) => setContext(e.target.value)}
               placeholder="What do you want to say? (e.g., 'Follow up on our meeting, ask about timeline, suggest next steps')"
-              rows={6}
-              className="w-full p-4 rounded-xl text-sm resize-none outline-none"
+              rows={4}
+              className="w-full p-4 rounded-xl text-sm outline-none resize-none"
               style={{ 
                 color: 'var(--app-text)',
                 background: 'var(--app-surface)',
@@ -555,33 +341,46 @@ export default function EmailAssistantPage() {
             />
           </div>
 
-          <div className="flex justify-center mb-8">
-            <button
-              onClick={handleGenerateDraft}
-              disabled={loading}
-              className={`flex items-center gap-2 px-8 py-3 rounded-xl text-sm font-semibold text-white shadow-lg transition-all ${
-                loading ? "opacity-50 cursor-not-allowed" : "hover:scale-105"
-              }`}
-              style={{ background: 'var(--app-accent)' }}
-            >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-              {loading ? "Generating..." : "Generate Email with AI"}
-            </button>
-          </div>
+          <button
+            onClick={handleGenerateDraft}
+            disabled={loading || !recipient.trim() || !context.trim()}
+            className={`w-full flex items-center justify-center gap-2 px-8 py-3 rounded-xl text-sm font-semibold text-white mb-6 transition-all ${
+              loading ? "opacity-50" : "hover:scale-[1.02]"
+            }`}
+            style={{ background: 'var(--app-accent)' }}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                FlowAI is drafting your email...
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-4 h-4" />
+                Generate Email with AI
+              </>
+            )}
+          </button>
 
           {draftedEmail && (
             <div className="space-y-4">
-              <div 
-                className="p-6 rounded-xl text-sm leading-relaxed whitespace-pre-wrap"
-                style={{ 
-                  background: 'var(--app-surface)',
-                  color: 'var(--app-text)',
-                  border: '1px solid var(--app-border)'
-                }}
-              >
-                {draftedEmail}
+              <div>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--app-text)' }}>
+                  AI-Generated Email (editable):
+                </label>
+                <textarea
+                  value={draftedEmail}
+                  onChange={(e) => setDraftedEmail(e.target.value)}
+                  rows={12}
+                  className="w-full p-4 rounded-xl text-sm outline-none resize-none"
+                  style={{ 
+                    color: 'var(--app-text)',
+                    background: 'var(--app-surface)',
+                    border: '1px solid var(--app-border)'
+                  }}
+                />
               </div>
-              
+
               <div className="flex justify-center gap-4">
                 <button
                   onClick={handleSendEmail}
