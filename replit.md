@@ -78,9 +78,13 @@ PostgreSQL (Neon-backed) is the primary database, managed with Drizzle ORM. The 
 - **UX Improvements**: Reserved toast notifications for actionable confirmations/errors to prevent alert fatigue
 - **Professional Weekly Calendar**: Replaced AI planner with Reclaim.ai-style calendar featuring 24-hour time format (00:00-23:00), 7-day week view, GMT timezone indicator, all-day events row, and real-time event creation with immediate refetch
 - **Real-Time Event Updates**: Implemented `useCalendarEventsWithRefetch` hook that watches refetch triggers and immediately displays newly created events from `/api/app-calendar/events`
+- **Week Navigation**: Fully functional Previous/Next/Today buttons to navigate across weeks and months, with weekOffset state propagating through event fetching and transformation logic
+- **Day/Week View Toggle**: Reclaim.ai-style view switcher allowing users to toggle between single-day and 7-day week views
+- **Calendar Height Constraint**: Added maxHeight to prevent calendar grid from extending to page bottom, with proper scroll behavior
 
 ### Calendar Components Added/Updated
-- `app/components/CalendarWeekView.tsx` - Professional weekly calendar with 24-hour format, 7-day grid, all-day events row
+- `app/components/CalendarWeekView.tsx` - Professional weekly calendar with 24-hour format, 7-day grid, all-day events row, week navigation, view toggle, height constraint
 - `app/components/AddEventModal.tsx` - Event creation modal with refetch integration
 - `app/app/planner/page.tsx` - Replaced AI text generation with interactive calendar view
+- `transformAppEventsToCalendarEvents()` - Event transformation function accounting for weekOffset to correctly filter and position events for any week
 ```
