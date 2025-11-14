@@ -346,6 +346,48 @@ Keep it warm, professional, and include clear next steps.`;
     }
   });
 
+  app.post("/api/calendar/events", isAuthenticated, async (req: any, res) => {
+    try {
+      const { title, start, end, description } = req.body;
+
+      if (!title || !start || !end) {
+        return res.status(400).json({ error: "Title, start, and end times are required" });
+      }
+
+      const calendar = await getCalendarClient();
+      
+      const calendarInfo = await calendar.calendars.get({ calendarId: 'primary' });
+      const userTimezone = calendarInfo.data.timeZone || 'UTC';
+
+      const event = {
+        summary: title,
+        description: description || '',
+        start: {
+          dateTime: start,
+          timeZone: userTimezone,
+        },
+        end: {
+          dateTime: end,
+          timeZone: userTimezone,
+        },
+      };
+
+      const response = await calendar.events.insert({
+        calendarId: 'primary',
+        requestBody: event,
+      });
+
+      res.json({ 
+        success: true, 
+        event: response.data,
+        message: "Event created successfully" 
+      });
+    } catch (err: any) {
+      console.error("Create calendar event error:", err);
+      res.status(500).json({ error: err.message || "Failed to create calendar event" });
+    }
+  });
+
   app.post("/api/mentor", isAuthenticated, async (req: any, res) => {
     try {
       const { text, voice } = req.body;

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Calendar as CalendarIcon, Loader2 } from "lucide-react";
+import { Calendar as CalendarIcon, Loader2, Plus } from "lucide-react";
 
 interface CalendarEvent {
   id: string;
@@ -24,6 +24,14 @@ export default function CalendarPage() {
   const [weekStart, setWeekStart] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [newEvent, setNewEvent] = useState({
+    title: "",
+    start: "",
+    end: "",
+    description: ""
+  });
 
   useEffect(() => {
     async function fetchEvents() {
@@ -46,6 +54,35 @@ export default function CalendarPage() {
     }
     fetchEvents();
   }, []);
+
+  const handleCreateEvent = async () => {
+    if (!newEvent.title || !newEvent.start || !newEvent.end) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    try {
+      setCreating(true);
+      const response = await fetch("/api/calendar/events", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newEvent),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create event");
+      }
+
+      setShowCreateModal(false);
+      setNewEvent({ title: "", start: "", end: "", description: "" });
+      
+      window.location.reload();
+    } catch (err: any) {
+      alert(err.message || "Failed to create event");
+    } finally {
+      setCreating(false);
+    }
+  };
 
   const allDayEvents = events.flatMap(event => 
     event.daySegments.filter(seg => seg.allDay).map(segment => ({
@@ -77,14 +114,131 @@ export default function CalendarPage() {
               Calendar
             </h1>
           </div>
-          {loading && (
-            <div className="flex items-center gap-2" style={{ color: 'var(--app-text-muted)' }}>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span className="text-sm">Loading events...</span>
-            </div>
-          )}
+          <div className="flex items-center gap-3">
+            {loading && (
+              <div className="flex items-center gap-2" style={{ color: 'var(--app-text-muted)' }}>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span className="text-sm">Loading events...</span>
+              </div>
+            )}
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-all hover:scale-105 active:scale-95"
+              style={{
+                background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                color: 'white',
+                boxShadow: 'var(--app-shadow-lg)'
+              }}
+            >
+              <Plus className="w-4 h-4" />
+              Add Event
+            </button>
+          </div>
         </div>
       </header>
+
+      {/* Create Event Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50" onClick={() => setShowCreateModal(false)}>
+          <div className="premium-card p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--app-text)' }}>
+              Create New Event
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--app-text-muted)' }}>
+                  Event Title *
+                </label>
+                <input
+                  type="text"
+                  value={newEvent.title}
+                  onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+                  placeholder="Meeting with team"
+                  className="w-full px-4 py-2 rounded-lg border text-sm outline-none transition-all"
+                  style={{
+                    background: 'var(--app-bg)',
+                    borderColor: 'var(--app-border)',
+                    color: 'var(--app-text)'
+                  }}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--app-text-muted)' }}>
+                  Start Time *
+                </label>
+                <input
+                  type="datetime-local"
+                  value={newEvent.start}
+                  onChange={(e) => setNewEvent({ ...newEvent, start: e.target.value })}
+                  className="w-full px-4 py-2 rounded-lg border text-sm outline-none"
+                  style={{
+                    background: 'var(--app-bg)',
+                    borderColor: 'var(--app-border)',
+                    color: 'var(--app-text)'
+                  }}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--app-text-muted)' }}>
+                  End Time *
+                </label>
+                <input
+                  type="datetime-local"
+                  value={newEvent.end}
+                  onChange={(e) => setNewEvent({ ...newEvent, end: e.target.value })}
+                  className="w-full px-4 py-2 rounded-lg border text-sm outline-none"
+                  style={{
+                    background: 'var(--app-bg)',
+                    borderColor: 'var(--app-border)',
+                    color: 'var(--app-text)'
+                  }}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--app-text-muted)' }}>
+                  Description
+                </label>
+                <textarea
+                  value={newEvent.description}
+                  onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+                  placeholder="Optional details..."
+                  rows={3}
+                  className="w-full px-4 py-2 rounded-lg border text-sm outline-none resize-none"
+                  style={{
+                    background: 'var(--app-bg)',
+                    borderColor: 'var(--app-border)',
+                    color: 'var(--app-text)'
+                  }}
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setShowCreateModal(false)}
+                  className="flex-1 px-4 py-2 rounded-lg border font-semibold text-sm transition-all hover:scale-105"
+                  style={{
+                    borderColor: 'var(--app-border)',
+                    color: 'var(--app-text-muted)'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreateEvent}
+                  disabled={creating}
+                  className="flex-1 px-4 py-2 rounded-lg font-semibold text-sm transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{
+                    background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                    color: 'white',
+                    boxShadow: 'var(--app-shadow-lg)'
+                  }}
+                >
+                  {creating ? "Creating..." : "Create Event"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Calendar Grid */}
       <div className="flex-1 p-8">
