@@ -10,7 +10,7 @@ export default function PricingPage() {
           <nav className="flex gap-6 text-sm font-medium text-slate-700">
             <a href="/" className="hover:text-slate-900 transition">Home</a>
             <a href="/pricing" className="text-blue-600 font-semibold">Pricing</a>
-            <a href="/signup" className="hover:text-slate-900 transition">Get Started</a>
+            <a href="/login" className="hover:text-slate-900 transition">Get Started</a>
           </nav>
         </div>
       </header>
@@ -36,7 +36,7 @@ export default function PricingPage() {
                 <li>✅ Limited mentor messages</li>
                 <li>✅ 2 email summaries/day</li>
               </ul>
-              <a href="/signup" className="inline-block w-full bg-slate-900 text-white rounded-lg py-2 font-medium hover:bg-slate-800 transition">
+              <a href="/login" className="inline-block w-full bg-slate-900 text-white rounded-lg py-2 font-medium hover:bg-slate-800 transition">
                 Get Started
               </a>
             </div>
@@ -52,7 +52,7 @@ export default function PricingPage() {
                 <li>✅ Calendar sync</li>
                 <li>✅ Unlimited email drafts</li>
               </ul>
-              <a href="/signup" className="inline-block w-full bg-white text-blue-700 rounded-lg py-2 font-semibold hover:bg-slate-100 transition">
+              <a href="/login" className="inline-block w-full bg-white text-blue-700 rounded-lg py-2 font-semibold hover:bg-slate-100 transition">
                 Upgrade to Pro
               </a>
               <p className="text-xs text-slate-200 mt-2">£79/year (save 27%)</p>
@@ -69,7 +69,7 @@ export default function PricingPage() {
                 <li>✅ Team focus analytics</li>
                 <li>✅ Slack + Gmail integration</li>
               </ul>
-              <a href="/signup" className="inline-block w-full bg-blue-600 text-white rounded-lg py-2 font-medium hover:bg-blue-700 transition">
+              <a href="/login" className="inline-block w-full bg-blue-600 text-white rounded-lg py-2 font-medium hover:bg-blue-700 transition">
                 Contact Sales
               </a>
             </div>
