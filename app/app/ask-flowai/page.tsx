@@ -115,7 +115,7 @@ export default function AskFlowAIPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-8 w-full max-w-2xl">
                 {[
                   "What's on my schedule today?",
-                  "Help me prioritize my tasks",
+                  "Help me prioritise my tasks",
                   "Draft an email to my team",
                   "Create a focus time block"
                 ].map((suggestion, i) => (

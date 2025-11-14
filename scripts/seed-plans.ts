@@ -42,8 +42,8 @@ const plans = [
     slug: 'pro',
     name: 'Pro',
     description: 'Full power for productive professionals',
-    priceMonthly: 1900,
-    priceAnnual: 18000,
+    priceMonthly: 1500,
+    priceAnnual: 14400,
     stripePriceIdMonthly: null,
     stripePriceIdAnnual: null,
     limits: {
@@ -67,8 +67,8 @@ const plans = [
     slug: 'team',
     name: 'Team',
     description: 'For teams that work together',
-    priceMonthly: 4900,
-    priceAnnual: 47000,
+    priceMonthly: 3900,
+    priceAnnual: 37440,
     stripePriceIdMonthly: null,
     stripePriceIdAnnual: null,
     limits: {
@@ -118,8 +118,9 @@ async function seedPlans() {
   console.log('\nSeeding complete!');
   console.log('\nNext steps:');
   console.log('1. Create products in Stripe Dashboard: https://dashboard.stripe.com/products');
-  console.log('2. Update stripePriceIdMonthly and stripePriceIdAnnual in the database');
-  console.log('3. Run this script again to sync the Stripe Price IDs');
+  console.log('2. Set currency to GBP when creating products');
+  console.log('3. Update stripePriceIdMonthly and stripePriceIdAnnual in the database');
+  console.log('4. Run this script again to sync the Stripe Price IDs');
 }
 
 seedPlans()

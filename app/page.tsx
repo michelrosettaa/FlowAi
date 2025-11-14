@@ -242,8 +242,8 @@ export default function LandingPage() {
             </div>
             <h3 className="text-2xl font-bold text-slate-900 mb-3">Ask FlowAI Anything</h3>
             <p className="text-slate-700 text-base leading-relaxed mb-6">
-              "What should I focus on today?" "Help me prioritize my tasks" "Draft an email for my team" 
-              — Ask FlowAI understands context and gives you smart, personalized answers instantly.
+              "What should I focus on today?" "Help me prioritise my tasks" "Draft an email for my team" 
+              — Ask FlowAI understands context and gives you smart, personalised answers instantly.
             </p>
             <div className="bg-white/60 backdrop-blur rounded-2xl p-4 border border-purple-200/40">
               <div className="flex items-start gap-3 mb-3">

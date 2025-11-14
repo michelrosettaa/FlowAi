@@ -9,7 +9,7 @@ export default function Features() {
         </div>
         <div className="p-6 rounded-2xl shadow-md hover:shadow-xl transition">
           <h3 className="text-xl font-semibold mb-2 text-blue-600">Email Automation</h3>
-          <p className="text-gray-600">Generate, personalize, and schedule follow-up emails with one click — powered by AI.</p>
+          <p className="text-gray-600">Generate, personalise, and schedule follow-up emails with one click — powered by AI.</p>
         </div>
         <div className="p-6 rounded-2xl shadow-md hover:shadow-xl transition">
           <h3 className="text-xl font-semibold mb-2 text-blue-600">Smart Focus Mode</h3>

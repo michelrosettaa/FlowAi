@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
         },
       ],
       success_url: `${process.env.NEXTAUTH_URL}/app/billing?success=true`,
-      cancel_url: `${process.env.NEXTAUTH_URL}/app/billing?canceled=true`,
+      cancel_url: `${process.env.NEXTAUTH_URL}/app/billing?cancelled=true`,
       subscription_data: {
         metadata: {
           userId: session.user.id,

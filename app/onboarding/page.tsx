@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 const steps = [
   {
     title: "What brings you to FlowAI?",
-    subtitle: "I'll personalize your experience to help you stay productive.",
+    subtitle: "I'll personalise your experience to help you stay productive.",
     options: [
-      "I need help staying organized",
+      "I need help staying organised",
       "I want to protect my focus time",
       "I need assistance with emails and follow-ups",
       "All of the above!",
@@ -31,7 +31,7 @@ const steps = [
     options: [
       "Too many meetings interrupt my day",
       "Email and messages are overwhelming",
-      "I struggle to prioritize what matters most",
+      "I struggle to prioritise what matters most",
       "I lose track of tasks and follow-ups",
     ],
     key: "challenge",
@@ -84,7 +84,7 @@ export default function OnboardingPage() {
             <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 text-white text-xl font-bold flex items-center justify-center shadow-lg mb-4">
               F
             </div>
-            <p className="text-sm text-slate-500">Let's personalize your experience</p>
+            <p className="text-sm text-slate-500">Let's personalise your experience</p>
           </div>
 
           <h2 className="text-3xl font-bold text-slate-900 leading-tight mb-3">
