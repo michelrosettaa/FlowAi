@@ -100,8 +100,23 @@ export const userPreferences = pgTable("user_preferences", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const calendarEvents = pgTable("calendar_events", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id"),
+  sessionId: varchar("session_id"),
+  title: text("title").notNull(),
+  description: text("description"),
+  startDate: timestamp("start_date", { withTimezone: true }).notNull(),
+  endDate: timestamp("end_date", { withTimezone: true }).notNull(),
+  allDay: boolean("all_day").default(false).notNull(),
+  color: varchar("color").default("#3b82f6"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const usersRelations = relations(users, ({ many, one }) => ({
   tasks: many(tasks),
+  calendarEvents: many(calendarEvents),
   preferences: one(userPreferences, {
     fields: [users.id],
     references: [userPreferences.userId],
@@ -111,6 +126,13 @@ export const usersRelations = relations(users, ({ many, one }) => ({
 export const tasksRelations = relations(tasks, ({ one }) => ({
   user: one(users, {
     fields: [tasks.userId],
+    references: [users.id],
+  }),
+}));
+
+export const calendarEventsRelations = relations(calendarEvents, ({ one }) => ({
+  user: one(users, {
+    fields: [calendarEvents.userId],
     references: [users.id],
   }),
 }));
@@ -128,3 +150,5 @@ export type Task = typeof tasks.$inferSelect;
 export type InsertTask = typeof tasks.$inferInsert;
 export type UserPreferences = typeof userPreferences.$inferSelect;
 export type InsertUserPreferences = typeof userPreferences.$inferInsert;
+export type CalendarEvent = typeof calendarEvents.$inferSelect;
+export type InsertCalendarEvent = typeof calendarEvents.$inferInsert;

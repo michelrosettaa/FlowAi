@@ -2,15 +2,18 @@ import {
   users,
   tasks,
   userPreferences,
+  calendarEvents,
   type User,
   type UpsertUser,
   type Task,
   type InsertTask,
   type UserPreferences,
   type InsertUserPreferences,
+  type CalendarEvent,
+  type InsertCalendarEvent,
 } from "../lib/db/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, or, and, gte, lte } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -24,6 +27,10 @@ export interface IStorage {
   
   getUserPreferences(userId: string): Promise<UserPreferences | undefined>;
   upsertUserPreferences(prefs: InsertUserPreferences): Promise<UserPreferences>;
+  
+  getCalendarEvents(userIdOrSessionId: string, startDate?: Date, endDate?: Date): Promise<CalendarEvent[]>;
+  createCalendarEvent(event: InsertCalendarEvent): Promise<CalendarEvent>;
+  deleteCalendarEvent(id: string, userIdOrSessionId: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -111,6 +118,62 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return prefs;
+  }
+
+  async getCalendarEvents(
+    userIdOrSessionId: string,
+    startDate?: Date,
+    endDate?: Date
+  ): Promise<CalendarEvent[]> {
+    // Build predicates correctly to avoid overwriting user/session filter
+    const userFilter = or(
+      eq(calendarEvents.userId, userIdOrSessionId),
+      eq(calendarEvents.sessionId, userIdOrSessionId)
+    );
+
+    if (startDate && endDate) {
+      return await db
+        .select()
+        .from(calendarEvents)
+        .where(
+          and(
+            userFilter,
+            gte(calendarEvents.startDate, startDate),
+            lte(calendarEvents.endDate, endDate)
+          )
+        );
+    }
+
+    return await db
+      .select()
+      .from(calendarEvents)
+      .where(userFilter);
+  }
+
+  async createCalendarEvent(eventData: InsertCalendarEvent): Promise<CalendarEvent> {
+    const [event] = await db
+      .insert(calendarEvents)
+      .values(eventData)
+      .returning();
+    return event;
+  }
+
+  async deleteCalendarEvent(id: string, userIdOrSessionId: string): Promise<boolean> {
+    const event = await db
+      .select()
+      .from(calendarEvents)
+      .where(eq(calendarEvents.id, id))
+      .limit(1);
+
+    if (
+      !event[0] ||
+      (event[0].userId !== userIdOrSessionId && event[0].sessionId !== userIdOrSessionId)
+    ) {
+      return false;
+    }
+
+    await db.delete(calendarEvents).where(eq(calendarEvents.id, id));
+    return true;
   }
 }
 

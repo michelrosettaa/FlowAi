@@ -518,6 +518,111 @@ Keep it warm, professional, and include clear next steps.`;
     }
   });
 
+  // App Calendar Endpoints (work for both authenticated and unauthenticated users)
+  app.get("/api/app-calendar/events", async (req: any, res) => {
+    try {
+      // Determine user identifier (userId for authenticated, sessionId for anonymous)
+      let userIdentifier: string;
+      
+      if (req.auth?.userId) {
+        // Authenticated user
+        userIdentifier = req.auth.userId;
+      } else {
+        // Unauthenticated user - use session ID
+        if (!req.session.id) {
+          return res.status(400).json({ error: "Session required" });
+        }
+        userIdentifier = req.session.id;
+      }
+
+      const events = await storage.getCalendarEvents(userIdentifier);
+      
+      // Transform events to calendar format
+      const transformedEvents = events.map(event => ({
+        id: event.id,
+        title: event.title,
+        description: event.description,
+        startDate: event.startDate,
+        endDate: event.endDate,
+        allDay: event.allDay,
+        color: event.color,
+      }));
+
+      res.json({ events: transformedEvents });
+    } catch (err: any) {
+      console.error("App calendar events error:", err);
+      res.status(500).json({ error: err.message || "Failed to fetch calendar events" });
+    }
+  });
+
+  app.post("/api/app-calendar/events", async (req: any, res) => {
+    try {
+      const { title, description, startDate, endDate, allDay, color } = req.body;
+
+      if (!title || !startDate || !endDate) {
+        return res.status(400).json({ error: "Title, start date, and end date are required" });
+      }
+
+      // Determine user identifier (server-side only, never trust client input)
+      let userId: string | null = null;
+      let sessionId: string | null = null;
+
+      if (req.auth?.userId) {
+        // Authenticated user
+        userId = req.auth.userId;
+      } else {
+        // Unauthenticated user - use session ID
+        if (!req.session.id) {
+          return res.status(400).json({ error: "Session required" });
+        }
+        sessionId = req.session.id;
+      }
+
+      const event = await storage.createCalendarEvent({
+        userId,
+        sessionId,
+        title,
+        description,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        allDay: allDay || false,
+        color: color || "#3b82f6",
+      });
+
+      res.json({ success: true, event });
+    } catch (err: any) {
+      console.error("Create app calendar event error:", err);
+      res.status(500).json({ error: err.message || "Failed to create calendar event" });
+    }
+  });
+
+  app.delete("/api/app-calendar/events/:id", async (req: any, res) => {
+    try {
+      // Determine user identifier
+      let userIdentifier: string;
+
+      if (req.auth?.userId) {
+        userIdentifier = req.auth.userId;
+      } else {
+        if (!req.session.id) {
+          return res.status(400).json({ error: "Session required" });
+        }
+        userIdentifier = req.session.id;
+      }
+
+      const deleted = await storage.deleteCalendarEvent(req.params.id, userIdentifier);
+      
+      if (!deleted) {
+        return res.status(404).json({ error: "Event not found" });
+      }
+
+      res.json({ success: true });
+    } catch (err: any) {
+      console.error("Delete app calendar event error:", err);
+      res.status(500).json({ error: err.message || "Failed to delete calendar event" });
+    }
+  });
+
   app.post("/api/preferences", requireNextAuth, async (req: any, res) => {
     try {
       const userId = req.auth!.userId;
