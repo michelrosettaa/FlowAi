@@ -1,6 +1,7 @@
 // app/layout.tsx
 import "./globals.css";
 import React from "react";
+import Toaster from "./components/Toaster";
 
 export const metadata = {
   title: "FlowAI",
@@ -10,7 +11,10 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="bg-[#0a0f1c] text-slate-100">{children}</body>
+      <body className="bg-[#0a0f1c] text-slate-100">
+        {children}
+        <Toaster />
+      </body>
     </html>
   );
 }
