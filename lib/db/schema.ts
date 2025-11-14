@@ -2,8 +2,10 @@ import { sql } from "drizzle-orm";
 import {
   boolean,
   index,
+  integer,
   jsonb,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   varchar,
@@ -26,9 +28,52 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
+  name: varchar("name"),
+  emailVerified: timestamp("email_verified", { mode: "date" }),
+  image: varchar("image"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+export const authAccounts = pgTable(
+  "auth_accounts",
+  {
+    userId: varchar("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: varchar("type").$type<"oauth" | "oidc" | "email">().notNull(),
+    provider: varchar("provider").notNull(),
+    providerAccountId: varchar("provider_account_id").notNull(),
+    refresh_token: text("refresh_token"),
+    access_token: text("access_token"),
+    expires_at: integer("expires_at"),
+    token_type: varchar("token_type"),
+    scope: text("scope"),
+    id_token: text("id_token"),
+    session_state: varchar("session_state"),
+  },
+  (table) => [
+    primaryKey({ columns: [table.provider, table.providerAccountId] }),
+  ]
+);
+
+export const authSessions = pgTable("auth_sessions", {
+  sessionToken: varchar("session_token").primaryKey(),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  expires: timestamp("expires", { mode: "date" }).notNull(),
+});
+
+export const authVerificationTokens = pgTable(
+  "auth_verification_tokens",
+  {
+    identifier: varchar("identifier").notNull(),
+    token: varchar("token").notNull(),
+    expires: timestamp("expires", { mode: "date" }).notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.identifier, table.token] })]
+);
 
 export const tasks = pgTable("tasks", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
