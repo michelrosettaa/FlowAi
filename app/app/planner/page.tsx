@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Calendar, Sparkles, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function AIPlanner() {
   const [tasks, setTasks] = useState("");
@@ -13,10 +14,20 @@ export default function AIPlanner() {
   const [loading, setLoading] = useState(false);
 
   const generatePlan = async () => {
-    if (!tasks.trim()) return alert("Please enter your tasks first.");
+    if (!tasks.trim()) {
+      toast.error("Please enter your tasks first", {
+        description: "Tell me what you want to accomplish today",
+      });
+      return;
+    }
+    
     setLoading(true);
     setPlan("");
     setTimeline([]);
+
+    toast.loading("FlowAI is crafting your perfect day...", {
+      id: "generating-plan",
+    });
 
     try {
       const response = await fetch("/api/plan", {
@@ -32,9 +43,18 @@ export default function AIPlanner() {
       const data = await response.json();
       setPlan(data.plan || "No plan generated.");
       setTimeline(data.timeline || []);
+      
+      toast.success("Your day is planned! ✨", {
+        id: "generating-plan",
+        description: `Created ${data.timeline?.length || 0} time blocks`,
+      });
     } catch (err) {
       console.error("Error generating plan:", err);
       setPlan("Error generating plan. Please try again later.");
+      toast.error("Failed to generate plan", {
+        id: "generating-plan",
+        description: "Please try again in a moment",
+      });
     } finally {
       setLoading(false);
     }
