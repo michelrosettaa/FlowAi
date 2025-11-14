@@ -22,7 +22,7 @@ interface CalendarWeekViewProps {
   refetchTrigger?: number;
 }
 
-export function useCalendarEvents() {
+export function useCalendarEvents(weekOffset: number = 0) {
   const { isAuthenticated } = useAuth();
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [weekStart, setWeekStart] = useState("");
@@ -51,7 +51,7 @@ export function useCalendarEvents() {
       let appEvents: CalendarEvent[] = [];
       if (appResponse.ok) {
         const appData = await appResponse.json();
-        appEvents = transformAppEventsToCalendarEvents(appData.events || []);
+        appEvents = transformAppEventsToCalendarEvents(appData.events || [], weekOffset);
       }
 
       let googleEvents: CalendarEvent[] = [];
@@ -81,7 +81,7 @@ export function useCalendarEvents() {
   return { events, weekStart, loading, error, refetch: fetchEvents, isAuthenticated };
 }
 
-export function useCalendarEventsWithRefetch(refetchTrigger?: number) {
+export function useCalendarEventsWithRefetch(refetchTrigger?: number, weekOffset: number = 0) {
   const { isAuthenticated } = useAuth();
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [weekStart, setWeekStart] = useState("");
@@ -110,7 +110,7 @@ export function useCalendarEventsWithRefetch(refetchTrigger?: number) {
       let appEvents: CalendarEvent[] = [];
       if (appResponse.ok) {
         const appData = await appResponse.json();
-        appEvents = transformAppEventsToCalendarEvents(appData.events || []);
+        appEvents = transformAppEventsToCalendarEvents(appData.events || [], weekOffset);
       }
 
       let googleEvents: CalendarEvent[] = [];
@@ -135,17 +135,17 @@ export function useCalendarEventsWithRefetch(refetchTrigger?: number) {
 
   useEffect(() => {
     fetchEvents();
-  }, [isAuthenticated, refetchTrigger]);
+  }, [isAuthenticated, refetchTrigger, weekOffset]);
 
   return { events, weekStart, loading, error, refetch: fetchEvents, isAuthenticated };
 }
 
-function transformAppEventsToCalendarEvents(appEvents: any[]): CalendarEvent[] {
+function transformAppEventsToCalendarEvents(appEvents: any[], weekOffset: number = 0): CalendarEvent[] {
   const getMonday = (d: Date) => {
     const day = d.getDay();
     const diff = day === 0 ? -6 : 1 - day;
     const monday = new Date(d);
-    monday.setDate(d.getDate() + diff);
+    monday.setDate(d.getDate() + diff + (weekOffset * 7));
     monday.setHours(0, 0, 0, 0);
     return monday;
   };
@@ -214,7 +214,7 @@ export default function CalendarWeekView({ onEventCreate, readOnly = false, refe
   const [weekOffset, setWeekOffset] = useState(0);
   const [viewMode, setViewMode] = useState<'week' | 'day'>('week');
   
-  const { events, weekStart, loading, error, isAuthenticated } = useCalendarEventsWithRefetch(refetchTrigger);
+  const { events, weekStart, loading, error, isAuthenticated } = useCalendarEventsWithRefetch(refetchTrigger, weekOffset);
 
   const navigateWeek = (direction: 'prev' | 'next') => {
     setWeekOffset(prev => direction === 'prev' ? prev - 1 : prev + 1);
