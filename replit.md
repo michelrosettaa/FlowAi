@@ -18,7 +18,7 @@ The frontend is built with Next.js 15.1.6 (App Router) and React 18.3.1, styled 
 
 A custom Express server runs alongside Next.js, handling protected API routes with NextAuth v5 JWT authentication. Key protected routes include `/api/ask-flowai` (AI chat with Google Calendar integration), `/api/email/generate`, `/api/email/send`, `/api/email/inbox`, `/api/email/reply`, `/api/mentor`, `/api/tasks`, and `/api/preferences`. A hybrid authentication system supports local calendar CRUD operations (`/api/app-calendar/events`) for both authenticated (via `userId`) and unauthenticated (via `sessionId` and Express sessions) users.
 
-**Universal Email Support**: FlowAI implements provider-agnostic email integration using IMAP/SMTP protocols via `nodemailer` and `imap` libraries. Users can connect ANY email provider (Gmail, Outlook, Yahoo, iCloud, ProtonMail, corporate email) by entering credentials in Settings. Email passwords are encrypted using AES-256-CBC with a required `ENCRYPTION_KEY` environment variable before database storage. Auto-detection provides optimal IMAP/SMTP settings for popular providers, with TLS certificate validation enabled for security.
+**Hybrid Email Support**: FlowAI implements a dual-mode email system combining OAuth and traditional protocols. Gmail users authenticate via OAuth (using Replit's Google Mail connection) for secure, password-free email access through Gmail API. Non-Gmail users (Outlook, Yahoo, iCloud, ProtonMail, corporate email) connect via IMAP/SMTP protocols with AES-256-CBC encrypted passwords (requires `ENCRYPTION_KEY` environment variable). The system automatically detects which method to use, providing seamless email integration regardless of provider. Auto-detection provides optimal IMAP/SMTP settings for popular providers, with TLS certificate validation enabled for security.
 
 ### AI Integration
 
@@ -71,6 +71,16 @@ PostgreSQL (Neon-backed) is the primary database, managed with Drizzle ORM. The 
 -   **Environment Variables**: Requires `OPENAI_API_KEY`, `DATABASE_URL`, `ENCRYPTION_KEY` (32-character random key for email password encryption), `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, and optionally Microsoft/Apple OAuth credentials.
 
 ## Recent Changes
+
+### November 14, 2025 - Hybrid Gmail OAuth + IMAP/SMTP Email System (Production-Ready)
+- **Gmail OAuth Integration**: Implemented Gmail API service using existing Google Mail OAuth connection for seamless, password-free Gmail access
+- **Hybrid Email Routing**: Created intelligent routing system that detects Gmail OAuth connection and automatically routes to Gmail API, falling back to IMAP/SMTP for other providers
+- **Access Token Fix**: Fixed critical bug in OAuth token reading to correctly access `settings.oauth.credentials.access_token` from Replit connector
+- **Enhanced Diagnostics**: Added clear logging to distinguish when Gmail OAuth is connected vs disconnected for better debugging
+- **UI Updates**: Updated Email Helper page to recognize Gmail OAuth connection status and display appropriate messaging
+- **API Endpoints**: Modified `/api/email/inbox`, `/api/email/send`, and `/api/email/accounts` to support hybrid Gmail OAuth + IMAP/SMTP routing
+- **Production-Ready**: Architect confirmed Gmail OAuth routing works correctly and system is ready for production deployment
+- **Architecture**: Gmail users get OAuth (secure, no passwords), while other providers use encrypted IMAP/SMTP credentials
 
 ### November 14, 2025 - Universal Email Support (Production-Ready)
 - **Provider-Agnostic Email Integration**: Migrated from Gmail API to universal IMAP/SMTP protocols supporting ANY email provider
