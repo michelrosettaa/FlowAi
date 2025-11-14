@@ -23,8 +23,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   }),
   providers: [
     Google({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.AUTH_GOOGLE_ID!,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET!,
       authorization: {
         params: {
           scope: "openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/gmail.compose",
@@ -34,8 +34,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
     Microsoft({
-      clientId: process.env.MICROSOFT_CLIENT_ID!,
-      clientSecret: process.env.MICROSOFT_CLIENT_SECRET!,
+      clientId: process.env.AUTH_MICROSOFT_ID!,
+      clientSecret: process.env.AUTH_MICROSOFT_SECRET!,
       authorization: {
         params: {
           scope: "openid email profile offline_access Calendars.ReadWrite Mail.Send Mail.ReadWrite",
@@ -43,8 +43,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
     Apple({
-      clientId: process.env.APPLE_CLIENT_ID!,
-      clientSecret: process.env.APPLE_CLIENT_SECRET!,
+      clientId: process.env.AUTH_APPLE_ID!,
+      clientSecret: process.env.AUTH_APPLE_SECRET!,
     }),
   ],
   callbacks: {
