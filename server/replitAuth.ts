@@ -6,6 +6,7 @@ import type { Express, RequestHandler } from "express";
 import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
+import { isEmailAllowed } from "./allowlist";
 
 const getOidcConfig = memoize(
   async () => {
@@ -71,9 +72,18 @@ export async function setupAuth(app: Express) {
     tokens: client.TokenEndpointResponse & client.TokenEndpointResponseHelpers,
     verified: passport.AuthenticateCallback
   ) => {
+    const claims = tokens.claims();
+    const email = claims?.email;
+    
+    // Check if email is allowed (family & friends only in production)
+    if (!isEmailAllowed(email)) {
+      console.log("[Auth] Access denied for email:", email);
+      return verified(new Error("Access restricted to invited users only"), false);
+    }
+    
     const user = {};
     updateUserSession(user, tokens);
-    await upsertUser(tokens.claims());
+    await upsertUser(claims);
     verified(null, user);
   };
 
@@ -113,7 +123,7 @@ export async function setupAuth(app: Express) {
     ensureStrategy(req.hostname);
     passport.authenticate(`replitauth:${req.hostname}`, {
       successReturnToOrRedirect: "/",
-      failureRedirect: "/api/login",
+      failureRedirect: "/access-denied",
     })(req, res, next);
   });
 
