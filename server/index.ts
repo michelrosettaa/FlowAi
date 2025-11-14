@@ -1,4 +1,5 @@
 import express from "express";
+import session from "express-session";
 import next from "next";
 import { registerRoutes } from "./routes";
 
@@ -11,6 +12,20 @@ const handle = app.getRequestHandler();
 
 app.prepare().then(async () => {
   const server = express();
+  
+  // Express session middleware for unauthenticated users
+  server.use(
+    session({
+      secret: process.env.NEXTAUTH_SECRET || "flowai-dev-secret-change-in-production",
+      resave: false,
+      saveUninitialized: true,
+      cookie: {
+        secure: process.env.NODE_ENV === "production",
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24 * 365,
+      },
+    })
+  );
   
   // Don't parse body for NextAuth routes - let Next.js handle them
   server.use((req, res, next) => {
