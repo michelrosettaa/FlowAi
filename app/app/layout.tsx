@@ -48,28 +48,8 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading, isAuthenticated } = useAuth();
   const { toggleTheme } = useTheme();
 
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      window.location.href = "/api/login";
-    }
-  }, [isLoading, isAuthenticated]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--app-bg)' }}>
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 text-white text-2xl font-bold flex items-center justify-center shadow-lg animate-pulse">
-            F
-          </div>
-          <p style={{ color: 'var(--app-text-muted)' }}>Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return null;
-  }
+  // Allow both authenticated AND email-only users to access the app
+  // Email-only users won't have user data but can still use the app
 
   const navSections = [
     {
