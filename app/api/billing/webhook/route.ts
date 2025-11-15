@@ -132,7 +132,7 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
 
   const currentPeriodStart = new Date((subscription as any).current_period_start * 1000);
   const currentPeriodEnd = new Date((subscription as any).current_period_end * 1000);
-  const cancelledAt = (subscription as any).canceled_at
+  const canceledAt = (subscription as any).canceled_at
     ? new Date((subscription as any).canceled_at * 1000)
     : null;
 
@@ -145,7 +145,7 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
     currentPeriodStart,
     currentPeriodEnd,
     cancelAtPeriodEnd: (subscription as any).cancel_at_period_end,
-    cancelledAt,
+    canceledAt,
   });
 }
 
