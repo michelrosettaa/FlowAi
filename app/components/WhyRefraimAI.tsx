@@ -1,6 +1,6 @@
 "use client";
 
-export default function WhyRefraim AISection() {
+export default function WhyRefraimAI() {
   return (
     <section className="relative z-10 w-full max-w-6xl px-6 mt-24">
       <div className="bg-white/70 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-xl p-8 md:p-10 flex flex-col md:flex-row gap-10">

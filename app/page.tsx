@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { Sparkles, MessageSquare, Calendar, Mail, Brain, Zap, Menu, X } from "lucide-react";
 
 import TypingAssistant from "./components/TypingAssistant";
-import WhyRefraim AI from "./components/WhyRefraim AI";
+import WhyRefraimAI from "./components/WhyRefraimAI";
 import ProductivityAnalytics from "./components/ProductivityAnalytics";
 import ImpactTimeline from "./components/ImpactTimeline";
 import ConnectCTA from "./components/ConnectCTA";
@@ -323,9 +323,9 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* === WHY FLOWAI === */}
+      {/* === WHY REFRAIM AI === */}
       <section id="why" className="w-full max-w-7xl px-6 mt-40">
-        <WhyRefraim AI />
+        <WhyRefraimAI />
       </section>
 
       {/* === PRODUCTIVITY ANALYTICS === */}

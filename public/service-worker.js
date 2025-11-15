@@ -1,19 +1,19 @@
 // public/service-worker.js
 
 self.addEventListener("install", (event) => {
-  console.log("🛠️ FlowAI Service Worker installed");
+  console.log("🛠️ Refraim AI Service Worker installed");
   self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
-  console.log("✅ FlowAI Service Worker activated");
+  console.log("✅ Refraim AI Service Worker activated");
 });
 
 self.addEventListener("push", (event) => {
   const data = event.data?.json() || {};
-  const title = data.title || "FlowAI Update";
+  const title = data.title || "Refraim AI Update";
   const options = {
-    body: data.body || "You have a new FlowAI notification.",
+    body: data.body || "You have a new Refraim AI notification.",
     icon: "/icons/icon-192x192.png",
     badge: "/icons/icon-96x96.png",
   };
@@ -25,6 +25,6 @@ self.addEventListener("push", (event) => {
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
   event.waitUntil(
-    clients.openWindow("https://flowai.app") // Change this to your app URL when deployed
+    clients.openWindow("https://refraim.ai") // Change this to your app URL when deployed
   );
 });
