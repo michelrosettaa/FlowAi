@@ -1015,12 +1015,23 @@ Write a helpful, warm reply that addresses their message. Keep it brief and prof
     }
   });
 
-  app.post("/api/plan", requireNextAuth, async (req: any, res) => {
+  app.post("/api/plan", optionalNextAuth, async (req: any, res) => {
     try {
+      const userId = req.auth?.userId;
       const { tasks } = req.body;
 
       if (!tasks || !tasks.trim()) {
         return res.status(400).json({ error: "Tasks are required" });
+      }
+
+      if (userId) {
+        const canUse = await canUseFeature(userId, 'ai_messages');
+        if (!canUse) {
+          return res.status(403).json({ 
+            error: "AI message limit reached. Please upgrade your plan to continue using AI features.",
+            limitReached: true 
+          });
+        }
       }
 
       const completion = await openai.chat.completions.create({
@@ -1032,7 +1043,7 @@ Write a helpful, warm reply that addresses their message. Keep it brief and prof
 Format your response as:
 1. A detailed plan with specific times (9am-5pm work hours)
 2. Include breaks and realistic time estimates
-3. Prioritize important tasks for peak productivity hours
+3. Prioritise important tasks for peak productivity hours
 
 Return your response in this exact format:
 PLAN:
@@ -1065,6 +1076,12 @@ etc.`
           const [time, label] = line.split("|").map(s => s.trim().replace(/^-\s*/, ""));
           return { time, label };
         });
+
+      if (userId) {
+        await incrementUsage(userId, 'ai_messages').catch(err => {
+          console.error('Failed to increment AI message usage (non-blocking):', err);
+        });
+      }
 
       res.json({
         plan,
