@@ -32,7 +32,7 @@ export default function DashboardPage() {
                   <kbd className="px-2 py-0.5 bg-slate-800 rounded text-xs mx-1 border border-slate-700">
                     ⌘ K
                   </kbd>{" "}
-                  to instantly create tasks, schedule events, or ask FlowAI anything
+                  to instantly create tasks, schedule events, or ask Refraim AI anything
                 </p>
               </div>
             </div>

@@ -61,7 +61,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
     {
       section: "AI Assistants",
       items: [
-        { name: "Ask FlowAI", path: "/app/ask-flowai", icon: <BrainCircuit size={18} /> },
+        { name: "Ask Refraim AI", path: "/app/ask-refraim", icon: <BrainCircuit size={18} /> },
         { name: "Mentor", path: "/app/mentor", icon: <Users size={18} /> },
         { name: "Email Helper", path: "/app/email", icon: <Mail size={18} /> },
       ]
@@ -103,7 +103,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
               </div>
               {!collapsed && (
                 <div className="font-bold text-base" style={{ color: 'var(--app-text)' }}>
-                  FlowAI
+                  Refraim AI
                 </div>
               )}
             </div>
@@ -326,7 +326,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
               color: 'var(--app-text-muted)',
               borderTop: '1px solid var(--app-border)'
             }}>
-              © {new Date().getFullYear()} FlowAI
+              © {new Date().getFullYear()} Refraim AI
             </div>
           )}
         </div>

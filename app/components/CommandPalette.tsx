@@ -103,14 +103,14 @@ export default function CommandPalette() {
               </Command.Item>
 
               <Command.Item
-                onSelect={() => navigate("/app/ask-flowai")}
+                onSelect={() => navigate("/app/ask-refraim")}
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer hover:bg-purple-500/20 text-white mb-1 group transition-colors"
               >
                 <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
                   <MessageSquare className="w-4 h-4 text-purple-400" />
                 </div>
                 <div className="flex-1">
-                  <div className="font-medium">Ask FlowAI</div>
+                  <div className="font-medium">Ask Refraim AI</div>
                   <div className="text-xs text-slate-400">Get AI assistance instantly</div>
                 </div>
                 <kbd className="px-2 py-1 bg-slate-800 text-slate-400 text-xs rounded">A</kbd>
@@ -152,11 +152,11 @@ export default function CommandPalette() {
               </Command.Item>
 
               <Command.Item
-                onSelect={() => navigate("/app/ask-flowai")}
+                onSelect={() => navigate("/app/ask-refraim")}
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer hover:bg-slate-700/50 text-white mb-1 transition-colors"
               >
                 <Sparkles className="w-4 h-4 text-slate-400" />
-                <span>Ask FlowAI</span>
+                <span>Ask Refraim AI</span>
               </Command.Item>
             </Command.Group>
           </Command.List>

@@ -38,7 +38,7 @@ export default function BillingPage() {
 
     if (searchParams.get('success') === 'true') {
       toast.success("Subscription activated successfully!", {
-        description: "Welcome to FlowAI Pro! Enjoy unlimited features.",
+        description: "Welcome to Refraim AI Pro! Enjoy unlimited features.",
       });
       router.replace('/app/billing');
     }
@@ -145,7 +145,7 @@ export default function BillingPage() {
           Billing & Subscription
         </h1>
         <p className="text-base" style={{ color: 'var(--app-text-muted)' }}>
-          Manage your FlowAI subscription and billing settings
+          Manage your Refraim AI subscription and billing settings
         </p>
       </header>
 

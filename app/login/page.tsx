@@ -17,7 +17,7 @@ export default function LoginPage() {
     if (!email) return;
     
     // Store email in session storage for use in onboarding
-    sessionStorage.setItem("flowai_email", email);
+    sessionStorage.setItem("refraim_email", email);
     router.push("/onboarding");
   };
 
@@ -29,7 +29,7 @@ export default function LoginPage() {
           <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xl mb-3">
             F
           </div>
-          <h1 className="text-2xl font-semibold text-slate-900">Continue to FlowAI</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">Continue to Refraim AI</h1>
           <p className="text-sm text-slate-600 text-center mt-2">
             Sign in with your email or provider
           </p>
@@ -103,11 +103,11 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-xs text-slate-500 mt-8 leading-relaxed">
-          By continuing, you agree to FlowAI's Terms of Service and Privacy Policy
+          By continuing, you agree to Refraim AI's Terms of Service and Privacy Policy
         </p>
 
         <p className="text-center text-[11px] text-slate-400 mt-4">
-          © {new Date().getFullYear()} FlowAI — Focus, clarity, momentum.
+          © {new Date().getFullYear()} Refraim AI — Focus, clarity, momentum.
         </p>
       </div>
     </main>

@@ -38,7 +38,7 @@ export default function PlanPage() {
     <>
       <Nav />
       <main className="min-h-screen flex flex-col items-center p-6 bg-gray-50">
-        <h1 className="text-4xl font-bold mb-2 text-blue-700">FlowAI Planner</h1>
+        <h1 className="text-4xl font-bold mb-2 text-blue-700">Refraim AI Planner</h1>
         <p className="text-gray-600 mb-6">Turn your tasks into a smart daily plan.</p>
 
         <div className="w-full max-w-lg space-y-3">

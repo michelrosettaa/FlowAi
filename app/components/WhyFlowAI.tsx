@@ -1,16 +1,16 @@
 "use client";
 
-export default function WhyFlowAISection() {
+export default function WhyRefraim AISection() {
   return (
     <section className="relative z-10 w-full max-w-6xl px-6 mt-24">
       <div className="bg-white/70 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-xl p-8 md:p-10 flex flex-col md:flex-row gap-10">
         {/* Left copy */}
         <div className="flex-1">
           <h2 className="text-3xl font-bold text-slate-900 tracking-tight mb-4">
-            Why FlowAI?
+            Why Refraim AI?
           </h2>
           <p className="text-slate-600 text-sm leading-relaxed max-w-md">
-            FlowAI doesn’t just give you another to-do list. It actively
+            Refraim AI doesn’t just give you another to-do list. It actively
             protects your focus time, handles boring admin work, and keeps you
             moving toward what matters.
           </p>
@@ -25,7 +25,7 @@ export default function WhyFlowAISection() {
                   Plans your day for you
                 </div>
                 <div className="text-slate-600 text-[13px] leading-relaxed">
-                  FlowAI takes what you need to do and auto-blocks it on your
+                  Refraim AI takes what you need to do and auto-blocks it on your
                   calendar — no more guessing where work fits.
                 </div>
               </div>
@@ -79,7 +79,7 @@ export default function WhyFlowAISection() {
                 Pitch deck final
               </div>
               <div className="text-[12px] text-slate-500 mt-1">
-                Blocked by FlowAI
+                Blocked by Refraim AI
               </div>
             </div>
 
@@ -99,7 +99,7 @@ export default function WhyFlowAISection() {
             </div>
 
             <div className="text-[11px] text-slate-500 text-center">
-              Built + defended by FlowAI
+              Built + defended by Refraim AI
             </div>
           </div>
         </div>

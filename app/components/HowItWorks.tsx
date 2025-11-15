@@ -6,20 +6,20 @@ export default function HowItWorks() {
   const steps = [
     {
       step: "1",
-      title: "Tell FlowAI what matters today",
+      title: "Tell Refraim AI what matters today",
       desc: "Type your tasks, goals, meetings or stress points. You can paste your messy notes — no formatting.",
       icon: "✍️",
     },
     {
       step: "2",
       title: "We build your day for you",
-      desc: "FlowAI turns that into a realistic schedule: focus blocks, priorities, when to email people, when to rest.",
+      desc: "Refraim AI turns that into a realistic schedule: focus blocks, priorities, when to email people, when to rest.",
       icon: "⚡",
     },
     {
       step: "3",
       title: "You just execute",
-      desc: "As your day changes, FlowAI adapts the plan, reschedules deep work, and reminds you what actually matters.",
+      desc: "As your day changes, Refraim AI adapts the plan, reschedules deep work, and reminds you what actually matters.",
       icon: "🎯",
     },
   ];
@@ -33,7 +33,7 @@ export default function HowItWorks() {
         {/* header */}
         <div className="max-w-2xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-            How FlowAI works
+            How Refraim AI works
           </h2>
           <p className="text-gray-600 text-base mt-3">
             It’s not “yet another task app.” It’s an operator that runs your
@@ -68,7 +68,7 @@ export default function HowItWorks() {
 
               {i === 1 && (
                 <div className="mt-4 text-[11px] text-blue-600 font-medium bg-blue-50 border border-blue-100 rounded-md px-3 py-2 shadow-inner">
-                  “FlowAI scheduled 2h deep work 9–11am, rescheduled 1 meeting,
+                  “Refraim AI scheduled 2h deep work 9–11am, rescheduled 1 meeting,
                   and drafted 3 follow-up emails.”
                 </div>
               )}

@@ -13,7 +13,7 @@ export default function ProductivityAnalyticsSection() {
             Track & analyse your productivity
           </h2>
           <p className="text-indigo-100 text-sm leading-relaxed max-w-md">
-            FlowAI shows you where your time is really going — deep work,
+            Refraim AI shows you where your time is really going — deep work,
             meetings, admin, context switching — so you can protect focus
             instead of reacting all day.
           </p>

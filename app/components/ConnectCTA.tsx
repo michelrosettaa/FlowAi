@@ -20,7 +20,7 @@ export default function ConnectCTA() {
                 Connect your email
               </h3>
               <p className="text-slate-600 text-sm leading-relaxed mt-1">
-                FlowAI can summarise long threads, draft replies in your tone,
+                Refraim AI can summarise long threads, draft replies in your tone,
                 and remind you about follow-ups.
               </p>
             </div>
@@ -45,7 +45,7 @@ export default function ConnectCTA() {
                 Sync your calendar
               </h3>
               <p className="text-slate-600 text-sm leading-relaxed mt-1">
-                FlowAI will block “deep work” time around your meetings and keep
+                Refraim AI will block “deep work” time around your meetings and keep
                 you on track without you doing anything.
               </p>
             </div>

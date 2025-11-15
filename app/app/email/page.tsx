@@ -202,7 +202,7 @@ export default function EmailAssistantPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           recipient, 
-          subject: subject || "Message from FlowAI",
+          subject: subject || "Message from Refraim AI",
           emailBody: draftedEmail 
         }),
       });
@@ -421,7 +421,7 @@ export default function EmailAssistantPage() {
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                FlowAI is drafting your email...
+                Refraim AI is drafting your email...
               </>
             ) : (
               <>

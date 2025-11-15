@@ -58,7 +58,7 @@ export default function EmailPage() {
           Email Automation
         </h1>
         <p className="text-sm text-gray-600 mb-6">
-          FlowAI writes your follow-ups and outreach emails for you. Just describe the situation.
+          Refraim AI writes your follow-ups and outreach emails for you. Just describe the situation.
         </p>
 
         <label className="block text-sm font-medium mb-1">Recipient</label>

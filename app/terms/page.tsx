@@ -2,8 +2,8 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 export const metadata = {
-  title: "Terms of Service | FlowAI",
-  description: "Terms of Service for FlowAI productivity platform",
+  title: "Terms of Service | Refraim AI",
+  description: "Terms of Service for Refraim AI productivity platform",
 };
 
 export default function TermsOfService() {
@@ -25,12 +25,12 @@ export default function TermsOfService() {
           <div className="prose prose-slate max-w-none">
             <h2 className="text-2xl font-bold text-slate-900 mt-8 mb-4">1. Acceptance of Terms</h2>
             <p className="text-slate-700 mb-4">
-              By accessing and using FlowAI ("the Service"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to these Terms of Service, please do not use the Service.
+              By accessing and using Refraim AI ("the Service"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to these Terms of Service, please do not use the Service.
             </p>
 
             <h2 className="text-2xl font-bold text-slate-900 mt-8 mb-4">2. Description of Service</h2>
             <p className="text-slate-700 mb-4">
-              FlowAI provides an AI-powered productivity platform that includes email management, calendar integration, task planning, and AI assistance features. The Service is provided "as is" and we reserve the right to modify, suspend, or discontinue any part of the Service at any time.
+              Refraim AI provides an AI-powered productivity platform that includes email management, calendar integration, task planning, and AI assistance features. The Service is provided "as is" and we reserve the right to modify, suspend, or discontinue any part of the Service at any time.
             </p>
 
             <h2 className="text-2xl font-bold text-slate-900 mt-8 mb-4">3. User Accounts</h2>
@@ -67,7 +67,7 @@ export default function TermsOfService() {
 
             <h2 className="text-2xl font-bold text-slate-900 mt-8 mb-4">7. Intellectual Property</h2>
             <p className="text-slate-700 mb-4">
-              The Service and its original content, features, and functionality are owned by FlowAI and are protected by international copyright, trademark, and other intellectual property laws.
+              The Service and its original content, features, and functionality are owned by Refraim AI and are protected by international copyright, trademark, and other intellectual property laws.
             </p>
 
             <h2 className="text-2xl font-bold text-slate-900 mt-8 mb-4">8. Third-Party Services</h2>
@@ -77,7 +77,7 @@ export default function TermsOfService() {
 
             <h2 className="text-2xl font-bold text-slate-900 mt-8 mb-4">9. Limitation of Liability</h2>
             <p className="text-slate-700 mb-4">
-              FlowAI shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use the Service.
+              Refraim AI shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use the Service.
             </p>
 
             <h2 className="text-2xl font-bold text-slate-900 mt-8 mb-4">10. Changes to Terms</h2>

@@ -14,7 +14,7 @@ const features = [
   {
     icon: "📅",
     title: "Smart Calendar Sync",
-    desc: "Connect Google or Outlook and let FlowAI plan deep work around your real meetings.",
+    desc: "Connect Google or Outlook and let Refraim AI plan deep work around your real meetings.",
     preview: "/dashboard/calendar-sync.svg",
     gradient: "from-indigo-400 to-purple-500",
   },
@@ -61,7 +61,7 @@ export default function FeatureShowcase() {
         Built for focus, powered by AI.
       </h2>
       <p className="text-gray-600 max-w-2xl mb-14">
-        Every feature in FlowAI works together to plan, protect, and optimise your time —
+        Every feature in Refraim AI works together to plan, protect, and optimise your time —
         automatically.
       </p>
 

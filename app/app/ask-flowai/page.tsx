@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Send, Loader2, Sparkles, User, Bot } from "lucide-react";
 
-export default function AskFlowAIPage() {
+export default function AskRefraim AIPage() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
   const [loading, setLoading] = useState(false);
@@ -17,7 +17,7 @@ export default function AskFlowAIPage() {
     scrollToBottom();
   }, [messages]);
 
-  const handleAskFlowAI = async () => {
+  const handleAskRefraim AI = async () => {
     if (!input.trim()) return;
     const userMsg: { role: "user"; content: string } = {
       role: "user",
@@ -29,7 +29,7 @@ export default function AskFlowAIPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/ask-flowai", {
+      const response = await fetch("/api/ask-refraim", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -44,7 +44,7 @@ export default function AskFlowAIPage() {
       const data = await response.json();
       setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
     } catch (error) {
-      console.error("Error asking FlowAI:", error);
+      console.error("Error asking Refraim AI:", error);
       setMessages((prev) => [
         ...prev,
         {
@@ -70,7 +70,7 @@ export default function AskFlowAIPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold" style={{ color: 'var(--app-text)' }}>
-              Ask FlowAI
+              Ask Refraim AI
             </h1>
             <p className="text-sm" style={{ color: 'var(--app-text-muted)' }}>
               Your AI productivity assistant
@@ -201,7 +201,7 @@ export default function AskFlowAIPage() {
               >
                 <div className="flex items-center gap-2" style={{ color: 'var(--app-text-muted)' }}>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-sm">FlowAI is thinking...</span>
+                  <span className="text-sm">Refraim AI is thinking...</span>
                 </div>
               </div>
             </div>
@@ -222,10 +222,10 @@ export default function AskFlowAIPage() {
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
-                  handleAskFlowAI();
+                  handleAskRefraim AI();
                 }
               }}
-              placeholder="Ask FlowAI anything..."
+              placeholder="Ask Refraim AI anything..."
               rows={1}
               className="flex-1 bg-transparent focus:outline-none resize-none text-sm leading-relaxed max-h-32"
               style={{ 
@@ -235,7 +235,7 @@ export default function AskFlowAIPage() {
               }}
             />
             <button
-              onClick={handleAskFlowAI}
+              onClick={handleAskRefraim AI}
               disabled={loading || !input.trim()}
               className="flex-shrink-0 p-3 rounded-lg text-white shadow-md hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               style={{ background: 'var(--app-accent)' }}

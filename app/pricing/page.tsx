@@ -6,7 +6,7 @@ export default function PricingPage() {
       {/* HEADER */}
       <header className="w-full py-6 border-b border-slate-200 bg-white/70 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto flex justify-between items-center px-6">
-          <div className="text-xl font-bold text-slate-900">FlowAI</div>
+          <div className="text-xl font-bold text-slate-900">Refraim AI</div>
           <nav className="flex gap-6 text-sm font-medium text-slate-700">
             <a href="/" className="hover:text-slate-900 transition">Home</a>
             <a href="/pricing" className="text-blue-600 font-semibold">Pricing</a>
@@ -19,7 +19,7 @@ export default function PricingPage() {
       <section className="py-24">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-indigo-500 text-transparent bg-clip-text">
-            Choose your FlowAI plan
+            Choose your Refraim AI plan
           </h1>
           <p className="text-slate-500 mb-16 text-lg">
             Start for free — upgrade anytime to unlock your full productivity.
@@ -79,7 +79,7 @@ export default function PricingPage() {
 
       {/* FOOTER */}
       <footer className="py-8 text-center text-slate-400 text-sm border-t border-slate-200">
-        © {new Date().getFullYear()} FlowAI — Focus, clarity, momentum.
+        © {new Date().getFullYear()} Refraim AI — Focus, clarity, momentum.
       </footer>
     </main>
   );

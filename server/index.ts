@@ -16,7 +16,7 @@ app.prepare().then(async () => {
   // Express session middleware for unauthenticated users
   server.use(
     session({
-      secret: process.env.NEXTAUTH_SECRET || "flowai-dev-secret-change-in-production",
+      secret: process.env.NEXTAUTH_SECRET || "refraim-dev-secret-change-in-production",
       resave: false,
       saveUninitialized: true,
       cookie: {

@@ -76,7 +76,7 @@ export default function LoadingPlannerPage() {
 
         {/* Title */}
         <div className="text-xs uppercase tracking-widest text-indigo-300 font-semibold mb-3 animate-fade-in">
-          Setting Up FlowAI
+          Setting Up Refraim AI
         </div>
 
         {/* Current step text */}

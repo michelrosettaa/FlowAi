@@ -14,7 +14,7 @@ export default function SignupPage() {
           Start your free trial
         </h1>
         <p className="text-sm text-slate-600 text-center mt-2">
-          FlowAI will build your daily plan, protect your focus, and draft emails for you.
+          Refraim AI will build your daily plan, protect your focus, and draft emails for you.
         </p>
 
         <label className="block text-xs font-medium text-slate-700 mt-6 mb-2">
@@ -31,7 +31,7 @@ export default function SignupPage() {
           onClick={() => {
             if (!email.trim()) return;
             // store in localStorage for now (mock)
-            localStorage.setItem("flowai_email", email.trim());
+            localStorage.setItem("refraim_email", email.trim());
             router.push("/onboarding");
           }}
           className="w-full bg-gradient-to-r from-blue-600 to-indigo-500 text-white text-sm font-semibold px-4 py-3 rounded-lg mt-6 shadow-md hover:shadow-lg hover:scale-[1.02] transition"

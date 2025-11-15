@@ -17,10 +17,10 @@ export default function ConnectCalendar() {
     <section className="relative w-full py-20 px-6 md:px-10 flex flex-col items-center bg-gradient-to-br from-blue-50 to-indigo-50 border-t border-indigo-100">
       <div className="max-w-4xl w-full text-center">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-          Sync your <span className="text-blue-600">Calendar</span> with FlowAI
+          Sync your <span className="text-blue-600">Calendar</span> with Refraim AI
         </h2>
         <p className="text-gray-600 text-lg mb-8">
-          Let FlowAI automatically plan your deep work sessions and meetings
+          Let Refraim AI automatically plan your deep work sessions and meetings
           around your real schedule.
         </p>
 
@@ -37,7 +37,7 @@ export default function ConnectCalendar() {
                 className="w-14 h-14 opacity-80"
               />
               <p className="text-gray-700 font-medium text-base">
-                Connect your Google or Outlook calendar to FlowAI
+                Connect your Google or Outlook calendar to Refraim AI
               </p>
               <button
                 onClick={handleConnect}
@@ -57,7 +57,7 @@ export default function ConnectCalendar() {
                 Calendar connected successfully!
               </p>
               <p className="text-gray-600 mt-2 text-sm">
-                FlowAI will now optimize your focus sessions based on meetings.
+                Refraim AI will now optimize your focus sessions based on meetings.
               </p>
             </motion.div>
           )}

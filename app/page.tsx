@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { Sparkles, MessageSquare, Calendar, Mail, Brain, Zap, Menu, X } from "lucide-react";
 
 import TypingAssistant from "./components/TypingAssistant";
-import WhyFlowAI from "./components/WhyFlowAI";
+import WhyRefraim AI from "./components/WhyRefraim AI";
 import ProductivityAnalytics from "./components/ProductivityAnalytics";
 import ImpactTimeline from "./components/ImpactTimeline";
 import ConnectCTA from "./components/ConnectCTA";
@@ -23,7 +23,7 @@ export default function LandingPage() {
       name: "Ella Martinez",
       role: "Startup Founder",
       quote:
-        "FlowAI saves me hours every week — I just type my goals, and it builds my entire day perfectly.",
+        "Refraim AI saves me hours every week — I just type my goals, and it builds my entire day perfectly.",
       img: "https://randomuser.me/api/portraits/women/44.jpg",
     },
     {
@@ -37,7 +37,7 @@ export default function LandingPage() {
       name: "Sophia Patel",
       role: "Freelance Designer",
       quote:
-        "Ask FlowAI is incredible — it's like having a productivity coach in my pocket. I ask it anything and get instant help.",
+        "Ask Refraim is incredible — it's like having a productivity coach in my pocket. I ask it anything and get instant help.",
       img: "https://randomuser.me/api/portraits/women/65.jpg",
     },
   ];
@@ -51,7 +51,7 @@ export default function LandingPage() {
             onClick={() => router.push("/")}
             className="text-xl font-bold text-slate-900 cursor-pointer tracking-tight"
           >
-            FlowAI
+            Refraim AI
           </div>
 
           {/* Desktop Navigation */}
@@ -168,11 +168,11 @@ export default function LandingPage() {
           transition={{ delay: 0.1 }}
           className="text-6xl md:text-7xl font-bold leading-[1.1] text-slate-900 tracking-tighter"
         >
-          Plan your day without
+          Reclaim your time.
           <br />
-          burning your brain.
+          Let AI handle the planning.
           <span className="block mt-3 bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-500 bg-clip-text text-transparent">
-            FlowAI does it for you.
+            Refraim AI does it for you.
           </span>
         </motion.h1>
 
@@ -223,7 +223,7 @@ export default function LandingPage() {
       <section id="features" className="w-full max-w-7xl px-6 mt-32">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">
-            Meet <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Ask FlowAI</span>
+            Meet <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Ask Refraim</span>
           </h2>
           <p className="text-slate-600 text-lg mt-4 max-w-2xl mx-auto">
             Your personal AI assistant that understands your productivity needs
@@ -231,7 +231,7 @@ export default function LandingPage() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 items-center">
-          {/* Ask FlowAI Card */}
+          {/* Ask Refraim AI Card */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -241,10 +241,10 @@ export default function LandingPage() {
             <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl mb-6">
               <MessageSquare className="w-7 h-7 text-white" />
             </div>
-            <h3 className="text-2xl font-bold text-slate-900 mb-3">Ask FlowAI Anything</h3>
+            <h3 className="text-2xl font-bold text-slate-900 mb-3">Ask Refraim Anything</h3>
             <p className="text-slate-700 text-base leading-relaxed mb-6">
               "What should I focus on today?" "Help me prioritise my tasks" "Draft an email for my team" 
-              — Ask FlowAI understands context and gives you smart, personalised answers instantly.
+              — Ask Refraim understands context and gives you smart, personalised answers instantly.
             </p>
             <div className="bg-white/60 backdrop-blur rounded-2xl p-4 border border-purple-200/40">
               <div className="flex items-start gap-3 mb-3">
@@ -325,7 +325,7 @@ export default function LandingPage() {
 
       {/* === WHY FLOWAI === */}
       <section id="why" className="w-full max-w-7xl px-6 mt-40">
-        <WhyFlowAI />
+        <WhyRefraim AI />
       </section>
 
       {/* === PRODUCTIVITY ANALYTICS === */}
@@ -344,7 +344,7 @@ export default function LandingPage() {
         className="relative z-10 mt-40 px-6 max-w-7xl w-full text-center overflow-hidden"
       >
         <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-12 tracking-tight">
-          People using FlowAI feel calmer
+          People using Refraim AI feel calmer
           <br />
           and get more done.
         </h2>
@@ -407,7 +407,7 @@ export default function LandingPage() {
           </Link>
         </div>
         <div className="text-center text-slate-400">
-          © {new Date().getFullYear()} FlowAI — Focus, clarity, momentum.
+          © {new Date().getFullYear()} Refraim AI — Reclaim your time, reclaim your focus.
         </div>
       </footer>
 
@@ -423,7 +423,7 @@ export default function LandingPage() {
             </button>
 
             <h3 className="text-2xl font-bold text-slate-900 mb-4">
-              FlowAI in Action
+              Refraim AI in Action
             </h3>
 
             <div
@@ -451,7 +451,7 @@ export default function LandingPage() {
             </div>
 
             <p className="text-slate-600 text-base leading-relaxed my-6">
-              FlowAI plans your day, protects deep work, and automates your focus — see it in action.
+              Refraim AI plans your day, protects deep work, and automates your focus — see it in action.
             </p>
 
             <button

@@ -12,7 +12,7 @@ export default function ConnectEmail() {
             Connect your email — automate replies
           </h2>
           <p className="text-blue-100 text-lg max-w-md mb-8">
-            FlowAI can summarise, write, and schedule responses for you.
+            Refraim AI can summarise, write, and schedule responses for you.
             Connect your Gmail or Outlook to start automating your inbox.
           </p>
           <button

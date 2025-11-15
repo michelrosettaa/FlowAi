@@ -13,7 +13,7 @@ export default function EmailPreviewCard() {
       <div className="text-xs text-gray-500 mb-2 flex items-center justify-between">
         <span>Inbox · 3 new</span>
         <span className="text-[10px] text-indigo-600 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded">
-          Drafted by FlowAI
+          Drafted by Refraim AI
         </span>
       </div>
 
@@ -25,7 +25,7 @@ export default function EmailPreviewCard() {
           From Sarah • 5m ago
         </div>
         <div className="text-gray-700 leading-relaxed bg-gray-50 border border-gray-200 rounded p-2">
-          FlowAI’s draft:  
+          Refraim AI’s draft:  
           <br />
           “Hi Sarah — thanks for sending this over. I’ve reviewed the terms and
           I’m good with timeline and scope. I’ll send the signed version today.”

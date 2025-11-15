@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 const steps = [
   {
-    title: "What brings you to FlowAI?",
+    title: "What brings you to Refraim AI?",
     subtitle: "I'll personalise your experience to help you stay productive.",
     options: [
       "I need help staying organised",
@@ -52,7 +52,7 @@ export default function OnboardingPage() {
     // if last step -> save to database/localStorage and go to loading
     if (stepIndex === steps.length - 1) {
       // Save answers to localStorage for email-only users
-      localStorage.setItem('flowai_onboarding', JSON.stringify(newAnswers));
+      localStorage.setItem('refraim_onboarding', JSON.stringify(newAnswers));
       
       // Try to save to database if authenticated (will fail silently for email-only users)
       try {
@@ -169,7 +169,7 @@ export default function OnboardingPage() {
             <div className="rounded-xl bg-gradient-to-br from-slate-50 to-blue-50 border border-slate-200 p-5">
               <h4 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
                 <span className="text-lg">✨</span>
-                FlowAI helps you:
+                Refraim AI helps you:
               </h4>
               <ul className="text-sm text-slate-700 space-y-2">
                 <li className="flex items-start gap-2">

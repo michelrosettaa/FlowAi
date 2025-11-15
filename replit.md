@@ -1,8 +1,8 @@
-# FlowAI - AI-Powered Productivity Platform
+# Refraim AI - AI-Powered Productivity Platform
 
 ## Overview
 
-FlowAI is a Next.js-based AI productivity platform designed to enhance user productivity by intelligently managing daily tasks, schedules, emails, and focus time. Leveraging OpenAI's API, it provides intelligent planning, email assistance, and motivational mentoring. The platform aims to automate routine work and safeguard deep focus periods, offering a comprehensive suite for personal and professional efficiency. It is deployed on Replit, utilizing a PostgreSQL database and integrated with Google services like Gmail and Calendar.
+Refraim AI is a Next.js-based AI productivity platform designed to help users reclaim their time by intelligently managing daily tasks, schedules, emails, and focus time. Leveraging OpenAI's API, it provides intelligent planning, email assistance, and motivational mentoring. The platform aims to automate routine work and safeguard deep focus periods, offering a comprehensive suite for personal and professional efficiency. It is deployed on Replit, utilizing a PostgreSQL database and integrated with Google services like Gmail and Calendar.
 
 ## User Preferences
 
@@ -16,13 +16,13 @@ The frontend is built with Next.js 15.1.6 (App Router) and React 18.3.1, styled 
 
 ### Backend Architecture
 
-A custom Express server runs alongside Next.js, handling protected API routes with NextAuth v5 JWT authentication. Key protected routes include `/api/ask-flowai` (AI chat with Google Calendar integration), `/api/email/generate`, `/api/email/send`, `/api/email/inbox`, `/api/email/reply`, `/api/mentor`, `/api/tasks`, and `/api/preferences`. A hybrid authentication system supports local calendar CRUD operations (`/api/app-calendar/events`) for both authenticated (via `userId`) and unauthenticated (via `sessionId` and Express sessions) users.
+A custom Express server runs alongside Next.js, handling protected API routes with NextAuth v5 JWT authentication. Key protected routes include `/api/ask-refraim` (AI chat with Google Calendar integration), `/api/email/generate`, `/api/email/send`, `/api/email/inbox`, `/api/email/reply`, `/api/mentor`, `/api/tasks`, and `/api/preferences`. A hybrid authentication system supports local calendar CRUD operations (`/api/app-calendar/events`) for both authenticated (via `userId`) and unauthenticated (via `sessionId` and Express sessions) users.
 
-**Hybrid Email Support**: FlowAI implements a dual-mode email system combining OAuth and traditional protocols. Gmail users authenticate via OAuth (using Replit's Google Mail connection) for secure, password-free email access through Gmail API. Non-Gmail users (Outlook, Yahoo, iCloud, ProtonMail, corporate email) connect via IMAP/SMTP protocols with AES-256-CBC encrypted passwords (requires `ENCRYPTION_KEY` environment variable). The system automatically detects which method to use, providing seamless email integration regardless of provider. Auto-detection provides optimal IMAP/SMTP settings for popular providers, with TLS certificate validation enabled for security.
+**Hybrid Email Support**: Refraim AI implements a dual-mode email system combining OAuth and traditional protocols. Gmail users authenticate via OAuth (using Replit's Google Mail connection) for secure, password-free email access through Gmail API. Non-Gmail users (Outlook, Yahoo, iCloud, ProtonMail, corporate email) connect via IMAP/SMTP protocols with AES-256-CBC encrypted passwords (requires `ENCRYPTION_KEY` environment variable). The system automatically detects which method to use, providing seamless email integration regardless of provider. Auto-detection provides optimal IMAP/SMTP settings for popular providers, with TLS certificate validation enabled for security.
 
 ### AI Integration
 
-OpenAI API (v6.7.0) is central to FlowAI's intelligence, utilizing `gpt-4o-mini` for text generation and `gpt-4o-mini-tts` for voice synthesis. AI features include daily planning, email automation, meeting summarization, and an AI mentor. The "Ask FlowAI" feature integrates with Google Calendar to provide real-time, context-aware responses about user schedules, handling timezones with `date-fns-tz`. All OpenAI calls are handled server-side for security.
+OpenAI API (v6.7.0) is central to Refraim AI's intelligence, utilizing `gpt-4o-mini` for text generation and `gpt-4o-mini-tts` for voice synthesis. AI features include daily planning, email automation, meeting summarization, and an AI mentor. The "Ask Refraim" feature integrates with Google Calendar to provide real-time, context-aware responses about user schedules, handling timezones with `date-fns-tz`. All OpenAI calls are handled server-side for security.
 
 ### Authentication
 
@@ -77,7 +77,7 @@ PostgreSQL (Neon-backed) is the primary database, managed with Drizzle ORM. The 
 - **Gmail OAuth Detection Fix**: Fixed critical loop where Google sign-in users were incorrectly asked to configure email
 - **Dual OAuth Detection**: System now checks BOTH Replit Gmail connector AND NextAuth Google OAuth accounts
 - **Seamless Gmail Access**: Users who sign in with Google automatically have Gmail access without additional configuration
-- **Personalised Onboarding**: Welcome email includes user's name and highlights all FlowAI features
+- **Personalised Onboarding**: Welcome email includes user's name and highlights all Refraim AI features
 - **API Endpoints**: Added `/api/auth/send-welcome-email` for manual welcome email triggering
 - **Production-Ready**: Both fixes tested and working for improved user experience
 
@@ -121,7 +121,7 @@ PostgreSQL (Neon-backed) is the primary database, managed with Drizzle ORM. The 
 - **Day/Week View Toggle**: Reclaim.ai-style view switcher allowing users to toggle between single-day and 7-day week views
 - **Calendar Height Constraint**: Added maxHeight to prevent calendar grid from extending to page bottom, with proper scroll behavior
 - **Click-to-Create Events**: Calendar time slots are now clickable - click any hour to instantly create events with pre-filled date and time
-- **Ask FlowAI Universal Access**: Made AI assistant accessible to all users (authenticated and unauthenticated), with authenticated users getting calendar-aware responses
+- **Ask Refraim AI Universal Access**: Made AI assistant accessible to all users (authenticated and unauthenticated), with authenticated users getting calendar-aware responses
 - **Email Inbox Integration**: Added Gmail inbox view with real-time email fetching via `/api/email/inbox` endpoint
 - **AI-Powered Email Replies**: Implemented context-aware reply generation via `/api/email/reply` with HTML email parsing and 2000-character body extraction
 - **Email Helper Redesign**: Professional glassmorphism UI with Inbox/Compose tabs, full error handling, and retry affordances

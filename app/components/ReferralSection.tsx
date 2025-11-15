@@ -8,17 +8,17 @@ export default function ReferralSection() {
   const [userCode, setUserCode] = useState<string | null>(null);
 
   useEffect(() => {
-    let code = localStorage.getItem("flowai_referral_code");
+    let code = localStorage.getItem("refraim_referral_code");
     if (!code) {
-      code = "flowai-" + Math.random().toString(36).substring(2, 8);
-      localStorage.setItem("flowai_referral_code", code);
+      code = "refraim-" + Math.random().toString(36).substring(2, 8);
+      localStorage.setItem("refraim_referral_code", code);
     }
     setUserCode(code);
   }, []);
 
   if (!userCode) return null;
 
-  const referralLink = `https://flowai.app/signup?ref=${userCode}`;
+  const referralLink = `https://refraim.app/signup?ref=${userCode}`;
 
   const copyToClipboard = async () => {
     await navigator.clipboard.writeText(referralLink);
@@ -39,7 +39,7 @@ export default function ReferralSection() {
 
       <p className="text-slate-600 mb-6 text-sm leading-relaxed max-w-md mx-auto">
         Share your personal referral link. When your friend joins, you’ll both
-        unlock <span className="font-semibold text-indigo-600">1 free month of FlowAI Pro</span>.
+        unlock <span className="font-semibold text-indigo-600">1 free month of Refraim AI Pro</span>.
       </p>
 
       {/* Referral Link */}
@@ -75,7 +75,7 @@ export default function ReferralSection() {
 
       {/* Tagline */}
       <div className="mt-8 text-[13px] text-slate-500 italic">
-        Share focus. Grow together with FlowAI.
+        Share focus. Grow together with Refraim AI.
       </div>
     </section>
   );

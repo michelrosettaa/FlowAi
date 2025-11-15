@@ -55,7 +55,7 @@ export const emailTemplates = {
             <div style="width: 64px; height: 64px; margin: 0 auto 20px; background: white; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; color: #6366f1;">
               F
             </div>
-            <h1 style="margin: 0; color: white; font-size: 28px; font-weight: bold;">Welcome to FlowAI! 🎉</h1>
+            <h1 style="margin: 0; color: white; font-size: 28px; font-weight: bold;">Welcome to Refraim AI! 🎉</h1>
             <p style="margin: 12px 0 0; color: rgba(255,255,255,0.95); font-size: 16px;">Your personal AI productivity assistant</p>
           </div>
 
@@ -64,10 +64,10 @@ export const emailTemplates = {
               Hi ${userName},
             </p>
             <p style="margin: 0 0 20px; color: #1e293b; font-size: 16px; line-height: 1.6;">
-              Welcome to FlowAI! We're thrilled to have you on board. 🚀
+              Welcome to Refraim AI! We're thrilled to have you on board. 🚀
             </p>
             <p style="margin: 0 0 24px; color: #1e293b; font-size: 16px; line-height: 1.6;">
-              FlowAI is here to supercharge your productivity by helping you:
+              Refraim AI is here to supercharge your productivity by helping you:
             </p>
 
             <div style="background: #f1f5f9; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
@@ -88,17 +88,17 @@ export const emailTemplates = {
               </div>
               <div>
                 <span style="font-size: 20px; margin-right: 8px;">🤖</span>
-                <strong style="color: #1e293b; font-size: 15px;">Ask FlowAI Anything</strong>
+                <strong style="color: #1e293b; font-size: 15px;">Ask Refraim AI Anything</strong>
                 <p style="margin: 4px 0 0 28px; color: #64748b; font-size: 14px;">Get instant answers about your schedule and tasks</p>
               </div>
             </div>
 
             <p style="margin: 0 0 24px; color: #1e293b; font-size: 16px; line-height: 1.6;">
-              Ready to boost your productivity? Log in to your FlowAI dashboard and start exploring!
+              Ready to boost your productivity? Log in to your Refraim AI dashboard and start exploring!
             </p>
 
             <div style="text-align: center; margin: 32px 0;">
-              <a href="${process.env.NEXTAUTH_URL || process.env.REPLIT_DOMAINS ? `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}/app` : 'https://flowai.com/app'}" 
+              <a href="${process.env.NEXTAUTH_URL || process.env.REPLIT_DOMAINS ? `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}/app` : 'https://refraim.com/app'}" 
                  style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 15px; box-shadow: 0 4px 12px rgba(99,102,241,0.3);">
                 Go to Dashboard
               </a>
@@ -112,10 +112,10 @@ export const emailTemplates = {
           <div style="background: #f8fafc; padding: 24px; text-align: center; border-top: 1px solid #e2e8f0;">
             <p style="margin: 0; color: #64748b; font-size: 13px;">
               Happy flowing! 🌊<br>
-              The FlowAI Team
+              The Refraim AI Team
             </p>
             <p style="margin: 12px 0 0; color: #94a3b8; font-size: 12px;">
-              © ${new Date().getFullYear()} FlowAI - Your Personal AI Productivity Assistant
+              © ${new Date().getFullYear()} Refraim AI - Your Personal AI Productivity Assistant
             </p>
           </div>
         </div>
@@ -174,9 +174,9 @@ export const emailTemplates = {
 
             <!-- CTA Button -->
             <div style="text-align: center; margin-top: 32px;">
-              <a href="${process.env.REPLIT_DOMAINS ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}` : 'https://flowai.com'}" 
+              <a href="${process.env.REPLIT_DOMAINS ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}` : 'https://refraim.com'}" 
                  style="display: inline-block; background: linear-gradient(135deg, #3b82f6, #6366f1); color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px;">
-                Open FlowAI
+                Open Refraim AI
               </a>
             </div>
           </div>
@@ -184,10 +184,10 @@ export const emailTemplates = {
           <!-- Footer -->
           <div style="padding: 24px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
             <p style="margin: 0; color: #64748b; font-size: 13px;">
-              You're receiving this because you enabled daily digest emails in FlowAI
+              You're receiving this because you enabled daily digest emails in Refraim AI
             </p>
             <p style="margin: 8px 0 0; color: #94a3b8; font-size: 12px;">
-              © ${new Date().getFullYear()} FlowAI - Your Personal AI Productivity Assistant
+              © ${new Date().getFullYear()} Refraim AI - Your Personal AI Productivity Assistant
             </p>
           </div>
         </div>
@@ -223,7 +223,7 @@ export const emailTemplates = {
             </div>
 
             <div style="text-align: center;">
-              <a href="${process.env.REPLIT_DOMAINS ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}/app` : 'https://flowai.com/app'}" 
+              <a href="${process.env.REPLIT_DOMAINS ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}/app` : 'https://refraim.com/app'}" 
                  style="display: inline-block; background: linear-gradient(135deg, #f59e0b, #f97316); color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px;">
                 View Task
               </a>
@@ -231,7 +231,7 @@ export const emailTemplates = {
           </div>
 
           <div style="padding: 16px 24px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
-            <p style="margin: 0; color: #94a3b8; font-size: 12px;">FlowAI - Stay on track, stay productive</p>
+            <p style="margin: 0; color: #94a3b8; font-size: 12px;">Refraim AI - Stay on track, stay productive</p>
           </div>
         </div>
       </body>
@@ -276,7 +276,7 @@ export const emailTemplates = {
             </div>
 
             <div style="text-align: center;">
-              <a href="${process.env.REPLIT_DOMAINS ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}/app` : 'https://flowai.com/app'}" 
+              <a href="${process.env.REPLIT_DOMAINS ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}/app` : 'https://refraim.com/app'}" 
                  style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px;">
                 Get Ready
               </a>
@@ -284,7 +284,7 @@ export const emailTemplates = {
           </div>
 
           <div style="padding: 16px 24px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
-            <p style="margin: 0; color: #94a3b8; font-size: 12px;">FlowAI - Protect your focus, maximize your impact</p>
+            <p style="margin: 0; color: #94a3b8; font-size: 12px;">Refraim AI - Protect your focus, maximize your impact</p>
           </div>
         </div>
       </body>

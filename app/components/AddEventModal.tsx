@@ -230,7 +230,7 @@ export default function AddEventModal({ isOpen, onClose, onEventCreated, initial
         </form>
 
         <div className="mt-4 text-xs text-center" style={{ color: 'var(--app-text-dim)' }}>
-          Event saved to your FlowAI calendar. Google Calendar events are read-only.
+          Event saved to your Refraim AI calendar. Google Calendar events are read-only.
         </div>
       </div>
     </div>

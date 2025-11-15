@@ -58,7 +58,7 @@ export default function AnalyticsPreviewCard() {
       </div>
 
       <div className="text-[11px] text-gray-500 mt-3 leading-snug">
-        You’re most focused 10AM–1PM. FlowAI will protect that block.
+        You’re most focused 10AM–1PM. Refraim AI will protect that block.
       </div>
     </motion.div>
   );

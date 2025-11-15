@@ -32,13 +32,13 @@ export default function MentorPage() {
       >
         <h1 className="text-2xl font-semibold text-white mb-3">Your AI Mentor</h1>
         <p className="text-sm text-slate-400 mb-8">
-          FlowAI Mentor provides motivational boosts and focus guidance.
+          Refraim AI Mentor provides motivational boosts and focus guidance.
         </p>
 
         <textarea
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Tell FlowAI what's on your mind..."
+          placeholder="Tell Refraim AI what's on your mind..."
           className="w-full h-28 rounded-lg border border-white/10 bg-white/5 text-slate-100 text-sm p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
         />
 

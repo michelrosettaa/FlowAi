@@ -5,8 +5,8 @@ import Toaster from "./components/Toaster";
 import GlobalComponents from "./components/GlobalComponents";
 
 export const metadata = {
-  title: "FlowAI",
-  description: "AI-powered productivity and planning",
+  title: "Refraim AI",
+  description: "Reclaim your time with AI-powered productivity and planning",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

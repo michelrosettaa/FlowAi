@@ -50,7 +50,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-xs font-semibold flex items-center justify-center">
             F
           </div>
-          <div className="text-slate-100 font-semibold text-sm">FlowAI</div>
+          <div className="text-slate-100 font-semibold text-sm">Refraim AI</div>
         </div>
 
         {/* main nav */}
@@ -85,7 +85,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </ul>
 
         <div className="mt-auto pt-8 text-[11px] text-slate-500">
-          © {new Date().getFullYear()} FlowAI
+          © {new Date().getFullYear()} Refraim AI
         </div>
       </aside>
 

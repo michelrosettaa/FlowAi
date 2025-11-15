@@ -8,13 +8,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState("dark");
 
   useEffect(() => {
-    const stored = localStorage.getItem("flowai-theme");
+    const stored = localStorage.getItem("refraim-theme");
     if (stored) setTheme(stored);
   }, []);
 
   const toggleTheme = (newTheme: string) => {
     setTheme(newTheme);
-    localStorage.setItem("flowai-theme", newTheme);
+    localStorage.setItem("refraim-theme", newTheme);
   };
 
   return (

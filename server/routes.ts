@@ -41,7 +41,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             sendNotificationEmail({
               to: user.email,
-              subject: "Welcome to FlowAI! 🎉",
+              subject: "Welcome to Refraim AI! 🎉",
               html,
             }).catch(err => {
               console.error("Failed to send welcome email (non-blocking):", err);
@@ -73,7 +73,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       await sendNotificationEmail({
         to: user.email,
-        subject: "Welcome to FlowAI! 🎉",
+        subject: "Welcome to Refraim AI! 🎉",
         html,
       });
 
@@ -85,7 +85,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/ask-flowai", optionalNextAuth, async (req: any, res) => {
+  app.post("/api/ask-refraim", optionalNextAuth, async (req: any, res) => {
     try {
       const userId = req.auth?.userId;
       const { messages } = req.body;
@@ -179,7 +179,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         messages: [
           {
             role: "system",
-            content: `You are FlowAI, an intelligent productivity assistant integrated into a productivity platform. You help users with:
+            content: `You are Refraim AI, an intelligent productivity assistant integrated into a productivity platform. You help users with:
 - Planning their day and managing tasks
 - Understanding their schedule and calendar
 - Email management and drafting
@@ -206,7 +206,7 @@ Be concise, helpful, and actionable. Provide specific suggestions when possible.
       
       res.json({ reply });
     } catch (err: any) {
-      console.error("Ask FlowAI error:", err);
+      console.error("Ask Refraim AI error:", err);
       res.status(500).json({ error: err.message || "Failed to get AI response" });
     }
   });
@@ -684,7 +684,7 @@ Write a helpful, warm reply that addresses their message. Keep it brief and prof
         messages: [
           {
             role: "system",
-            content: `You are FlowAI, an AI mentor with a ${voice} personality. Be concise, warm, and motivational in your feedback.`,
+            content: `You are Refraim AI, an AI mentor with a ${voice} personality. Be concise, warm, and motivational in your feedback.`,
           },
           { role: "user", content: text },
         ],
@@ -936,7 +936,7 @@ Write a helpful, warm reply that addresses their message. Keep it brief and prof
 
       await sendNotificationEmail({
         to: user.email,
-        subject: "☀️ Your Daily FlowAI Digest",
+        subject: "☀️ Your Daily Refraim AI Digest",
         html
       });
 

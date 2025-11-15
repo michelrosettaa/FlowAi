@@ -161,7 +161,7 @@ export default function EmailSettingsPage() {
                 Email Settings
               </h1>
               <p className="text-sm" style={{ color: 'var(--app-text-muted)' }}>
-                Connect your email accounts to use FlowAI Email Helper
+                Connect your email accounts to use Refraim AI Email Helper
               </p>
             </div>
           </div>

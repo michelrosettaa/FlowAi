@@ -5,7 +5,7 @@ export default function Hero() {
     <section className="flex flex-col md:flex-row items-center justify-between pt-28 px-8 md:px-20 bg-gradient-to-r from-blue-50 to-white">
       <div className="md:w-1/2 space-y-6 text-center md:text-left">
         <h1 className="text-5xl font-bold text-blue-700 leading-tight">
-          Plan your day in seconds with <span className="text-blue-600">FlowAI</span>
+          Plan your day in seconds with <span className="text-blue-600">Refraim AI</span>
         </h1>
         <p className="text-gray-600 text-lg">
           Your AI productivity assistant that turns messy to-do lists into a clear, time-blocked daily plan.

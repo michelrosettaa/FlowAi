@@ -14,7 +14,7 @@ export default function AccessDenied() {
           </h1>
           
           <p className="text-gray-600 mb-6">
-            FlowAI is currently in private beta testing with family and friends. 
+            Refraim AI is currently in private beta testing with family and friends. 
             Access is restricted to invited users only.
           </p>
           

@@ -15,7 +15,7 @@ export async function POST(req: Request) {
         {
           role: "system",
           content:
-            "You are FlowAI — a friendly AI productivity assistant that creates structured day plans from messy to-do lists. Output short time-blocked schedules.",
+            "You are Refraim AI — a friendly AI productivity assistant that creates structured day plans from messy to-do lists. Output short time-blocked schedules.",
         },
         {
           role: "user",

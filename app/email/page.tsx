@@ -32,7 +32,7 @@ export default function EmailAssistantPage() {
     // fake AI reply
     setTimeout(() => {
       const reply =
-        "Hi there,\n\nThanks for the update — I appreciate the detail. I'll review and circle back shortly with next steps.\n\nBest,\nFlowAI ✨";
+        "Hi there,\n\nThanks for the update — I appreciate the detail. I'll review and circle back shortly with next steps.\n\nBest,\nRefraim AI ✨";
       setOutput(reply);
       setLoading(false);
     }, 800);
@@ -45,9 +45,9 @@ export default function EmailAssistantPage() {
         <div className="w-full max-w-2xl">
           {/* Header */}
           <div className="mb-8 text-center">
-            <h1 className="text-2xl font-semibold mb-2">✉️ FlowAI Email Assistant</h1>
+            <h1 className="text-2xl font-semibold mb-2">✉️ Refraim AI Email Assistant</h1>
             <p className="text-slate-400 text-sm">
-              Paste an email or your notes. FlowAI can summarize or draft a reply in your voice.
+              Paste an email or your notes. Refraim AI can summarize or draft a reply in your voice.
             </p>
           </div>
 
@@ -55,7 +55,7 @@ export default function EmailAssistantPage() {
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Paste an email you got… or write rough bullet points and let FlowAI reply for you."
+            placeholder="Paste an email you got… or write rough bullet points and let Refraim AI reply for you."
             rows={8}
             className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-slate-100 placeholder-slate-500 focus:ring-2 focus:ring-blue-500 outline-none resize-none shadow-inner"
           />

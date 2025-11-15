@@ -54,8 +54,8 @@ export default function NotFound() {
               Planner
             </Link>
             <span className="text-white/40">•</span>
-            <Link href="/app/ask-flowai" className="text-white/80 hover:text-white text-sm transition-colors">
-              Ask FlowAI
+            <Link href="/app/ask-refraim" className="text-white/80 hover:text-white text-sm transition-colors">
+              Ask Refraim AI
             </Link>
             <span className="text-white/40">•</span>
             <Link href="/pricing" className="text-white/80 hover:text-white text-sm transition-colors">

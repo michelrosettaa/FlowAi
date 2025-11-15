@@ -2,8 +2,8 @@ import Link from "next/link";
 import { ArrowLeft, Shield } from "lucide-react";
 
 export const metadata = {
-  title: "Privacy Policy | FlowAI",
-  description: "Privacy Policy for FlowAI productivity platform",
+  title: "Privacy Policy | Refraim AI",
+  description: "Privacy Policy for Refraim AI productivity platform",
 };
 
 export default function PrivacyPolicy() {
@@ -27,7 +27,7 @@ export default function PrivacyPolicy() {
 
           <div className="prose prose-slate max-w-none">
             <p className="text-lg text-slate-700 mb-6">
-              At FlowAI, we take your privacy seriously. This Privacy Policy explains how we collect, use, and protect your personal information.
+              At Refraim AI, we take your privacy seriously. This Privacy Policy explains how we collect, use, and protect your personal information.
             </p>
 
             <h2 className="text-2xl font-bold text-slate-900 mt-8 mb-4">1. Information We Collect</h2>

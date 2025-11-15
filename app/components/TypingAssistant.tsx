@@ -63,7 +63,7 @@ export default function TypingAssistant() {
       </div>
 
       <div className="text-[11px] text-blue-600 font-medium">
-        FlowAI: I’ll plan that into your day.
+        Refraim AI: I’ll plan that into your day.
       </div>
     </div>
   );

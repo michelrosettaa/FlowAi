@@ -8,6 +8,6 @@ export function getMotivation(streak: number): string {
   } else if (streak < 10) {
     return `🚀 ${streak} days in a row! You're building unstoppable focus.`;
   } else {
-    return `💎 ${streak}-day mastery streak! FlowAI salutes your discipline.`;
+    return `💎 ${streak}-day mastery streak! Refraim AI salutes your discipline.`;
   }
 }
