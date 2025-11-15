@@ -24,6 +24,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     sessionsTable: authSessions,
     verificationTokensTable: authVerificationTokens,
   }),
+  session: {
+    strategy: "jwt", // Required for Credentials provider
+  },
   providers: [
     Credentials({
       name: "Email",
@@ -133,7 +136,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return session;
     },
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger }) {
       if (user) {
         token.id = user.id;
         token.onboardingCompleted = (user as any).onboardingCompleted;
@@ -142,6 +145,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;
       }
+      
+      // Refresh user data on update trigger
+      if (trigger === "update" && token.id) {
+        const [updatedUser] = await db
+          .select()
+          .from(users)
+          .where(eq(users.id, token.id as string))
+          .limit(1);
+        
+        if (updatedUser) {
+          token.onboardingCompleted = updatedUser.onboardingCompleted;
+        }
+      }
+      
       return token;
     },
     async redirect({ url, baseUrl }) {
@@ -154,9 +171,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: "/login",
     error: "/login",
     newUser: "/onboarding",
-  },
-  session: {
-    strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET,
 });
