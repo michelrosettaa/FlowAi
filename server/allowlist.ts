@@ -1,9 +1,9 @@
 // Authentication Access Control
 // Control who can sign up for your SaaS platform
 
-// Get access mode from environment variable, defaulting to 'allowlist' for security
+// Get access mode from environment variable, defaulting to 'open' for testing
 export const ACCESS_MODE: 'open' | 'allowlist' = 
-  (process.env.ACCESS_MODE as 'open' | 'allowlist') || 'allowlist';
+  (process.env.REFRAIM_ACCESS_MODE as 'open' | 'allowlist') || 'open';
 
 // Add approved email addresses here when using allowlist mode
 // These are the only emails that will be allowed to create accounts
