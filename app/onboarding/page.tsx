@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 const steps = [
   {
@@ -40,6 +41,7 @@ const steps = [
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const { update } = useSession();
   const [stepIndex, setStepIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
@@ -63,6 +65,9 @@ export default function OnboardingPage() {
             answers: newAnswers 
           }),
         });
+        
+        // Refresh the session to update onboardingCompleted flag
+        await update();
       } catch (error) {
         console.log("Not authenticated - using email-only flow");
       }
