@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Send, Loader2, Sparkles, User, Bot } from "lucide-react";
 
-export default function AskRefraim AIPage() {
+export default function AskRefraimAI() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
   const [loading, setLoading] = useState(false);
@@ -17,7 +17,7 @@ export default function AskRefraim AIPage() {
     scrollToBottom();
   }, [messages]);
 
-  const handleAskRefraim AI = async () => {
+  const handleAskRefraimAI = async () => {
     if (!input.trim()) return;
     const userMsg: { role: "user"; content: string } = {
       role: "user",
@@ -222,7 +222,7 @@ export default function AskRefraim AIPage() {
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
-                  handleAskRefraim AI();
+                  handleAskRefraimAI();
                 }
               }}
               placeholder="Ask Refraim AI anything..."
@@ -235,7 +235,7 @@ export default function AskRefraim AIPage() {
               }}
             />
             <button
-              onClick={handleAskRefraim AI}
+              onClick={handleAskRefraimAI}
               disabled={loading || !input.trim()}
               className="flex-shrink-0 p-3 rounded-lg text-white shadow-md hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               style={{ background: 'var(--app-accent)' }}
