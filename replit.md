@@ -72,6 +72,15 @@ PostgreSQL (Neon-backed) is the primary database, managed with Drizzle ORM. The 
 
 ## Recent Changes
 
+### November 15, 2025 - Welcome Email & Gmail OAuth Loop Fix (Production-Ready)
+- **Automatic Welcome Email**: Added professional welcome email template sent to new users within 24 hours of account creation
+- **Gmail OAuth Detection Fix**: Fixed critical loop where Google sign-in users were incorrectly asked to configure email
+- **Dual OAuth Detection**: System now checks BOTH Replit Gmail connector AND NextAuth Google OAuth accounts
+- **Seamless Gmail Access**: Users who sign in with Google automatically have Gmail access without additional configuration
+- **Personalised Onboarding**: Welcome email includes user's name and highlights all FlowAI features
+- **API Endpoints**: Added `/api/auth/send-welcome-email` for manual welcome email triggering
+- **Production-Ready**: Both fixes tested and working for improved user experience
+
 ### November 14, 2025 - Hybrid Gmail OAuth + IMAP/SMTP Email System (Production-Ready)
 - **Gmail OAuth Integration**: Implemented Gmail API service using existing Google Mail OAuth connection for seamless, password-free Gmail access
 - **Hybrid Email Routing**: Created intelligent routing system that detects Gmail OAuth connection and automatically routes to Gmail API, falling back to IMAP/SMTP for other providers

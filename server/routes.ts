@@ -13,6 +13,9 @@ import { EMAIL_PROVIDERS, detectProvider } from "./email-providers";
 import { encryptPassword } from "./crypto-utils";
 import { fetchGmailInbox, sendGmailEmail, checkGmailConnection } from "./gmail-api-service";
 import { checkUsageLimit, trackUsage, getUpgradeMessage } from "./usage-limits";
+import { db } from "./db";
+import { authAccounts } from "../lib/db/schema";
+import { eq, and } from "drizzle-orm";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -23,10 +26,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.auth!.userId;
       const user = await storage.getUser(userId);
+      
+      if (user && user.createdAt && user.email) {
+        const now = new Date();
+        const userCreated = new Date(user.createdAt);
+        const hoursSinceCreation = (now.getTime() - userCreated.getTime()) / (1000 * 60 * 60);
+        
+        if (hoursSinceCreation <= 24) {
+          const welcomeEmailSent = (user as any).welcomeEmailSent;
+          
+          if (!welcomeEmailSent) {
+            const userName = user.name || user.firstName || 'there';
+            const html = emailTemplates.welcome(userName);
+            
+            sendNotificationEmail({
+              to: user.email,
+              subject: "Welcome to FlowAI! 🎉",
+              html,
+            }).catch(err => {
+              console.error("Failed to send welcome email (non-blocking):", err);
+            });
+            
+            console.log(`📧 Sending welcome email to new user: ${user.email}`);
+          }
+        }
+      }
+      
       res.json(user);
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  app.post("/api/auth/send-welcome-email", requireNextAuth, async (req: any, res) => {
+    try {
+      const userId = req.auth!.userId;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.email) {
+        return res.status(400).json({ error: "User email not found" });
+      }
+
+      const userName = user.name || user.firstName || 'there';
+      const html = emailTemplates.welcome(userName);
+
+      await sendNotificationEmail({
+        to: user.email,
+        subject: "Welcome to FlowAI! 🎉",
+        html,
+      });
+
+      console.log(`✅ Welcome email sent to ${user.email}`);
+      res.json({ success: true, message: "Welcome email sent successfully" });
+    } catch (error: any) {
+      console.error("Error sending welcome email:", error);
+      res.status(500).json({ error: error.message || "Failed to send welcome email" });
     }
   });
 
@@ -325,7 +380,23 @@ Write a helpful, warm reply that addresses their message. Keep it brief and prof
     try {
       const userId = req.auth!.userId;
       const accounts = await storage.getEmailAccounts(userId);
-      const isGmailConnected = await checkGmailConnection();
+      
+      let isGmailConnected = await checkGmailConnection();
+      
+      if (!isGmailConnected) {
+        const googleAccount = await db.select().from(authAccounts).where(
+          and(
+            eq(authAccounts.userId, userId),
+            eq(authAccounts.provider, 'google')
+          )
+        ).limit(1);
+        
+        if (googleAccount.length > 0 && googleAccount[0].access_token) {
+          console.log("✅ User signed in with Google OAuth - Gmail access available");
+          isGmailConnected = true;
+        }
+      }
+      
       res.json({ accounts, isGmailConnected });
     } catch (err: any) {
       console.error("Get email accounts error:", err);
