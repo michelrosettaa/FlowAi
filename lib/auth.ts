@@ -7,6 +7,7 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "./db/client";
 import { authAccounts, authSessions, authVerificationTokens, users } from "./db/schema";
 import { eq } from "drizzle-orm";
+import { neon } from "@neondatabase/serverless";
 
 declare module "next-auth" {
   interface Session {
@@ -39,46 +40,47 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const email = credentials.email as string;
         
         try {
-          // Find or create user
-          let [user] = await db
-            .select({
-              id: users.id,
-              email: users.email,
-              name: users.name,
-              image: users.image,
-              emailVerified: users.emailVerified,
-              onboardingCompleted: users.onboardingCompleted,
-            })
-            .from(users)
-            .where(eq(users.email, email))
-            .limit(1);
+          // Use direct SQL connection for auth (avoids pool issues)
+          const sql = neon(process.env.DATABASE_URL!);
           
-          if (!user) {
-            // Create new user
-            [user] = await db
-              .insert(users)
-              .values({
-                email,
-                name: email.split('@')[0], // Use email username as name
-                emailVerified: new Date(), // Auto-verify for simplicity
-              })
-              .returning({
-                id: users.id,
-                email: users.email,
-                name: users.name,
-                image: users.image,
-                emailVerified: users.emailVerified,
-                onboardingCompleted: users.onboardingCompleted,
-              });
+          // Find existing user
+          const existingUsers = await sql`
+            SELECT id, email, name, image, email_verified, onboarding_completed 
+            FROM users 
+            WHERE email = ${email}
+            LIMIT 1
+          `;
+          
+          if (existingUsers.length > 0) {
+            const user = existingUsers[0];
+            return {
+              id: user.id as string,
+              email: user.email as string,
+              name: user.name as string | null,
+              image: user.image as string | null,
+              onboardingCompleted: user.onboarding_completed as boolean,
+            };
           }
           
-          return {
-            id: user.id,
-            email: user.email!,
-            name: user.name,
-            image: user.image,
-            onboardingCompleted: user.onboardingCompleted,
-          };
+          // Create new user
+          const newUsers = await sql`
+            INSERT INTO users (email, name, email_verified)
+            VALUES (${email}, ${email.split('@')[0]}, NOW())
+            RETURNING id, email, name, image, email_verified, onboarding_completed
+          `;
+          
+          if (newUsers.length > 0) {
+            const user = newUsers[0];
+            return {
+              id: user.id as string,
+              email: user.email as string,
+              name: user.name as string | null,
+              image: user.image as string | null,
+              onboardingCompleted: user.onboarding_completed as boolean,
+            };
+          }
+          
+          return null;
         } catch (error) {
           console.error("❌ Email auth error:", error);
           return null;
