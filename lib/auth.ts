@@ -38,31 +38,51 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         
         const email = credentials.email as string;
         
-        // Find or create user
-        let [user] = await db
-          .select()
-          .from(users)
-          .where(eq(users.email, email))
-          .limit(1);
-        
-        if (!user) {
-          // Create new user
-          [user] = await db
-            .insert(users)
-            .values({
-              email,
-              name: email.split('@')[0], // Use email username as name
-              emailVerified: new Date(), // Auto-verify for simplicity
+        try {
+          // Find or create user
+          let [user] = await db
+            .select({
+              id: users.id,
+              email: users.email,
+              name: users.name,
+              image: users.image,
+              emailVerified: users.emailVerified,
+              onboardingCompleted: users.onboardingCompleted,
             })
-            .returning();
+            .from(users)
+            .where(eq(users.email, email))
+            .limit(1);
+          
+          if (!user) {
+            // Create new user
+            [user] = await db
+              .insert(users)
+              .values({
+                email,
+                name: email.split('@')[0], // Use email username as name
+                emailVerified: new Date(), // Auto-verify for simplicity
+              })
+              .returning({
+                id: users.id,
+                email: users.email,
+                name: users.name,
+                image: users.image,
+                emailVerified: users.emailVerified,
+                onboardingCompleted: users.onboardingCompleted,
+              });
+          }
+          
+          return {
+            id: user.id,
+            email: user.email!,
+            name: user.name,
+            image: user.image,
+            onboardingCompleted: user.onboardingCompleted,
+          };
+        } catch (error) {
+          console.error("❌ Email auth error:", error);
+          return null;
         }
-        
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          image: user.image,
-        };
       },
     }),
     Google({
