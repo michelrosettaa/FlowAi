@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CreditCard, CheckCircle, Clock, XCircle, ExternalLink, Loader2, Crown, Zap } from "lucide-react";
 import { toast } from "sonner";
@@ -23,7 +23,7 @@ interface Subscription {
   cancelAtPeriodEnd: boolean;
 }
 
-export default function BillingPage() {
+function BillingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
@@ -331,5 +331,17 @@ export default function BillingPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function BillingPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex-1 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'var(--app-accent)' }} />
+      </div>
+    }>
+      <BillingContent />
+    </Suspense>
   );
 }
