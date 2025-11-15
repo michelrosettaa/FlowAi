@@ -60,6 +60,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return false;
       }
 
+      if (user.id) {
+        const { storage } = await import("../server/storage");
+        
+        const existingSubscription = await storage.getUserSubscription(user.id);
+        
+        if (!existingSubscription) {
+          const freePlan = await storage.getPlanBySlug('free');
+          if (freePlan) {
+            await storage.createUserSubscription({
+              userId: user.id,
+              planId: freePlan.id,
+              status: 'active',
+            });
+            console.log(`✅ Created Free plan subscription for new user: ${user.email}`);
+          }
+        }
+      }
+
       return true;
     },
     async session({ session, token }) {
