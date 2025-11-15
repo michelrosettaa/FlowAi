@@ -5,11 +5,42 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 function LoginForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const callbackUrl = searchParams.get("callbackUrl") || "/onboarding";
 
   const handleOAuthSignIn = (provider: string) => {
     signIn(provider, { callbackUrl });
+  };
+
+  const handleEmailContinue = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    
+    setIsLoading(true);
+    
+    try {
+      // Sign in with email (creates account if doesn't exist)
+      const result = await signIn("credentials", {
+        email,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        alert("Unable to sign in. Please try again.");
+        setIsLoading(false);
+        return;
+      }
+
+      // Successful login - redirect to callback
+      router.push(callbackUrl);
+    } catch (error) {
+      console.error("Sign in error:", error);
+      alert("An error occurred. Please try again.");
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -26,10 +57,36 @@ function LoginForm() {
           </p>
         </div>
 
+        {/* Email Form */}
+        <form onSubmit={handleEmailContinue} className="mb-6">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
+            className="w-full px-4 py-3 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent mb-3"
+            required
+            disabled={isLoading}
+          />
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white text-sm font-medium px-4 py-3 rounded-lg transition-all shadow-sm hover:shadow-md disabled:cursor-not-allowed"
+          >
+            {isLoading ? "Signing in..." : "Continue with Email"}
+          </button>
+        </form>
+
+        <div className="relative mb-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-slate-300"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-4 bg-white text-slate-500">Or continue with</span>
+          </div>
+        </div>
+
         {/* OAuth Buttons */}
-        <p className="text-sm text-slate-600 text-center mb-6">
-          Choose your preferred sign-in method
-        </p>
         <div className="flex flex-col gap-3">
           <button
             onClick={() => handleOAuthSignIn("google")}

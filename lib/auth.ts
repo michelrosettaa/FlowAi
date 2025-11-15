@@ -2,9 +2,11 @@ import NextAuth, { type DefaultSession } from "next-auth";
 import Google from "next-auth/providers/google";
 import Microsoft from "next-auth/providers/microsoft-entra-id";
 import Apple from "next-auth/providers/apple";
+import Credentials from "next-auth/providers/credentials";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "./db/client";
 import { authAccounts, authSessions, authVerificationTokens, users } from "./db/schema";
+import { eq } from "drizzle-orm";
 
 declare module "next-auth" {
   interface Session {
@@ -23,6 +25,43 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     verificationTokensTable: authVerificationTokens,
   }),
   providers: [
+    Credentials({
+      name: "Email",
+      credentials: {
+        email: { label: "Email", type: "email" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email) return null;
+        
+        const email = credentials.email as string;
+        
+        // Find or create user
+        let [user] = await db
+          .select()
+          .from(users)
+          .where(eq(users.email, email))
+          .limit(1);
+        
+        if (!user) {
+          // Create new user
+          [user] = await db
+            .insert(users)
+            .values({
+              email,
+              name: email.split('@')[0], // Use email username as name
+              emailVerified: new Date(), // Auto-verify for simplicity
+            })
+            .returning();
+        }
+        
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          image: user.image,
+        };
+      },
+    }),
     Google({
       clientId: process.env.AUTH_GOOGLE_ID!,
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,
