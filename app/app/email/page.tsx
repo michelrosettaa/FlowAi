@@ -239,11 +239,11 @@ export default function EmailAssistantPage() {
             Sign in to access your inbox and get AI-powered email assistance
           </p>
           <a
-            href="/login"
+            href="/login?callbackUrl=/app/email"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-semibold text-white transition-all hover:scale-105"
             style={{ background: 'var(--app-accent)' }}
           >
-            Sign In with Google
+            Sign In to Continue
           </a>
         </div>
       </div>

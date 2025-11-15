@@ -1,24 +1,33 @@
-// Family & Friends Beta - Access Control
-// Set to 'open' to allow anyone with the link
-// Set to 'allowlist' to restrict to specific emails only
+// Authentication Access Control
+// Control who can sign up for your SaaS platform
 
-export const ACCESS_MODE: 'open' | 'allowlist' = 'open';
+// Get access mode from environment variable, defaulting to 'allowlist' for security
+export const ACCESS_MODE: 'open' | 'allowlist' = 
+  (process.env.ACCESS_MODE as 'open' | 'allowlist') || 'allowlist';
 
+// Add approved email addresses here when using allowlist mode
+// These are the only emails that will be allowed to create accounts
 export const ALLOWED_EMAILS = new Set<string>([
-  // Only used if ACCESS_MODE is set to 'allowlist'
-  // Add your family and friends emails here:
-  // "mom@example.com",
-  // "dad@example.com",
+  // Add your beta testers' emails here:
+  // "tester1@example.com",
+  // "tester2@example.com",
+  // "your.email@example.com",
 ]);
 
 export function isEmailAllowed(email: string | null | undefined): boolean {
   if (!email) return false;
   
-  // Open access mode - anyone can log in
+  // Open access mode - anyone can sign up
+  // Use this for public launch
   if (ACCESS_MODE === 'open') {
     return true;
   }
   
-  // Allowlist mode - only specific emails
+  // Allowlist mode - only specific emails can sign up
+  // Use this for private beta testing
   return ALLOWED_EMAILS.has(email.toLowerCase());
+}
+
+export function getAccessDeniedMessage(): string {
+  return "This app is currently in private beta. Please contact the administrator for access.";
 }

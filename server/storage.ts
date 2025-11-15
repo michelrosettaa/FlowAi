@@ -104,25 +104,19 @@ export class DatabaseStorage implements IStorage {
     const [updatedTask] = await db
       .update(tasks)
       .set({ ...updates, updatedAt: new Date() })
-      .where(eq(tasks.id, id))
+      .where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
       .returning();
-    
-    if (updatedTask && updatedTask.userId !== userId) {
-      return undefined;
-    }
     
     return updatedTask;
   }
 
   async deleteTask(id: string, userId: string): Promise<boolean> {
-    const task = await db.select().from(tasks).where(eq(tasks.id, id)).limit(1);
+    const result = await db
+      .delete(tasks)
+      .where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
+      .returning();
     
-    if (!task[0] || task[0].userId !== userId) {
-      return false;
-    }
-    
-    await db.delete(tasks).where(eq(tasks.id, id));
-    return true;
+    return result.length > 0;
   }
 
   async getUserPreferences(userId: string): Promise<UserPreferences | undefined> {
@@ -187,21 +181,20 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteCalendarEvent(id: string, userIdOrSessionId: string): Promise<boolean> {
-    const event = await db
-      .select()
-      .from(calendarEvents)
-      .where(eq(calendarEvents.id, id))
-      .limit(1);
-
-    if (
-      !event[0] ||
-      (event[0].userId !== userIdOrSessionId && event[0].sessionId !== userIdOrSessionId)
-    ) {
-      return false;
-    }
-
-    await db.delete(calendarEvents).where(eq(calendarEvents.id, id));
-    return true;
+    const result = await db
+      .delete(calendarEvents)
+      .where(
+        and(
+          eq(calendarEvents.id, id),
+          or(
+            eq(calendarEvents.userId, userIdOrSessionId),
+            eq(calendarEvents.sessionId, userIdOrSessionId)
+          )
+        )
+      )
+      .returning();
+    
+    return result.length > 0;
   }
 
   async getEmailAccounts(userId: string): Promise<EmailAccount[]> {
@@ -223,14 +216,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteEmailAccount(id: string, userId: string): Promise<boolean> {
-    const account = await db.select().from(emailAccounts).where(eq(emailAccounts.id, id)).limit(1);
+    const result = await db
+      .delete(emailAccounts)
+      .where(and(eq(emailAccounts.id, id), eq(emailAccounts.userId, userId)))
+      .returning();
     
-    if (!account[0] || account[0].userId !== userId) {
-      return false;
-    }
-    
-    await db.delete(emailAccounts).where(eq(emailAccounts.id, id));
-    return true;
+    return result.length > 0;
   }
 
   async getAllPlans(): Promise<SubscriptionPlan[]> {

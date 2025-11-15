@@ -60,6 +60,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return false;
       }
 
+      // Check if user's email is allowed to access the platform
+      const { isEmailAllowed } = await import("../server/allowlist");
+      if (!isEmailAllowed(user.email)) {
+        console.log(`🚫 Access denied for ${user.email} - not on allowlist`);
+        return false;
+      }
+
       if (user.id) {
         const { storage } = await import("../server/storage");
         

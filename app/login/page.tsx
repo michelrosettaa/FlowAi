@@ -1,24 +1,25 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
+  const callbackUrl = searchParams.get("callbackUrl") || "/onboarding";
 
   const handleOAuthSignIn = (provider: string) => {
-    signIn(provider, { callbackUrl: "/onboarding" });
+    signIn(provider, { callbackUrl });
   };
 
   const handleEmailContinue = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
     
-    // Store email in session storage for use in onboarding
     sessionStorage.setItem("refraim_email", email);
-    router.push("/onboarding");
+    router.push(callbackUrl);
   };
 
   return (
@@ -27,7 +28,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
           <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xl mb-3">
-            F
+            R
           </div>
           <h1 className="text-2xl font-semibold text-slate-900">Continue to Refraim AI</h1>
           <p className="text-sm text-slate-600 text-center mt-2">
