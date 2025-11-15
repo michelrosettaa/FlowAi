@@ -72,6 +72,16 @@ PostgreSQL (Neon-backed) is the primary database, managed with Drizzle ORM. The 
 
 ## Recent Changes
 
+### November 15, 2025 - Complete Rebrand to "Refraim AI"
+- **Brand Identity**: Fully rebranded from "FlowAI" to "Refraim AI" across entire codebase and user experience
+- **New Brand Messaging**: Updated hero headline to "Reclaim your time. Let AI handle the planning." emphasising time reclamation
+- **Comprehensive Updates**: Updated all components, pages, documentation, API routes, and file names
+- **Updated Files**: Landing page, navigation, components, metadata, package.json, service worker, and localStorage keys
+- **API Route Rename**: Changed `/api/ask-flowai` to `/api/ask-refraim` and updated directory structure
+- **Component Rename**: Renamed `WhyFlowAI.tsx` to `WhyRefraimAI.tsx` with proper export names
+- **SEO Updates**: Updated page titles, meta descriptions, and footer tagline to "Reclaim your time, reclaim your focus"
+- **Production-Ready**: All branding changes tested and verified working in production environment
+
 ### November 15, 2025 - Welcome Email & Gmail OAuth Loop Fix (Production-Ready)
 - **Automatic Welcome Email**: Added professional welcome email template sent to new users within 24 hours of account creation
 - **Gmail OAuth Detection Fix**: Fixed critical loop where Google sign-in users were incorrectly asked to configure email
