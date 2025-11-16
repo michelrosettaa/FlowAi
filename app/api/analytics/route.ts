@@ -19,12 +19,21 @@ export async function GET(req: NextRequest) {
     const streakLookbackStart = new Date(now);
     streakLookbackStart.setDate(streakLookbackStart.getDate() - 30); // Last 30 days
     
-    // Fetch user's tasks and calendar events for analytics
-    const [allTasks, weekEvents, allRecentEvents] = await Promise.all([
-      storage.getTasks(userId),
-      storage.getCalendarEvents(userId, weekStart, weekEnd),
-      storage.getCalendarEvents(userId, streakLookbackStart, now)
-    ]);
+    // Fetch user's tasks and calendar events for analytics with error handling
+    let allTasks: any[] = [];
+    let weekEvents: any[] = [];
+    let allRecentEvents: any[] = [];
+    
+    try {
+      [allTasks, weekEvents, allRecentEvents] = await Promise.all([
+        storage.getTasks(userId).catch(() => []),
+        storage.getCalendarEvents(userId, weekStart, weekEnd).catch(() => []),
+        storage.getCalendarEvents(userId, streakLookbackStart, now).catch(() => [])
+      ]);
+    } catch (dbError) {
+      console.error("Database fetch error:", dbError);
+      // Continue with empty arrays
+    }
 
     // Calculate completed tasks this week
     const tasksCompletedThisWeek = allTasks.filter(task => {
