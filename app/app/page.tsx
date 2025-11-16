@@ -28,11 +28,14 @@ export default function DashboardPage() {
         const res = await fetch('/api/user/profile');
         if (res.ok) {
           const userData = await res.json();
+          console.log('[APP PAGE] Profile data:', userData);
+          console.log('[APP PAGE] Onboarding completed?', userData.onboardingCompleted);
           if (!userData.onboardingCompleted) {
             console.log('[APP PAGE] User has not completed onboarding, redirecting...');
             router.push("/onboarding");
             return;
           }
+          console.log('[APP PAGE] Onboarding complete, showing dashboard');
         }
       } catch (error) {
         console.error('[APP PAGE] Error checking onboarding:', error);

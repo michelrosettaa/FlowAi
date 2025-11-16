@@ -14,6 +14,8 @@ export async function GET(req: NextRequest) {
     
     // Get user's onboarding status directly from database
     const user = await storage.getUser(userId);
+    
+    console.log(`[PROFILE API] User ${userId} - onboarding status:`, user?.onboardingCompleted);
 
     return NextResponse.json({
       name: session.user.name,
