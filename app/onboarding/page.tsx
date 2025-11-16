@@ -85,8 +85,8 @@ export default function OnboardingPage() {
   return (
     <main className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* LEFT PANE (question) */}
-      <section className="w-full md:w-1/2 bg-white flex flex-col justify-center px-8 py-12 md:px-20 shadow-2xl">
-        <div className="max-w-lg">
+      <section className="w-full md:w-1/2 bg-white flex flex-col justify-center px-8 py-12 md:px-20 shadow-2xl overflow-y-auto">
+        <div className="max-w-lg pb-20">
           {/* Logo & Welcome */}
           <div className="mb-12">
             <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 text-white text-xl font-bold flex items-center justify-center shadow-lg mb-4">
@@ -102,12 +102,12 @@ export default function OnboardingPage() {
             {step.subtitle}
           </p>
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 relative z-10">
             {step.options.map((opt) => (
               <button
                 key={opt}
                 onClick={() => selectOption(opt)}
-                className="group text-left w-full border-2 border-slate-200 bg-white rounded-xl px-5 py-4 text-base text-slate-800 hover:border-indigo-500 hover:shadow-xl hover:scale-[1.02] transition-all duration-200 flex items-start gap-4"
+                className="group text-left w-full border-2 border-slate-200 bg-white rounded-xl px-5 py-4 text-base text-slate-800 hover:border-indigo-500 hover:shadow-xl hover:scale-[1.02] transition-all duration-200 flex items-start gap-4 cursor-pointer relative z-10"
               >
                 <div className="w-5 h-5 rounded-full border-2 border-slate-300 mt-[2px] group-hover:border-indigo-500 group-hover:bg-indigo-50 transition-all flex items-center justify-center">
                   <div className="w-2 h-2 rounded-full bg-transparent group-hover:bg-indigo-500 transition-all"></div>
@@ -140,8 +140,8 @@ export default function OnboardingPage() {
       </section>
 
       {/* RIGHT PANE (preview) */}
-      <section className="w-full md:w-1/2 flex items-center justify-center px-8 py-16 md:py-12">
-        <div className="w-full max-w-lg space-y-6">
+      <section className="w-full md:w-1/2 flex items-center justify-center px-8 py-16 md:py-12 overflow-y-auto">
+        <div className="w-full max-w-lg space-y-6 relative z-0">
           {/* Preview Card */}
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 p-8">
             <div className="flex items-center gap-3 mb-6">
