@@ -1,57 +1,26 @@
 import { google } from 'googleapis';
+import { getUserTokens } from '@/lib/auth/tokens';
 
-let connectionSettings: any;
-
-async function getAccessToken() {
-  if (connectionSettings?.settings?.oauth?.credentials?.access_token && 
-      connectionSettings?.settings?.expires_at && 
-      new Date(connectionSettings.settings.expires_at).getTime() > Date.now()) {
-    return connectionSettings.settings.oauth.credentials.access_token;
-  }
-  
-  const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME
-  const xReplitToken = process.env.REPL_IDENTITY 
-    ? 'repl ' + process.env.REPL_IDENTITY 
-    : process.env.WEB_REPL_RENEWAL 
-    ? 'depl ' + process.env.WEB_REPL_RENEWAL 
-    : null;
-
-  if (!xReplitToken) {
-    throw new Error('X_REPLIT_TOKEN not found for repl/depl');
-  }
-
-  connectionSettings = await fetch(
-    'https://' + hostname + '/api/v2/connection?include_secrets=true&connector_names=google-mail',
-    {
-      headers: {
-        'Accept': 'application/json',
-        'X_REPLIT_TOKEN': xReplitToken
-      }
-    }
-  ).then(res => res.json()).then(data => data.items?.[0]);
-
-  const accessToken = connectionSettings?.settings?.oauth?.credentials?.access_token;
-
-  if (!connectionSettings || !accessToken) {
-    throw new Error('Gmail not connected');
-  }
-  return accessToken;
-}
-
-async function getUncachableGmailClient() {
-  const accessToken = await getAccessToken();
-
-  const oauth2Client = new google.auth.OAuth2();
-  oauth2Client.setCredentials({
-    access_token: accessToken
-  });
-
-  return google.gmail({ version: 'v1', auth: oauth2Client });
-}
-
-export async function fetchGmailInbox(maxResults: number = 10) {
+async function getGmailClient(userId: string) {
   try {
-    const gmail = await getUncachableGmailClient();
+    const tokens = await getUserTokens(userId, 'google');
+    
+    const oauth2Client = new google.auth.OAuth2();
+    oauth2Client.setCredentials({
+      access_token: tokens.accessToken,
+      refresh_token: tokens.refreshToken,
+    });
+
+    return google.gmail({ version: 'v1', auth: oauth2Client });
+  } catch (error: any) {
+    console.error('Gmail client error:', error);
+    throw new Error('Gmail not connected. Please connect your Google account in settings.');
+  }
+}
+
+export async function fetchGmailInbox(userId: string, maxResults: number = 10) {
+  try {
+    const gmail = await getGmailClient(userId);
     
     const response = await gmail.users.messages.list({
       userId: 'me',
@@ -112,9 +81,9 @@ export async function fetchGmailInbox(maxResults: number = 10) {
   }
 }
 
-export async function sendGmailEmail(to: string, subject: string, body: string) {
+export async function sendGmailEmail(userId: string, to: string, subject: string, body: string) {
   try {
-    const gmail = await getUncachableGmailClient();
+    const gmail = await getGmailClient(userId);
     
     const raw = [
       `To: ${to}`,
@@ -140,13 +109,13 @@ export async function sendGmailEmail(to: string, subject: string, body: string) 
   }
 }
 
-export async function checkGmailConnection(): Promise<boolean> {
+export async function checkGmailConnection(userId: string): Promise<boolean> {
   try {
-    await getAccessToken();
-    console.log("✅ Gmail OAuth connection active");
+    await getUserTokens(userId, 'google');
+    console.log("✅ Gmail OAuth connection active for user:", userId);
     return true;
   } catch (error: any) {
-    console.log("ℹ️  Gmail OAuth not connected:", error.message);
+    console.log("ℹ️  Gmail OAuth not connected for user:", userId, error.message);
     return false;
   }
 }

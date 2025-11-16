@@ -10,6 +10,7 @@ import {
   Calendar,
   LineChart,
   Users,
+  User,
   Settings,
   BrainCircuit,
   PhoneCall,
@@ -78,6 +79,13 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
       section: "Insights",
       items: [
         { name: "Analytics", path: "/app/stats", icon: <LineChart size={18} /> },
+      ]
+    },
+    {
+      section: "Account",
+      items: [
+        { name: "Profile", path: "/app/profile", icon: <User size={18} /> },
+        { name: "Email Settings", path: "/app/settings/email", icon: <Mail size={18} /> },
       ]
     },
   ];

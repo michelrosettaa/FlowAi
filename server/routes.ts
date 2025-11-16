@@ -235,10 +235,10 @@ Be concise, helpful, and actionable. Provide specific suggestions when possible.
         console.error("Usage check error (allowing request):", usageError);
       }
 
-      const isGmailConnected = await checkGmailConnection();
+      const isGmailConnected = await checkGmailConnection(userId);
       
       if (isGmailConnected) {
-        await sendGmailEmail(recipient, subject, emailBody);
+        await sendGmailEmail(userId, recipient, subject, emailBody);
         try {
           await trackUsage(userId, 'email_sends');
         } catch (trackError) {
@@ -310,10 +310,10 @@ Keep it warm, professional, and include clear next steps.`;
     try {
       const userId = req.auth!.userId;
       
-      const isGmailConnected = await checkGmailConnection();
+      const isGmailConnected = await checkGmailConnection(userId);
       
       if (isGmailConnected) {
-        const emails = await fetchGmailInbox(20);
+        const emails = await fetchGmailInbox(userId, 20);
         return res.json({ emails });
       }
       
@@ -381,7 +381,7 @@ Write a helpful, warm reply that addresses their message. Keep it brief and prof
       const userId = req.auth!.userId;
       const accounts = await storage.getEmailAccounts(userId);
       
-      let isGmailConnected = await checkGmailConnection();
+      let isGmailConnected = await checkGmailConnection(userId);
       
       if (!isGmailConnected) {
         const googleAccount = await db.select().from(authAccounts).where(
