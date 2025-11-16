@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import session from "express-session";
 import next from "next";
@@ -6,6 +7,16 @@ import { registerRoutes } from "./routes";
 const dev = process.env.NODE_ENV !== "production";
 const hostname = process.env.HOST || "0.0.0.0";
 const port = parseInt(process.env.PORT || "5000", 10);
+
+// Set NEXTAUTH_URL if not already set
+if (!process.env.NEXTAUTH_URL) {
+  const replitDomain = process.env.REPLIT_DOMAINS;
+  if (replitDomain) {
+    process.env.NEXTAUTH_URL = `https://${replitDomain}`;
+    process.env.NEXTAUTH_URL_INTERNAL = `http://0.0.0.0:5000`;
+    console.log(`✅ Set NEXTAUTH_URL to: ${process.env.NEXTAUTH_URL}`);
+  }
+}
 
 const app = next({ dev, hostname, port });
 const handle = app.getRequestHandler();

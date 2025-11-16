@@ -62,6 +62,7 @@ export default function OnboardingPage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ answers: newAnswers }),
+          credentials: 'include',
         });
         
         if (res.ok) {
