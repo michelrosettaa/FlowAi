@@ -131,21 +131,33 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return false;
       }
 
+      // Create subscription using direct SQL to avoid pool issues
       if (user.id) {
-        const { storage } = await import("../server/storage");
-        
-        const existingSubscription = await storage.getUserSubscription(user.id);
-        
-        if (!existingSubscription) {
-          const freePlan = await storage.getPlanBySlug('free');
-          if (freePlan) {
-            await storage.createUserSubscription({
-              userId: user.id,
-              planId: freePlan.id,
-              status: 'active',
-            });
-            console.log(`✅ Created Free plan subscription for new user: ${user.email}`);
+        try {
+          const sql = neon(process.env.DATABASE_URL!);
+          
+          // Check if subscription exists
+          const existingSubscriptions = await sql`
+            SELECT id FROM user_subscriptions WHERE user_id = ${user.id} LIMIT 1
+          `;
+          
+          if (existingSubscriptions.length === 0) {
+            // Get free plan
+            const freePlans = await sql`
+              SELECT id FROM subscription_plans WHERE slug = 'free' LIMIT 1
+            `;
+            
+            if (freePlans.length > 0) {
+              await sql`
+                INSERT INTO user_subscriptions (user_id, plan_id, status)
+                VALUES (${user.id}, ${freePlans[0].id}, 'active')
+              `;
+              console.log(`✅ Created Free plan subscription for new user: ${user.email}`);
+            }
           }
+        } catch (error) {
+          console.error("⚠️  Subscription creation error:", error);
+          // Don't block sign-in if subscription creation fails
         }
       }
 
@@ -168,16 +180,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.refreshToken = account.refresh_token;
       }
       
-      // Refresh user data on update trigger
+      // Refresh user data on update trigger using direct SQL
       if (trigger === "update" && token.id) {
-        const [updatedUser] = await db
-          .select()
-          .from(users)
-          .where(eq(users.id, token.id as string))
-          .limit(1);
-        
-        if (updatedUser) {
-          token.onboardingCompleted = updatedUser.onboardingCompleted;
+        try {
+          const sql = neon(process.env.DATABASE_URL!);
+          const updatedUsers = await sql`
+            SELECT onboarding_completed FROM users WHERE id = ${token.id as string} LIMIT 1
+          `;
+          
+          if (updatedUsers.length > 0) {
+            token.onboardingCompleted = updatedUsers[0].onboarding_completed as boolean;
+          }
+        } catch (error) {
+          console.error("⚠️  JWT refresh error:", error);
+          // Keep existing token data if refresh fails
         }
       }
       
