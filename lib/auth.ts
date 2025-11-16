@@ -9,6 +9,52 @@ import { authAccounts, authSessions, authVerificationTokens, users } from "./db/
 import { eq } from "drizzle-orm";
 import { neon } from "@neondatabase/serverless";
 
+// Helper: Create or get user by email using direct Neon SQL (avoids pool issues)
+async function getOrCreateUserByEmail(email: string) {
+  const sql = neon(process.env.DATABASE_URL!);
+  const normalizedEmail = email.toLowerCase().trim();
+  
+  // Check allowlist
+  const { isEmailAllowed } = await import("../server/allowlist");
+  if (!isEmailAllowed(normalizedEmail)) {
+    throw new Error("Email not allowed");
+  }
+  
+  // Find or create user
+  let user = await sql`
+    SELECT id, email, name, image, onboarding_completed 
+    FROM users 
+    WHERE email = ${normalizedEmail} 
+    LIMIT 1
+  `;
+  
+  if (user.length === 0) {
+    // Create new user
+    user = await sql`
+      INSERT INTO users (email, name, email_verified)
+      VALUES (${normalizedEmail}, ${normalizedEmail.split('@')[0]}, NOW())
+      RETURNING id, email, name, image, onboarding_completed
+    `;
+    
+    // Create free subscription
+    const freePlans = await sql`SELECT id FROM subscription_plans WHERE slug = 'free' LIMIT 1`;
+    if (freePlans[0]) {
+      await sql`
+        INSERT INTO user_subscriptions (user_id, plan_id, status)
+        VALUES (${user[0].id}, ${freePlans[0].id}, 'active')
+      `;
+    }
+  }
+  
+  return {
+    id: user[0].id as string,
+    email: user[0].email as string,
+    name: user[0].name as string | null,
+    image: user[0].image as string | null,
+    onboardingCompleted: user[0].onboarding_completed as boolean || false,
+  };
+}
+
 declare module "next-auth" {
   interface Session {
     user: {
@@ -26,7 +72,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     verificationTokensTable: authVerificationTokens,
   }),
   session: {
-    strategy: "jwt", // Required for Credentials provider
+    strategy: "jwt",
   },
   providers: [
     Credentials({
@@ -36,53 +82,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
       async authorize(credentials) {
         if (!credentials?.email) return null;
-        
-        const email = credentials.email as string;
-        
         try {
-          // Use direct SQL connection for auth (avoids pool issues)
-          const sql = neon(process.env.DATABASE_URL!);
-          
-          // Find existing user
-          const existingUsers = await sql`
-            SELECT id, email, name, image, email_verified, onboarding_completed 
-            FROM users 
-            WHERE email = ${email}
-            LIMIT 1
-          `;
-          
-          if (existingUsers.length > 0) {
-            const user = existingUsers[0];
-            return {
-              id: user.id as string,
-              email: user.email as string,
-              name: user.name as string | null,
-              image: user.image as string | null,
-              onboardingCompleted: user.onboarding_completed as boolean,
-            };
-          }
-          
-          // Create new user
-          const newUsers = await sql`
-            INSERT INTO users (email, name, email_verified)
-            VALUES (${email}, ${email.split('@')[0]}, NOW())
-            RETURNING id, email, name, image, email_verified, onboarding_completed
-          `;
-          
-          if (newUsers.length > 0) {
-            const user = newUsers[0];
-            return {
-              id: user.id as string,
-              email: user.email as string,
-              name: user.name as string | null,
-              image: user.image as string | null,
-              onboardingCompleted: user.onboarding_completed as boolean,
-            };
-          }
-          
-          return null;
+          return await getOrCreateUserByEmail(credentials.email as string);
         } catch (error) {
-          console.error("❌ Email auth error:", error);
+          console.error("Email auth error:", error);
           return null;
         }
       },
@@ -131,18 +134,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return false;
       }
 
-      // Create subscription using direct SQL to avoid pool issues
+      //Create subscription using direct SQL to avoid pool issues
       if (user.id) {
         try {
           const sql = neon(process.env.DATABASE_URL!);
           
-          // Check if subscription exists
           const existingSubscriptions = await sql`
             SELECT id FROM user_subscriptions WHERE user_id = ${user.id} LIMIT 1
           `;
           
           if (existingSubscriptions.length === 0) {
-            // Get free plan
             const freePlans = await sql`
               SELECT id FROM subscription_plans WHERE slug = 'free' LIMIT 1
             `;
@@ -152,12 +153,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 INSERT INTO user_subscriptions (user_id, plan_id, status)
                 VALUES (${user.id}, ${freePlans[0].id}, 'active')
               `;
-              console.log(`✅ Created Free plan subscription for new user: ${user.email}`);
+              console.log(`✅ Free subscription created for: ${user.email}`);
             }
           }
         } catch (error) {
-          console.error("⚠️  Subscription creation error:", error);
-          // Don't block sign-in if subscription creation fails
+          console.error("⚠️  Subscription error:", error);
         }
       }
 
@@ -180,20 +180,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.refreshToken = account.refresh_token;
       }
       
-      // Refresh user data on update trigger using direct SQL
+      // Refresh user data on update trigger
       if (trigger === "update" && token.id) {
         try {
           const sql = neon(process.env.DATABASE_URL!);
-          const updatedUsers = await sql`
-            SELECT onboarding_completed FROM users WHERE id = ${token.id as string} LIMIT 1
-          `;
-          
-          if (updatedUsers.length > 0) {
-            token.onboardingCompleted = updatedUsers[0].onboarding_completed as boolean;
+          const rows = await sql`SELECT onboarding_completed FROM users WHERE id = ${token.id as string} LIMIT 1`;
+          if (rows[0]) {
+            token.onboardingCompleted = rows[0].onboarding_completed as boolean;
           }
         } catch (error) {
-          console.error("⚠️  JWT refresh error:", error);
-          // Keep existing token data if refresh fails
+          console.error("JWT refresh error:", error);
         }
       }
       

@@ -15,31 +15,21 @@ function LoginForm() {
     signIn(provider, { callbackUrl });
   };
 
-  const handleEmailContinue = async (e: React.FormEvent) => {
+  const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!email || isLoading) return;
     
     setIsLoading(true);
+    const result = await signIn("credentials", {
+      email,
+      redirect: false,
+    });
     
-    try {
-      // Sign in with email (creates account if doesn't exist)
-      const result = await signIn("credentials", {
-        email,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        alert("Unable to sign in. Please try again.");
-        setIsLoading(false);
-        return;
-      }
-
-      // Successful login - redirect to callback
-      router.push(callbackUrl);
-    } catch (error) {
-      console.error("Sign in error:", error);
-      alert("An error occurred. Please try again.");
+    if (result?.error) {
+      alert("Unable to sign in. Please try again.");
       setIsLoading(false);
+    } else if (result?.ok) {
+      router.push(callbackUrl);
     }
   };
 
@@ -58,13 +48,13 @@ function LoginForm() {
         </div>
 
         {/* Email Form */}
-        <form onSubmit={handleEmailContinue} className="mb-6">
+        <form onSubmit={handleEmailSignIn} className="mb-6">
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
-            className="w-full px-4 py-3 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent mb-3"
+            className="w-full px-4 py-3 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-3"
             required
             disabled={isLoading}
           />

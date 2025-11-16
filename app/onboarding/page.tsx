@@ -56,25 +56,19 @@ export default function OnboardingPage() {
       // Save answers to localStorage for email-only users
       localStorage.setItem('refraim_onboarding', JSON.stringify(newAnswers));
       
-      // Try to save to database if authenticated
+      // Save to database
       try {
-        const response = await fetch('/api/onboarding', {
+        const res = await fetch('/api/onboarding', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            answers: newAnswers 
-          }),
+          body: JSON.stringify({ answers: newAnswers }),
         });
         
-        if (!response.ok) {
-          throw new Error('Failed to save onboarding');
+        if (res.ok) {
+          await update({ onboardingCompleted: true });
         }
-        
-        // Refresh the session to update onboardingCompleted flag
-        // IMPORTANT: Must pass data to trigger JWT callback
-        await update({ user: { onboardingCompleted: true } });
-      } catch (error) {
-        console.error("Onboarding save error:", error);
+      } catch (err) {
+        console.error("Save error:", err);
       }
       
       // Always continue to loading page
