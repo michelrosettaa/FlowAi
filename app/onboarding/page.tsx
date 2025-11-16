@@ -65,27 +65,12 @@ export default function OnboardingPage() {
         });
         
         if (res.ok) {
-          // NUCLEAR OPTION: Sign out and back in to get a completely fresh JWT token
-          // This is the only guaranteed way to update the session
-          const { signIn, signOut } = await import("next-auth/react");
-          const currentSession = await fetch('/api/auth/session').then(r => r.json());
-          const email = currentSession?.user?.email;
-          
-          if (email) {
-            // Sign out completely
-            await signOut({ redirect: false });
-            // Sign back in with the same email - this generates a fresh token with onboardingCompleted=true
-            await signIn('credentials', { email, redirect: false });
-            // Now redirect to app
-            window.location.href = "/app";
-          } else {
-            // Fallback
-            window.location.href = "/app";
-          }
+          // Middleware now checks the database directly, so just redirect
+          // No need for session refresh or sign-out/sign-in
+          window.location.href = "/app";
         }
       } catch (err) {
         console.error("Save error:", err);
-        // Even if save fails, continue
         window.location.href = "/app";
       }
     } else {
