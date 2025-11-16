@@ -65,9 +65,12 @@ export default function OnboardingPage() {
         });
         
         if (res.ok) {
-          // Middleware now checks the database directly, so just redirect
-          // No need for session refresh or sign-out/sign-in
-          window.location.href = "/app";
+          const data = await res.json();
+          console.log('[ONBOARDING] Save successful, redirecting to:', data.redirectTo);
+          // Force a complete page reload to bypass any caching issues
+          window.location.replace("/app");
+        } else {
+          console.error('[ONBOARDING] Save failed with status:', res.status);
         }
       } catch (err) {
         console.error("Save error:", err);

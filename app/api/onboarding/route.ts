@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { auth, signIn } from "@/lib/auth";
 import { neon } from "@neondatabase/serverless";
 
 export async function POST(request: NextRequest) {
@@ -25,9 +25,13 @@ export async function POST(request: NextRequest) {
       WHERE id = ${session.user.id}
     `;
 
+    console.log(`[ONBOARDING API] Saved onboarding for user ${session.user.id}`);
+
+    // Return the redirect URL for the client to use
     return NextResponse.json({ 
       success: true,
-      message: "Onboarding completed successfully" 
+      message: "Onboarding completed successfully",
+      redirectTo: "/app"
     });
   } catch (error) {
     console.error("Onboarding error:", error);

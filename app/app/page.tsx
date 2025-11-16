@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 import { Zap, Keyboard } from "lucide-react";
 import CalendarWeekView from "../components/CalendarWeekView";
@@ -8,7 +10,47 @@ import ReferralSection from "../components/ReferralSection";
 import InteractiveDashboard from "../components/InteractiveDashboard";
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const { data: session, status } = useSession();
   const [showCommandHint, setShowCommandHint] = useState(true);
+  const [checkingOnboarding, setCheckingOnboarding] = useState(true);
+
+  useEffect(() => {
+    async function checkOnboarding() {
+      if (status === "loading") return;
+      if (!session) {
+        router.push("/login");
+        return;
+      }
+
+      // Check database directly for onboarding status
+      try {
+        const res = await fetch('/api/user/profile');
+        if (res.ok) {
+          const userData = await res.json();
+          if (!userData.onboardingCompleted) {
+            console.log('[APP PAGE] User has not completed onboarding, redirecting...');
+            router.push("/onboarding");
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('[APP PAGE] Error checking onboarding:', error);
+      }
+      
+      setCheckingOnboarding(false);
+    }
+
+    checkOnboarding();
+  }, [session, status, router]);
+
+  if (status === "loading" || checkingOnboarding) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-slate-400">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <>
