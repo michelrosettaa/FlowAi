@@ -11,10 +11,14 @@ export async function GET(req: NextRequest) {
 
     const userId = session.user.id;
     const preferences = await storage.getUserPreferences(userId);
+    
+    // Get user's onboarding status directly from database
+    const user = await storage.getUser(userId);
 
     return NextResponse.json({
       name: session.user.name,
       email: session.user.email,
+      onboardingCompleted: user?.onboardingCompleted ?? false,
       preferences: preferences ? {
         goal: preferences.goal,
         workStyle: preferences.workStyle,
