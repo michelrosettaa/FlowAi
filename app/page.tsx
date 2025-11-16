@@ -84,7 +84,12 @@ export default function LandingPage() {
             </button>
 
             <button
-              onClick={() => router.push("/login")}
+              onClick={async () => {
+                // Clear any existing session first
+                const { signOut } = await import("next-auth/react");
+                await signOut({ redirect: false });
+                router.push("/login");
+              }}
               className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300"
             >
               Start Free
@@ -137,7 +142,10 @@ export default function LandingPage() {
               </button>
 
               <button
-                onClick={() => {
+                onClick={async () => {
+                  // Clear any existing session first
+                  const { signOut } = await import("next-auth/react");
+                  await signOut({ redirect: false });
                   router.push("/login");
                   setMobileMenuOpen(false);
                 }}
@@ -204,7 +212,12 @@ export default function LandingPage() {
           className="flex flex-col sm:flex-row gap-4 mt-10"
         >
           <button
-            onClick={() => router.push("/login")}
+            onClick={async () => {
+              // Clear any existing session first
+              const { signOut } = await import("next-auth/react");
+              await signOut({ redirect: false });
+              router.push("/login");
+            }}
             className="group relative overflow-hidden inline-flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-2xl text-base font-semibold shadow-[0_8px_30px_rgba(37,99,235,0.3)] hover:shadow-[0_12px_40px_rgba(37,99,235,0.4)] hover:scale-[1.02] transition-all duration-300 before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/0 before:via-white/20 before:to-white/0 before:translate-x-[-200%] hover:before:translate-x-[200%] before:transition-transform before:duration-700"
           >
             Start Free Trial →
@@ -455,8 +468,11 @@ export default function LandingPage() {
             </p>
 
             <button
-              onClick={() => {
+              onClick={async () => {
                 setShowDemoModal(false);
+                // Clear any existing session first
+                const { signOut } = await import("next-auth/react");
+                await signOut({ redirect: false });
                 router.push("/login");
               }}
               className="w-full inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-base font-semibold px-6 py-4 shadow-[0_8px_30px_rgba(37,99,235,0.3)] hover:shadow-[0_12px_40px_rgba(37,99,235,0.4)] hover:scale-[1.02] transition-all duration-300"

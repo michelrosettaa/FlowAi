@@ -67,10 +67,8 @@ export default function OnboardingPage() {
         if (res.ok) {
           // Trigger session refresh
           await update();
-          // Small delay to ensure session is updated
-          await new Promise(resolve => setTimeout(resolve, 500));
-          // Go directly to app
-          router.push("/app");
+          // Force a full page navigation to ensure middleware picks up new session
+          window.location.href = "/app";
         }
       } catch (err) {
         console.error("Save error:", err);
