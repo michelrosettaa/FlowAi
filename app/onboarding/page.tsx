@@ -51,7 +51,7 @@ export default function OnboardingPage() {
     const newAnswers = { ...answers, [step.key]: opt };
     setAnswers(newAnswers);
 
-    // if last step -> save to database/localStorage and go to loading
+    // if last step -> save to database and go to app
     if (stepIndex === steps.length - 1) {
       // Save answers to localStorage for email-only users
       localStorage.setItem('refraim_onboarding', JSON.stringify(newAnswers));
@@ -65,14 +65,18 @@ export default function OnboardingPage() {
         });
         
         if (res.ok) {
-          await update({ onboardingCompleted: true });
+          // Trigger session refresh
+          await update();
+          // Small delay to ensure session is updated
+          await new Promise(resolve => setTimeout(resolve, 500));
+          // Go directly to app
+          router.push("/app");
         }
       } catch (err) {
         console.error("Save error:", err);
+        // Even if save fails, continue
+        router.push("/app");
       }
-      
-      // Always continue to loading page
-      router.push("/loading");
     } else {
       setStepIndex(stepIndex + 1);
     }

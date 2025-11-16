@@ -6,7 +6,9 @@ Refraim AI is an AI-powered productivity platform built with Next.js, designed t
 ## Recent Work (Nov 16, 2025)
 **Authentication Streamlined for Launch**: Simplified to email + Google OAuth only. Microsoft and Apple providers removed for focused MVP launch.
 
-**Current State**: Login page features email input (passwordless via Credentials provider) and Google OAuth button. Ready for production launch with 15 testers.
+**Onboarding Loop Fixed**: Fixed session refresh issue where onboarding completion wasn't updating the JWT. Now properly updates session and redirects to /app.
+
+**Current State**: Login page features email input (passwordless via Credentials provider) and Google OAuth button. Onboarding flow complete. Ready for production launch with 15 testers.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
