@@ -56,9 +56,9 @@ export default function OnboardingPage() {
       // Save answers to localStorage for email-only users
       localStorage.setItem('refraim_onboarding', JSON.stringify(newAnswers));
       
-      // Try to save to database if authenticated (will fail silently for email-only users)
+      // Try to save to database if authenticated
       try {
-        await fetch('/api/onboarding', {
+        const response = await fetch('/api/onboarding', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
@@ -66,10 +66,15 @@ export default function OnboardingPage() {
           }),
         });
         
+        if (!response.ok) {
+          throw new Error('Failed to save onboarding');
+        }
+        
         // Refresh the session to update onboardingCompleted flag
-        await update();
+        // IMPORTANT: Must pass data to trigger JWT callback
+        await update({ user: { onboardingCompleted: true } });
       } catch (error) {
-        console.log("Not authenticated - using email-only flow");
+        console.error("Onboarding save error:", error);
       }
       
       // Always continue to loading page
