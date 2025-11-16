@@ -31,19 +31,23 @@ export async function middleware(request: NextRequest) {
       LIMIT 1
     `;
     onboardingCompleted = result[0]?.onboarding_completed ?? false;
+    console.log(`[MIDDLEWARE] User ${(session.user as any).id} onboarding status from DB: ${onboardingCompleted}`);
   } catch (error) {
-    console.error("Middleware DB check error:", error);
+    console.error("[MIDDLEWARE] DB check error:", error);
     // Fallback to session token if DB check fails
     onboardingCompleted = (session.user as any)?.onboardingCompleted ?? false;
+    console.log(`[MIDDLEWARE] Using fallback from JWT: ${onboardingCompleted}`);
   }
 
   // Authenticated users who haven't completed onboarding should go to /onboarding
   if (!onboardingCompleted && isAppRoute) {
+    console.log(`[MIDDLEWARE] Redirecting to /onboarding (user hasn't completed)`);
     return NextResponse.redirect(new URL("/onboarding", request.url));
   }
 
   // Authenticated users who completed onboarding shouldn't be on /onboarding
   if (onboardingCompleted && isOnboardingRoute) {
+    console.log(`[MIDDLEWARE] Redirecting to /app (onboarding completed)`);
     return NextResponse.redirect(new URL("/app", request.url));
   }
 
