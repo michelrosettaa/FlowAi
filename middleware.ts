@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
+  // Force fresh session lookup - no caching
   const session = await auth();
   
   const isAppRoute = request.nextUrl.pathname.startsWith("/app");

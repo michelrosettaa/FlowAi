@@ -65,15 +65,20 @@ export default function OnboardingPage() {
         });
         
         if (res.ok) {
-          // Trigger session refresh
+          // CRITICAL: Must wait for session update to complete before redirecting
+          // This triggers the JWT callback with trigger="update" which pulls fresh data from DB
           await update();
-          // Force a full page navigation to ensure middleware picks up new session
+          
+          // Small delay to ensure session propagation
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
+          // Force full page reload to ensure middleware sees updated session
           window.location.href = "/app";
         }
       } catch (err) {
         console.error("Save error:", err);
         // Even if save fails, continue
-        router.push("/app");
+        window.location.href = "/app";
       }
     } else {
       setStepIndex(stepIndex + 1);
