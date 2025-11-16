@@ -65,15 +65,23 @@ export default function OnboardingPage() {
         });
         
         if (res.ok) {
-          // CRITICAL: Must wait for session update to complete before redirecting
-          // This triggers the JWT callback with trigger="update" which pulls fresh data from DB
-          await update();
+          // NUCLEAR OPTION: Sign out and back in to get a completely fresh JWT token
+          // This is the only guaranteed way to update the session
+          const { signIn, signOut } = await import("next-auth/react");
+          const currentSession = await fetch('/api/auth/session').then(r => r.json());
+          const email = currentSession?.user?.email;
           
-          // Small delay to ensure session propagation
-          await new Promise(resolve => setTimeout(resolve, 100));
-          
-          // Force full page reload to ensure middleware sees updated session
-          window.location.href = "/app";
+          if (email) {
+            // Sign out completely
+            await signOut({ redirect: false });
+            // Sign back in with the same email - this generates a fresh token with onboardingCompleted=true
+            await signIn('credentials', { email, redirect: false });
+            // Now redirect to app
+            window.location.href = "/app";
+          } else {
+            // Fallback
+            window.location.href = "/app";
+          }
         }
       } catch (err) {
         console.error("Save error:", err);
