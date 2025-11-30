@@ -136,6 +136,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return false;
       }
 
+      // Update OAuth tokens when user signs in with Google
+      if (account && account.provider === 'google' && user.id) {
+        try {
+          const sql = neon(process.env.DATABASE_URL!);
+          await sql`
+            UPDATE auth_accounts 
+            SET access_token = ${account.access_token},
+                refresh_token = COALESCE(${account.refresh_token}, refresh_token),
+                expires_at = ${account.expires_at},
+                scope = ${account.scope}
+            WHERE user_id = ${user.id} AND provider = 'google'
+          `;
+          console.log(`✅ Updated Google OAuth tokens for user ${user.id}`);
+          console.log(`   Scopes: ${account.scope}`);
+        } catch (error) {
+          console.error("⚠️  Failed to update OAuth tokens:", error);
+        }
+      }
+
       //Create subscription using direct SQL to avoid pool issues
       if (user.id) {
         try {
