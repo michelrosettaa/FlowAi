@@ -1,12 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth, signIn } from "@/lib/auth";
 import { neon } from "@neondatabase/serverless";
+import { cookies } from "next/headers";
 
 export async function POST(request: NextRequest) {
   try {
+    // Debug: Log all cookies
+    const cookieStore = await cookies();
+    const allCookies = cookieStore.getAll();
+    console.log("[ONBOARDING API] Cookies received:", allCookies.map(c => c.name));
+    console.log("[ONBOARDING API] Request headers:", Object.fromEntries(request.headers.entries()));
+    
     const session = await auth();
+    console.log("[ONBOARDING API] Session:", session ? `User: ${session.user?.id}` : "NO SESSION");
     
     if (!session?.user?.id) {
+      console.log("[ONBOARDING API] Returning 401 - no session or user id");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

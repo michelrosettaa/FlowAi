@@ -1,6 +1,5 @@
 import "dotenv/config";
 import express from "express";
-import session from "express-session";
 import next from "next";
 import { registerRoutes } from "./routes";
 
@@ -24,30 +23,19 @@ const handle = app.getRequestHandler();
 app.prepare().then(async () => {
   const server = express();
   
-  // Express session middleware for unauthenticated users
-  server.use(
-    session({
-      secret: process.env.NEXTAUTH_SECRET || "refraim-dev-secret-change-in-production",
-      resave: false,
-      saveUninitialized: true,
-      cookie: {
-        secure: process.env.NODE_ENV === "production",
-        httpOnly: true,
-        maxAge: 1000 * 60 * 60 * 24 * 365,
-      },
-    })
-  );
+  // NOTE: Removed express-session middleware - NextAuth uses JWT sessions
+  // and express-session was interfering with NextAuth cookie handling
   
-  // Don't parse body for NextAuth routes - let Next.js handle them
+  // Don't parse body for Next.js API routes - let Next.js handle them
   server.use((req, res, next) => {
-    if (req.url?.startsWith('/api/auth')) {
+    if (req.url?.startsWith('/api/auth') || req.url?.startsWith('/api/onboarding') || req.url?.startsWith('/api/user')) {
       return next();
     }
     express.json()(req, res, next);
   });
   
   server.use((req, res, next) => {
-    if (req.url?.startsWith('/api/auth')) {
+    if (req.url?.startsWith('/api/auth') || req.url?.startsWith('/api/onboarding') || req.url?.startsWith('/api/user')) {
       return next();
     }
     express.urlencoded({ extended: true })(req, res, next);
