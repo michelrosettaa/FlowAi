@@ -18,27 +18,42 @@ export default function DashboardPage() {
   useEffect(() => {
     async function checkOnboarding() {
       if (status === "loading") return;
-      if (!session) {
+      
+      if (status === "unauthenticated" || !session) {
         router.push("/login");
         return;
       }
 
-      // Check database directly for onboarding status
+      // Always verify onboarding status from the database via API
+      // This ensures we have the latest status even if JWT is stale
       try {
-        const res = await fetch('/api/user/profile');
+        const res = await fetch('/api/user/profile', {
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (res.status === 401) {
+          router.push("/login");
+          return;
+        }
+        
         if (res.ok) {
           const userData = await res.json();
-          console.log('[APP PAGE] Profile data:', userData);
-          console.log('[APP PAGE] Onboarding completed?', userData.onboardingCompleted);
           if (!userData.onboardingCompleted) {
-            console.log('[APP PAGE] User has not completed onboarding, redirecting...');
             router.push("/onboarding");
             return;
           }
-          console.log('[APP PAGE] Onboarding complete, showing dashboard');
         }
       } catch (error) {
-        console.error('[APP PAGE] Error checking onboarding:', error);
+        console.error('Error checking onboarding:', error);
+        // On error, check session data as fallback
+        const sessionOnboardingCompleted = (session.user as any)?.onboardingCompleted;
+        if (sessionOnboardingCompleted === false) {
+          router.push("/onboarding");
+          return;
+        }
       }
       
       setCheckingOnboarding(false);

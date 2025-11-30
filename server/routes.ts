@@ -786,11 +786,8 @@ Write a helpful, warm reply that addresses their message. Keep it brief and prof
         // Authenticated user
         userIdentifier = req.auth.userId;
       } else {
-        // Unauthenticated user - use session ID
-        if (!req.session.id) {
-          return res.status(400).json({ error: "Session required" });
-        }
-        userIdentifier = req.session.id;
+        // Unauthenticated user - return empty events (no session available)
+        return res.json({ events: [] });
       }
 
       const events = await storage.getCalendarEvents(userIdentifier);
@@ -829,11 +826,8 @@ Write a helpful, warm reply that addresses their message. Keep it brief and prof
         // Authenticated user
         userId = req.auth.userId;
       } else {
-        // Unauthenticated user - use session ID
-        if (!req.session.id) {
-          return res.status(400).json({ error: "Session required" });
-        }
-        sessionId = req.session.id;
+        // Unauthenticated user - require login to create events
+        return res.status(401).json({ error: "Authentication required to create events" });
       }
 
       const event = await storage.createCalendarEvent({
@@ -862,10 +856,8 @@ Write a helpful, warm reply that addresses their message. Keep it brief and prof
       if (req.auth?.userId) {
         userIdentifier = req.auth.userId;
       } else {
-        if (!req.session.id) {
-          return res.status(400).json({ error: "Session required" });
-        }
-        userIdentifier = req.session.id;
+        // Unauthenticated user - require login to delete events
+        return res.status(401).json({ error: "Authentication required to delete events" });
       }
 
       const deleted = await storage.deleteCalendarEvent(req.params.id, userIdentifier);

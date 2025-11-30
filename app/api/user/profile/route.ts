@@ -5,6 +5,7 @@ import { storage } from "@/server/storage";
 export async function GET(req: NextRequest) {
   try {
     const session = await auth();
+    
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
     }
@@ -17,14 +18,16 @@ export async function GET(req: NextRequest) {
     
     console.log(`[PROFILE API] User ${userId} - onboarding status:`, user?.onboardingCompleted);
 
+    const prefsData = preferences?.preferences as Record<string, any> | null;
+    
     return NextResponse.json({
       name: session.user.name,
       email: session.user.email,
       onboardingCompleted: user?.onboardingCompleted ?? false,
-      preferences: preferences ? {
-        goal: preferences.goal,
-        workStyle: preferences.workStyle,
-        challenge: preferences.challenge,
+      preferences: prefsData ? {
+        goal: prefsData.goal,
+        workStyle: prefsData.workStyle,
+        challenge: prefsData.challenge,
       } : null,
     });
   } catch (error: any) {

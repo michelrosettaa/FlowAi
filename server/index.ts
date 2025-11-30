@@ -23,26 +23,41 @@ const handle = app.getRequestHandler();
 app.prepare().then(async () => {
   const server = express();
   
-  // NOTE: Removed express-session middleware - NextAuth uses JWT sessions
-  // and express-session was interfering with NextAuth cookie handling
+  // Routes that should be handled directly by Next.js (before any Express middleware)
+  // Note: /api/auth is handled specially - only NextAuth routes go to Next.js, not /api/auth/user
+  const shouldRouteToNextJs = (url: string | undefined) => {
+    if (!url) return false;
+    
+    // Static files always go to Next.js
+    if (url.startsWith('/_next')) return true;
+    
+    // NextAuth routes (but NOT /api/auth/user which is an Express route)
+    if (url.startsWith('/api/auth/') && !url.startsWith('/api/auth/user')) return true;
+    
+    // Next.js API routes
+    if (url.startsWith('/api/onboarding')) return true;
+    if (url.startsWith('/api/user')) return true;
+    if (url.startsWith('/api/analytics')) return true;
+    if (url.startsWith('/api/preferences')) return true;
+    
+    return false;
+  };
   
-  // Don't parse body for Next.js API routes - let Next.js handle them
+  // Middleware to route Next.js paths directly to Next.js handler
   server.use((req, res, next) => {
-    if (req.url?.startsWith('/api/auth') || req.url?.startsWith('/api/onboarding') || req.url?.startsWith('/api/user')) {
-      return next();
+    if (shouldRouteToNextJs(req.url)) {
+      return handle(req, res);
     }
-    express.json()(req, res, next);
+    next();
   });
   
-  server.use((req, res, next) => {
-    if (req.url?.startsWith('/api/auth') || req.url?.startsWith('/api/onboarding') || req.url?.startsWith('/api/user')) {
-      return next();
-    }
-    express.urlencoded({ extended: true })(req, res, next);
-  });
+  // Parse JSON for Express API routes
+  server.use('/api', express.json());
+  server.use('/api', express.urlencoded({ extended: true }));
 
   const httpServer = await registerRoutes(server);
 
+  // Catch-all for everything else (pages, other static files)
   server.use((req, res) => {
     return handle(req, res);
   });

@@ -180,6 +180,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     error: "/login",
     newUser: "/onboarding",
   },
+  cookies: {
+    sessionToken: {
+      name: 'authjs.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: true,
+      },
+    },
+  },
   secret: process.env.NEXTAUTH_SECRET,
   trustHost: true,
 });
