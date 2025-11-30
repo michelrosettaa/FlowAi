@@ -4,10 +4,48 @@ import { signIn } from "next-auth/react";
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+const DISPOSABLE_EMAIL_DOMAINS = [
+  'tempmail.com', 'throwaway.email', 'guerrillamail.com', 'mailinator.com',
+  'temp-mail.org', '10minutemail.com', 'fakeinbox.com', 'trashmail.com',
+  'tempail.com', 'dispostable.com', 'yopmail.com', 'maildrop.cc',
+  'getairmail.com', 'mohmal.com', 'getnada.com', 'emailondeck.com',
+  'tempr.email', 'discard.email', 'sharklasers.com', 'spam4.me'
+];
+
+function isValidEmail(email: string): { valid: boolean; error?: string } {
+  const trimmed = email.trim().toLowerCase();
+  
+  if (!trimmed) {
+    return { valid: false, error: "Please enter your email address" };
+  }
+  
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  if (!emailRegex.test(trimmed)) {
+    return { valid: false, error: "Please enter a valid email address" };
+  }
+  
+  const parts = trimmed.split('@');
+  if (parts.length !== 2) {
+    return { valid: false, error: "Please enter a valid email address" };
+  }
+  
+  const domain = parts[1];
+  if (!domain.includes('.') || domain.endsWith('.') || domain.startsWith('.')) {
+    return { valid: false, error: "Please enter a valid email domain" };
+  }
+  
+  if (DISPOSABLE_EMAIL_DOMAINS.includes(domain)) {
+    return { valid: false, error: "Please use a real email address, not a temporary one" };
+  }
+  
+  return { valid: true };
+}
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const callbackUrl = searchParams.get("callbackUrl") || "/onboarding";
 
@@ -15,18 +53,33 @@ function LoginForm() {
     signIn(provider, { callbackUrl });
   };
 
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    if (emailError) {
+      setEmailError(null);
+    }
+  };
+
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || isLoading) return;
+    if (isLoading) return;
+    
+    const validation = isValidEmail(email);
+    if (!validation.valid) {
+      setEmailError(validation.error || "Invalid email");
+      return;
+    }
     
     setIsLoading(true);
+    setEmailError(null);
+    
     const result = await signIn("credentials", {
-      email,
+      email: email.trim().toLowerCase(),
       redirect: false,
     });
     
     if (result?.error) {
-      alert("Unable to sign in. Please try again.");
+      setEmailError("Unable to sign in with this email. Please try again or use Google sign-in.");
       setIsLoading(false);
     } else if (result?.ok) {
       router.push(callbackUrl);
@@ -49,15 +102,24 @@ function LoginForm() {
 
         {/* Email Form */}
         <form onSubmit={handleEmailSignIn} className="mb-6">
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
-            className="w-full px-4 py-3 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-3"
-            required
-            disabled={isLoading}
-          />
+          <div className="mb-3">
+            <input
+              type="email"
+              value={email}
+              onChange={handleEmailChange}
+              placeholder="Enter your email"
+              className={`w-full px-4 py-3 rounded-lg border text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 transition-colors ${
+                emailError 
+                  ? 'border-red-400 focus:ring-red-500' 
+                  : 'border-slate-300 focus:ring-indigo-500'
+              }`}
+              disabled={isLoading}
+              autoComplete="email"
+            />
+            {emailError && (
+              <p className="mt-2 text-sm text-red-600">{emailError}</p>
+            )}
+          </div>
           <button
             type="submit"
             disabled={isLoading}

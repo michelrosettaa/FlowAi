@@ -7,9 +7,37 @@ import { authAccounts, authSessions, authVerificationTokens, users } from "./db/
 import { eq } from "drizzle-orm";
 import { neon } from "@neondatabase/serverless";
 
+const DISPOSABLE_EMAIL_DOMAINS = [
+  'tempmail.com', 'throwaway.email', 'guerrillamail.com', 'mailinator.com',
+  'temp-mail.org', '10minutemail.com', 'fakeinbox.com', 'trashmail.com',
+  'tempail.com', 'dispostable.com', 'yopmail.com', 'maildrop.cc',
+  'getairmail.com', 'mohmal.com', 'getnada.com', 'emailondeck.com',
+  'tempr.email', 'discard.email', 'sharklasers.com', 'spam4.me'
+];
+
+function isValidEmailFormat(email: string): boolean {
+  const trimmed = email.trim().toLowerCase();
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  
+  if (!emailRegex.test(trimmed)) return false;
+  
+  const parts = trimmed.split('@');
+  if (parts.length !== 2) return false;
+  
+  const domain = parts[1];
+  if (!domain.includes('.') || domain.endsWith('.') || domain.startsWith('.')) return false;
+  if (DISPOSABLE_EMAIL_DOMAINS.includes(domain)) return false;
+  
+  return true;
+}
+
 async function getOrCreateUserByEmail(email: string) {
   const sql = neon(process.env.DATABASE_URL!);
   const normalizedEmail = email.toLowerCase().trim();
+  
+  if (!isValidEmailFormat(normalizedEmail)) {
+    throw new Error("Invalid email format");
+  }
   
   const { isEmailAllowed } = await import("../server/allowlist");
   if (!isEmailAllowed(normalizedEmail)) {
