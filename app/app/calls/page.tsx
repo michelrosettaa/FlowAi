@@ -37,10 +37,10 @@ export default function CallSummariserPage() {
           <PhoneCall className="w-7 h-7 text-white" />
         </div>
         <h1 className="text-3xl font-bold mb-3" style={{ color: 'var(--app-text)' }}>
-          Call Summaries
+          Refraim Summariser
         </h1>
         <p className="text-base max-w-2xl" style={{ color: 'var(--app-text-dim)' }}>
-          Paste your meeting transcript or upload a text file — AI will summarize key decisions, action items, and next steps.
+          Paste your meeting transcript or upload a text file — AI will summarise key decisions, action items, and next steps.
         </p>
       </div>
 

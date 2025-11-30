@@ -62,23 +62,23 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
     {
       section: "AI Assistants",
       items: [
-        { name: "Ask Refraim AI", path: "/app/ask-refraim", icon: <BrainCircuit size={18} /> },
-        { name: "AI Motivator", path: "/app/mentor", icon: <Users size={18} /> },
-        { name: "Email Helper", path: "/app/email", icon: <Mail size={18} /> },
+        { name: "Ask Refraim", path: "/app/ask-refraim", icon: <BrainCircuit size={18} /> },
+        { name: "Refraim Motivator", path: "/app/mentor", icon: <Users size={18} /> },
+        { name: "Refraim Mail", path: "/app/email", icon: <Mail size={18} /> },
       ]
     },
     {
       section: "Productivity",
       items: [
-        { name: "Planner", path: "/app/planner", icon: <Calendar size={18} /> },
+        { name: "Refraim Planner", path: "/app/planner", icon: <Calendar size={18} /> },
         { name: "Calendar", path: "/app/calendar", icon: <Calendar size={18} /> },
-        { name: "Call Summaries", path: "/app/calls", icon: <PhoneCall size={18} /> },
+        { name: "Refraim Summariser", path: "/app/calls", icon: <PhoneCall size={18} /> },
       ]
     },
     {
       section: "Insights",
       items: [
-        { name: "Analytics", path: "/app/stats", icon: <LineChart size={18} /> },
+        { name: "Refraim Analytics", path: "/app/stats", icon: <LineChart size={18} /> },
       ]
     },
     {

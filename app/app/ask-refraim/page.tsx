@@ -70,7 +70,7 @@ export default function AskRefraimAI() {
           </div>
           <div>
             <h1 className="text-2xl font-bold" style={{ color: 'var(--app-text)' }}>
-              Ask Refraim AI
+              Ask Refraim
             </h1>
             <p className="text-sm" style={{ color: 'var(--app-text-muted)' }}>
               Your AI productivity assistant

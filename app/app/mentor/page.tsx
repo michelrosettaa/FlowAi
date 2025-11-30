@@ -59,7 +59,7 @@ export default function MotivatorPage() {
             <Sparkles className="w-7 h-7 text-white" />
           </div>
           <h1 className="text-3xl font-bold mb-3" style={{ color: 'var(--app-text)' }}>
-            AI Motivator
+            Refraim Motivator
           </h1>
           <p className="text-base" style={{ color: 'var(--app-text-dim)' }}>
             Your personal productivity coach. Share what's on your mind and get focused, actionable motivation.
