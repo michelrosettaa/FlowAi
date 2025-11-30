@@ -190,7 +190,7 @@ export default function OnboardingPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-purple-500 font-bold">•</span>
-                  <span>Get personalized mentoring to stay on track</span>
+                  <span>Get personalized motivation to stay on track</span>
                 </li>
               </ul>
             </div>

@@ -30,9 +30,9 @@ export default function MentorPage() {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-8 max-w-lg w-full text-center"
       >
-        <h1 className="text-2xl font-semibold text-white mb-3">Your AI Mentor</h1>
+        <h1 className="text-2xl font-semibold text-white mb-3">Your AI Motivator</h1>
         <p className="text-sm text-slate-400 mb-8">
-          Refraim AI Mentor provides motivational boosts and focus guidance.
+          Refraim AI Motivator provides motivational boosts and focus guidance.
         </p>
 
         <textarea

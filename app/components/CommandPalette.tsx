@@ -148,7 +148,7 @@ export default function CommandPalette() {
                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer hover:bg-slate-700/50 text-white mb-1 transition-colors"
               >
                 <Brain className="w-4 h-4 text-slate-400" />
-                <span>AI Mentor</span>
+                <span>AI Motivator</span>
               </Command.Item>
 
               <Command.Item

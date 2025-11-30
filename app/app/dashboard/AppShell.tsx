@@ -8,7 +8,7 @@ const coreFeatures = [
   { label: "Smart Calendar Sync", desc: "Protects focus time around real meetings." },
   { label: "Email Automation", desc: "Drafts / summarises replies for you." },
   {
-    label: "Focus Mode & Mentor",
+    label: "Focus Mode & Motivator",
     desc: "Keeps you accountable with gentle nudges.",
   },
   {
@@ -59,7 +59,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </div>
 
         <NavButton label="Dashboard" path="/app" />
-        <NavButton label="Mentor" path="/app/mentor" />
+        <NavButton label="AI Motivator" path="/app/mentor" />
         <NavButton label="Email" path="/app/email" />
         <NavButton label="Calendar" path="/app/calendar" />
 

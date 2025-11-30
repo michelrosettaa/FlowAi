@@ -316,7 +316,7 @@ export default function LandingPage() {
               <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center mb-4">
                 <Zap className="w-5 h-5 text-orange-600" />
               </div>
-              <h4 className="font-semibold text-slate-900 mb-2">AI Mentor</h4>
+              <h4 className="font-semibold text-slate-900 mb-2">AI Motivator</h4>
               <p className="text-sm text-slate-600">Keeps you motivated and accountable</p>
             </motion.div>
           </div>

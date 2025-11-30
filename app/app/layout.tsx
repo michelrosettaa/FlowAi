@@ -63,7 +63,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
       section: "AI Assistants",
       items: [
         { name: "Ask Refraim AI", path: "/app/ask-refraim", icon: <BrainCircuit size={18} /> },
-        { name: "Mentor", path: "/app/mentor", icon: <Users size={18} /> },
+        { name: "AI Motivator", path: "/app/mentor", icon: <Users size={18} /> },
         { name: "Email Helper", path: "/app/email", icon: <Mail size={18} /> },
       ]
     },

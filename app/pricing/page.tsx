@@ -33,7 +33,7 @@ export default function PricingPage() {
               <p className="text-4xl font-bold mb-6">£0<span className="text-base text-slate-500">/month</span></p>
               <ul className="text-left text-slate-600 text-sm mb-8 space-y-2">
                 <li>✅ 3 AI plans per day</li>
-                <li>✅ Limited mentor messages</li>
+                <li>✅ Limited motivator messages</li>
                 <li>✅ 2 email summaries/day</li>
               </ul>
               <a href="/login" className="inline-block w-full bg-slate-900 text-white rounded-lg py-2 font-medium hover:bg-slate-800 transition">
@@ -48,7 +48,7 @@ export default function PricingPage() {
               <p className="text-4xl font-bold mb-6">£8.99<span className="text-base text-slate-200">/month</span></p>
               <ul className="text-left text-white/90 text-sm mb-8 space-y-2">
                 <li>✅ Unlimited AI planning</li>
-                <li>✅ Full AI Mentor & streaks</li>
+                <li>✅ Full AI Motivator & streaks</li>
                 <li>✅ Calendar sync</li>
                 <li>✅ Unlimited email drafts</li>
               </ul>

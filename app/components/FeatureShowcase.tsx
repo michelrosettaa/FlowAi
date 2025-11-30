@@ -27,8 +27,8 @@ const features = [
   },
   {
     icon: "🎯",
-    title: "Focus Mode & Mentor",
-    desc: "Stay accountable with an AI mentor that tracks your flow and sends encouragement throughout your day.",
+    title: "Focus Mode & Motivator",
+    desc: "Stay accountable with an AI motivator that tracks your flow and sends encouragement throughout your day.",
     preview: "/dashboard/focus-mode.svg",
     gradient: "from-green-400 to-emerald-500",
   },

@@ -3,12 +3,12 @@
 import React, { useState } from "react";
 import { Sparkles } from "lucide-react";
 
-export default function MentorPage() {
+export default function MotivatorPage() {
   const [messages, setMessages] = useState<
-    { from: "you" | "mentor"; text: string }[]
+    { from: "you" | "motivator"; text: string }[]
   >([
     {
-      from: "mentor",
+      from: "motivator",
       text: "Hey! I'm here to help you stay focused and motivated. Tell me what's on your mind today 👇",
     },
   ]);
@@ -30,20 +30,20 @@ export default function MentorPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to get mentor response");
+        throw new Error("Failed to get motivator response");
       }
 
       const data = await response.json();
       const replyMsg = {
-        from: "mentor" as const,
+        from: "motivator" as const,
         text: data.summary || "I'm here to help you stay focused!",
       };
 
       setMessages((prev) => [...prev, replyMsg]);
     } catch (err) {
-      console.error("Error getting mentor response:", err);
+      console.error("Error getting motivator response:", err);
       const errorMsg = {
-        from: "mentor" as const,
+        from: "motivator" as const,
         text: "Sorry, I'm having trouble connecting right now. Please try again.",
       };
       setMessages((prev) => [...prev, errorMsg]);
@@ -59,10 +59,10 @@ export default function MentorPage() {
             <Sparkles className="w-7 h-7 text-white" />
           </div>
           <h1 className="text-3xl font-bold mb-3" style={{ color: 'var(--app-text)' }}>
-            AI Mentor
+            AI Motivator
           </h1>
           <p className="text-base" style={{ color: 'var(--app-text-dim)' }}>
-            Your personal productivity coach. Share what's on your mind and get focused, actionable guidance.
+            Your personal productivity coach. Share what's on your mind and get focused, actionable motivation.
           </p>
         </div>
 
@@ -89,7 +89,7 @@ export default function MentorPage() {
                     ? 'linear-gradient(to right, var(--app-accent), var(--app-accent-hover))' 
                     : 'var(--app-surface-hover)',
                   color: m.from === "you" ? 'white' : 'var(--app-text)',
-                  border: m.from === "mentor" ? '1px solid var(--app-border)' : 'none'
+                  border: m.from === "motivator" ? '1px solid var(--app-border)' : 'none'
                 }}
               >
                 {m.text}

@@ -684,7 +684,7 @@ Write a helpful, warm reply that addresses their message. Keep it brief and prof
         messages: [
           {
             role: "system",
-            content: `You are Refraim AI, an AI mentor with a ${voice} personality. Be concise, warm, and motivational in your feedback.`,
+            content: `You are Refraim AI, an AI motivator with a ${voice} personality. Be concise, warm, and motivational in your feedback.`,
           },
           { role: "user", content: text },
         ],
@@ -703,8 +703,8 @@ Write a helpful, warm reply that addresses their message. Keep it brief and prof
 
       res.json({ summary, audio: audioBase64 });
     } catch (error) {
-      console.error("❌ Mentor API Error:", error);
-      res.status(500).json({ error: "Failed to generate mentor voice." });
+      console.error("❌ Motivator API Error:", error);
+      res.status(500).json({ error: "Failed to generate motivator voice." });
     }
   });
 
@@ -1025,10 +1025,10 @@ Write a helpful, warm reply that addresses their message. Keep it brief and prof
       }
 
       if (userId) {
-        const canUse = await canUseFeature(userId, 'ai_messages');
-        if (!canUse) {
+        const usageCheck = await checkUsageLimit(userId, 'ai_messages');
+        if (!usageCheck.allowed) {
           return res.status(403).json({ 
-            error: "AI message limit reached. Please upgrade your plan to continue using AI features.",
+            error: getUpgradeMessage('ai_messages', usageCheck.planName),
             limitReached: true 
           });
         }
@@ -1078,7 +1078,7 @@ etc.`
         });
 
       if (userId) {
-        await incrementUsage(userId, 'ai_messages').catch(err => {
+        await trackUsage(userId, 'ai_messages').catch((err: any) => {
           console.error('Failed to increment AI message usage (non-blocking):', err);
         });
       }

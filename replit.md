@@ -1,10 +1,16 @@
 # Refraim AI - AI-Powered Productivity Platform
 
 ## Overview
-Refraim AI is an AI-powered productivity platform built with Next.js, designed to help users manage tasks, schedules, and emails efficiently. It leverages OpenAI's API for intelligent planning, email assistance, and motivational mentoring, aiming to automate routine work and protect deep focus time. The platform integrates with Google services (Gmail, Calendar) and uses a PostgreSQL database, deployed on Replit. Its core purpose is to enhance personal and professional efficiency by providing a comprehensive suite of AI-driven tools.
+Refraim AI is an AI-powered productivity platform built with Next.js, designed to help users manage tasks, schedules, and emails efficiently. It leverages OpenAI's API for intelligent planning, email assistance, and an AI Motivator feature, aiming to automate routine work and protect deep focus time. The platform integrates with Google services (Gmail, Calendar) and uses a PostgreSQL database, deployed on Replit. Its core purpose is to enhance personal and professional efficiency by providing a comprehensive suite of AI-driven tools.
 
-## Recent Work (Nov 16, 2025)
-**Production Ready - All Features Functional**: 
+## Recent Work (Nov 30, 2025)
+**Production Hardening & Polish**:
+- ✅ Fixed persistent onboarding 401 error (removed Express session middleware conflicting with NextAuth)
+- ✅ Completed "AI Mentor" → "AI Motivator" rebrand across 15+ files (pages, components, APIs, marketing copy)
+- ✅ Verified analytics API uses real database data (not mocks)
+- ✅ Fixed LSP errors in server/routes.ts (corrected usage limit function names)
+
+**Previous Work (Nov 16, 2025)**:
 - ✅ Removed demo/fake email page, now using real Gmail API integration
 - ✅ Created full Profile page with user data display and settings
 - ✅ All data persists in PostgreSQL database (users, tasks, calendar events, preferences)
@@ -16,7 +22,7 @@ Refraim AI is an AI-powered productivity platform built with Next.js, designed t
 
 **Authentication**: Email + Google OAuth working perfectly. Session management with JWT.
 
-**Current State**: 100% production-ready. All features fully functional, not demo data. Real Gmail integration, database persistence, profile management. Ready for launch with 15 testers today.
+**Current State**: 100% production-ready. All features fully functional, not demo data. Real Gmail integration, database persistence, profile management.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -27,10 +33,10 @@ Preferred communication style: Simple, everyday language.
 The frontend uses Next.js 15.1.6 (App Router), React 18.3.1, and Tailwind CSS v4 for styling with a gradient-based theme and glassmorphism effects. Framer Motion handles animations, and TypeScript ensures type safety. It features a landing page and protected `/app` routes. A custom design system utilizes CSS custom properties for theming and custom fonts (Inter, DM Sans).
 
 ### Backend
-A custom Express server co-exists with Next.js, managing protected API routes with NextAuth v5 JWT authentication. Key routes include AI chat (`/api/ask-refraim`), email management (`/api/email/*`), AI mentor (`/api/mentor`), tasks (`/api/tasks`), user preferences (`/api/preferences`), and analytics (`/api/analytics`). The analytics endpoint calculates real-time user metrics from the database, including completed tasks, focus hours from calendar events, productivity scores, and activity streaks over a 30-day lookback period. It supports hybrid authentication for local calendar CRUD operations. The platform offers dual-mode email support: Gmail users via OAuth (using Replit's Google Mail connection and Gmail API) and non-Gmail users via IMAP/SMTP protocols with AES-256-CBC encrypted passwords. OAuth redirect flows preserve callback URLs to ensure users return to their intended destination after authentication.
+A custom Express server co-exists with Next.js, managing protected API routes with NextAuth v5 JWT authentication. Key routes include AI chat (`/api/ask-refraim`), email management (`/api/email/*`), AI Motivator (`/api/mentor`), tasks (`/api/tasks`), user preferences (`/api/preferences`), and analytics (`/api/analytics`). The analytics endpoint calculates real-time user metrics from the database, including completed tasks, focus hours from calendar events, productivity scores, and activity streaks over a 30-day lookback period. It supports hybrid authentication for local calendar CRUD operations. The platform offers dual-mode email support: Gmail users via OAuth (using Replit's Google Mail connection and Gmail API) and non-Gmail users via IMAP/SMTP protocols with AES-256-CBC encrypted passwords. OAuth redirect flows preserve callback URLs to ensure users return to their intended destination after authentication.
 
 ### AI Integration
-Refraim AI uses OpenAI API (v6.7.0), specifically `gpt-4o-mini` for text generation and `gpt-4o-mini-tts` for voice synthesis. AI features include daily planning, email automation, meeting summarization, and an AI mentor. The "Ask Refraim" feature integrates with Google Calendar for context-aware responses, handling timezones with `date-fns-tz`. All OpenAI interactions are server-side for security.
+Refraim AI uses OpenAI API (v6.7.0), specifically `gpt-4o-mini` for text generation and `gpt-4o-mini-tts` for voice synthesis. AI features include daily planning, email automation, meeting summarization, and an AI Motivator. The "Ask Refraim" feature integrates with Google Calendar for context-aware responses, handling timezones with `date-fns-tz`. All OpenAI interactions are server-side for security.
 
 ### Authentication
 NextAuth v5 provides production-ready multi-provider OAuth (Google, Microsoft, Apple) with JWT-based sessions. Per-user OAuth tokens for Google and Microsoft are stored in the database and automatically refreshed, secured with `HttpOnly` cookies and JWT signing. Access control is configurable via the `REFRAIM_ACCESS_MODE` environment variable ('open' or 'allowlist'), with allowlist enforcement implemented in the NextAuth signIn callback.
