@@ -772,22 +772,9 @@ Write a helpful, warm reply that addresses their message. Keep it brief and prof
     }
   });
 
-  app.post("/api/onboarding", requireNextAuth, async (req: any, res) => {
-    try {
-      const userId = req.auth!.userId;
-      const { answers } = req.body;
-
-      await storage.updateUser(userId, {
-        onboardingCompleted: true,
-        onboardingData: answers,
-      });
-
-      res.json({ success: true });
-    } catch (error) {
-      console.error("Error saving onboarding:", error);
-      res.status(500).json({ message: "Failed to save onboarding" });
-    }
-  });
+  // NOTE: /api/onboarding is handled by Next.js API route at app/api/onboarding/route.ts
+  // The Express route was removed because requireNextAuth middleware couldn't properly
+  // read NextAuth session cookies. Next.js API routes use auth() directly which works correctly.
 
   // App Calendar Endpoints (work for both authenticated and unauthenticated users)
   app.get("/api/app-calendar/events", optionalNextAuth, async (req: any, res) => {
