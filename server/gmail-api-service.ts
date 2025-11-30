@@ -30,7 +30,20 @@ export async function fetchGmailInbox(userId: string, maxResults: number = 10) {
 
     const messages = response.data.messages || [];
     
-    const emailPromises = messages.map(async (message) => {
+    if (messages.length === 0) {
+      return [];
+    }
+    
+    const emails: Array<{
+      id: string;
+      from: string;
+      subject: string;
+      snippet: string;
+      date: string;
+      body: string;
+    }> = [];
+    
+    for (const message of messages) {
       try {
         const msg = await gmail.users.messages.get({
           userId: 'me',
@@ -39,15 +52,18 @@ export async function fetchGmailInbox(userId: string, maxResults: number = 10) {
         });
 
         const payload = msg.data.payload;
+        const snippet = msg.data.snippet || '';
+        
         if (!payload) {
-          return {
+          emails.push({
             id: message.id!,
             from: 'Unknown',
-            subject: 'Unable to load email',
-            snippet: msg.data.snippet || '',
+            subject: 'Email',
+            snippet,
             date: new Date().toISOString(),
-            body: msg.data.snippet || '',
-          };
+            body: snippet,
+          });
+          continue;
         }
 
         const headers = payload.headers || [];
@@ -56,60 +72,47 @@ export async function fetchGmailInbox(userId: string, maxResults: number = 10) {
         const dateHeader = headers.find(h => h.name === 'Date');
         
         let body = '';
-        const parts = payload.parts || [];
         
-        for (const part of parts) {
-          if (part.mimeType === 'text/plain' && part.body?.data) {
-            try {
+        try {
+          const parts = payload.parts || [];
+          for (const part of parts) {
+            if (part.mimeType === 'text/plain' && part.body?.data) {
               body = Buffer.from(part.body.data, 'base64').toString('utf-8');
               break;
-            } catch (e) {
-              continue;
             }
           }
-        }
-        
-        if (!body && payload.body?.data) {
-          try {
+          
+          if (!body && payload.body?.data) {
             body = Buffer.from(payload.body.data, 'base64').toString('utf-8');
-          } catch (e) {
-            body = '';
           }
+        } catch (decodeError) {
+          body = '';
         }
         
-        const snippet = msg.data.snippet || '';
         body = body || snippet;
         
         if (body.length > 2000) {
           body = body.substring(0, 2000) + '...';
         }
 
-        return {
+        emails.push({
           id: message.id!,
           from: fromHeader?.value || 'Unknown',
           subject: subjectHeader?.value || 'No Subject',
           snippet,
           date: dateHeader?.value || new Date().toISOString(),
           body,
-        };
+        });
       } catch (emailError) {
-        console.warn(`Failed to fetch email ${message.id}:`, emailError);
-        return {
-          id: message.id!,
-          from: 'Unknown',
-          subject: 'Unable to load email',
-          snippet: '',
-          date: new Date().toISOString(),
-          body: '',
-        };
+        console.warn(`Skipping email ${message.id} due to error`);
+        continue;
       }
-    });
-
-    const emails = await Promise.all(emailPromises);
+    }
+    
     return emails;
   } catch (error: any) {
-    console.error('Gmail API error:', error);
-    throw new Error(`Failed to fetch Gmail inbox: ${error.message}`);
+    console.error('Gmail API error:', error?.message || 'Unknown error');
+    return [];
   }
 }
 
