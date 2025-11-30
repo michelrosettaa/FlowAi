@@ -181,4 +181,5 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     newUser: "/onboarding",
   },
   secret: process.env.NEXTAUTH_SECRET,
+  trustHost: true,
 });
