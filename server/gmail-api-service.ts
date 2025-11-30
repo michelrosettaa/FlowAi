@@ -1,47 +1,17 @@
 import { google } from 'googleapis';
+import { getUserTokens } from '../lib/auth/tokens';
 
-let connectionSettings: any;
-
-async function getAccessToken() {
-  if (connectionSettings && connectionSettings.settings.expires_at && new Date(connectionSettings.settings.expires_at).getTime() > Date.now()) {
-    return connectionSettings.settings.access_token;
-  }
+async function getGmailClient(userId: string) {
+  const tokens = await getUserTokens(userId, 'google');
   
-  const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME;
-  const xReplitToken = process.env.REPL_IDENTITY 
-    ? 'repl ' + process.env.REPL_IDENTITY 
-    : process.env.WEB_REPL_RENEWAL 
-    ? 'depl ' + process.env.WEB_REPL_RENEWAL 
-    : null;
-
-  if (!xReplitToken) {
-    throw new Error('Replit token not found');
-  }
-
-  connectionSettings = await fetch(
-    'https://' + hostname + '/api/v2/connection?include_secrets=true&connector_names=google-mail',
-    {
-      headers: {
-        'Accept': 'application/json',
-        'X_REPLIT_TOKEN': xReplitToken
-      }
-    }
-  ).then(res => res.json()).then(data => data.items?.[0]);
-
-  const accessToken = connectionSettings?.settings?.access_token || connectionSettings?.settings?.oauth?.credentials?.access_token;
-
-  if (!connectionSettings || !accessToken) {
-    throw new Error('Gmail not connected');
-  }
-  return accessToken;
-}
-
-async function getGmailClient() {
-  const accessToken = await getAccessToken();
-
-  const oauth2Client = new google.auth.OAuth2();
+  const oauth2Client = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET
+  );
+  
   oauth2Client.setCredentials({
-    access_token: accessToken
+    access_token: tokens.accessToken,
+    refresh_token: tokens.refreshToken,
   });
 
   return google.gmail({ version: 'v1', auth: oauth2Client });
@@ -49,7 +19,7 @@ async function getGmailClient() {
 
 export async function fetchGmailInbox(userId: string, maxResults: number = 10) {
   try {
-    const gmail = await getGmailClient();
+    const gmail = await getGmailClient(userId);
     
     const response = await gmail.users.messages.list({
       userId: 'me',
@@ -147,7 +117,7 @@ export async function fetchGmailInbox(userId: string, maxResults: number = 10) {
 
 export async function sendGmailEmail(userId: string, to: string, subject: string, body: string) {
   try {
-    const gmail = await getGmailClient();
+    const gmail = await getGmailClient(userId);
     
     const raw = [
       `To: ${to}`,
@@ -175,11 +145,11 @@ export async function sendGmailEmail(userId: string, to: string, subject: string
 
 export async function checkGmailConnection(userId: string): Promise<boolean> {
   try {
-    await getAccessToken();
-    console.log("✅ Gmail connection active via Replit integration");
+    await getUserTokens(userId, 'google');
+    console.log("✅ Gmail OAuth connection active for user:", userId);
     return true;
   } catch (error: any) {
-    console.log("ℹ️  Gmail not connected:", error.message);
+    console.log("ℹ️  Gmail OAuth not connected for user:", userId, error.message);
     return false;
   }
 }
