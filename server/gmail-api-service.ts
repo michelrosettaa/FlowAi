@@ -31,46 +31,78 @@ export async function fetchGmailInbox(userId: string, maxResults: number = 10) {
     const messages = response.data.messages || [];
     
     const emailPromises = messages.map(async (message) => {
-      const msg = await gmail.users.messages.get({
-        userId: 'me',
-        id: message.id!,
-        format: 'full',
-      });
+      try {
+        const msg = await gmail.users.messages.get({
+          userId: 'me',
+          id: message.id!,
+          format: 'full',
+        });
 
-      const headers = msg.data.payload?.headers || [];
-      const fromHeader = headers.find(h => h.name === 'From');
-      const subjectHeader = headers.find(h => h.name === 'Subject');
-      const dateHeader = headers.find(h => h.name === 'Date');
-      
-      let body = '';
-      const parts = msg.data.payload?.parts || [];
-      
-      for (const part of parts) {
-        if (part.mimeType === 'text/plain' && part.body?.data) {
-          body = Buffer.from(part.body.data, 'base64').toString('utf-8');
-          break;
+        const payload = msg.data.payload;
+        if (!payload) {
+          return {
+            id: message.id!,
+            from: 'Unknown',
+            subject: 'Unable to load email',
+            snippet: msg.data.snippet || '',
+            date: new Date().toISOString(),
+            body: msg.data.snippet || '',
+          };
         }
-      }
-      
-      if (!body && msg.data.payload?.body?.data) {
-        body = Buffer.from(msg.data.payload.body.data, 'base64').toString('utf-8');
-      }
-      
-      const snippet = msg.data.snippet || '';
-      body = body || snippet;
-      
-      if (body.length > 2000) {
-        body = body.substring(0, 2000) + '...';
-      }
 
-      return {
-        id: message.id!,
-        from: fromHeader?.value || 'Unknown',
-        subject: subjectHeader?.value || 'No Subject',
-        snippet,
-        date: dateHeader?.value || new Date().toISOString(),
-        body,
-      };
+        const headers = payload.headers || [];
+        const fromHeader = headers.find(h => h.name === 'From');
+        const subjectHeader = headers.find(h => h.name === 'Subject');
+        const dateHeader = headers.find(h => h.name === 'Date');
+        
+        let body = '';
+        const parts = payload.parts || [];
+        
+        for (const part of parts) {
+          if (part.mimeType === 'text/plain' && part.body?.data) {
+            try {
+              body = Buffer.from(part.body.data, 'base64').toString('utf-8');
+              break;
+            } catch (e) {
+              continue;
+            }
+          }
+        }
+        
+        if (!body && payload.body?.data) {
+          try {
+            body = Buffer.from(payload.body.data, 'base64').toString('utf-8');
+          } catch (e) {
+            body = '';
+          }
+        }
+        
+        const snippet = msg.data.snippet || '';
+        body = body || snippet;
+        
+        if (body.length > 2000) {
+          body = body.substring(0, 2000) + '...';
+        }
+
+        return {
+          id: message.id!,
+          from: fromHeader?.value || 'Unknown',
+          subject: subjectHeader?.value || 'No Subject',
+          snippet,
+          date: dateHeader?.value || new Date().toISOString(),
+          body,
+        };
+      } catch (emailError) {
+        console.warn(`Failed to fetch email ${message.id}:`, emailError);
+        return {
+          id: message.id!,
+          from: 'Unknown',
+          subject: 'Unable to load email',
+          snippet: '',
+          date: new Date().toISOString(),
+          body: '',
+        };
+      }
     });
 
     const emails = await Promise.all(emailPromises);
