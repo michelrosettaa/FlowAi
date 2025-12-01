@@ -143,7 +143,7 @@ export default function RefraimMailPage() {
         throw new Error(errorData.error || "Failed to send reply");
       }
       
-      setSendStatus("✅ Reply sent successfully!");
+      setSendStatus("Reply sent successfully!");
       setTimeout(() => {
         setSelectedEmail(null);
         setAiReply("");
@@ -151,7 +151,7 @@ export default function RefraimMailPage() {
       }, 2000);
     } catch (err: any) {
       console.error("Error sending reply:", err);
-      setSendStatus(`❌ ${err.message || "Failed to send reply. Please try again."}`);
+      setSendStatus(`Error: ${err.message || "Failed to send reply. Please try again."}`);
     } finally {
       setSendingReply(false);
     }
@@ -207,14 +207,14 @@ export default function RefraimMailPage() {
       
       if (!response.ok) throw new Error("Failed to send email");
       
-      setSendStatus("✅ Email sent successfully via Gmail!");
+      setSendStatus("Email sent successfully!");
       setRecipient("");
       setSubject("");
       setContext("");
       setDraftedEmail("");
     } catch (err: any) {
       console.error("Error sending email:", err);
-      setSendStatus("❌ Failed to send email. Please try again.");
+      setSendStatus("Error: Failed to send email. Please try again.");
     } finally {
       setSending(false);
     }
@@ -567,7 +567,7 @@ export default function RefraimMailPage() {
 
                   {sendStatus && (
                     <div className={`mt-4 p-4 rounded-xl text-center text-sm font-medium ${
-                      sendStatus.includes('✅') ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'
+                      sendStatus.includes('successfully') ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'
                     }`}>
                       {sendStatus}
                     </div>
@@ -720,7 +720,7 @@ export default function RefraimMailPage() {
             
             {sendStatus && (
               <div className={`mt-6 p-4 rounded-xl text-center text-sm font-medium ${
-                sendStatus.includes('✅') ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'
+                sendStatus.includes('successfully') ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'
               }`}>
                 {sendStatus}
               </div>

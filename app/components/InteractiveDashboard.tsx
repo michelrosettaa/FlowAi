@@ -103,7 +103,7 @@ export default function InteractiveDashboard() {
           <div className="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center group-hover:bg-orange-500/30 transition-colors duration-200">
             <Flame className="w-6 h-6 text-orange-400" />
           </div>
-          <div className="text-2xl">🔥</div>
+          <Flame className="w-5 h-5 text-orange-400" />
         </div>
         <motion.h3
           initial={{ opacity: 0 }}

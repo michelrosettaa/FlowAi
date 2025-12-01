@@ -46,7 +46,7 @@ export default function MentorPage() {
           onClick={handleInspire}
           className="mt-4 w-full bg-gradient-to-r from-blue-600 to-indigo-500 text-white font-semibold py-2 rounded-lg hover:scale-[1.03] transition-all"
         >
-          Inspire Me ✨
+          Inspire Me
         </button>
 
         {response && (

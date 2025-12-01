@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     // Create a trial end date (7 days from now)
     const trialEnds = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
 
-    console.log("✅ Trial started for:", email, "Ends:", trialEnds);
+    console.log("Trial started for:", email, "Ends:", trialEnds);
 
     return NextResponse.json({ ok: true, email, trialEnds });
   } catch (error: any) {

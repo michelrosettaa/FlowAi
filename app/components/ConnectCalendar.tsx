@@ -52,7 +52,7 @@ export default function ConnectCalendar() {
               animate={{ opacity: 1 }}
               className="flex flex-col items-center"
             >
-              <div className="text-5xl mb-4">✅</div>
+              <div className="text-5xl mb-4">Success: </div>
               <p className="text-green-600 font-semibold text-lg">
                 Calendar connected successfully!
               </p>

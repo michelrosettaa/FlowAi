@@ -139,7 +139,7 @@ export default function AskRefraimAI() {
                       e.currentTarget.style.color = 'var(--app-text-muted)';
                     }}
                   >
-                    <span style={{ color: 'var(--app-accent)' }} className="inline-block mr-2 group-hover:scale-110 transition-transform">✨</span>
+                    <span style={{ color: 'var(--app-accent)' }} className="inline-block mr-2 group-hover:scale-110 transition-transform"></span>
                     {suggestion}
                   </button>
                 ))}

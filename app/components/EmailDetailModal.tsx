@@ -154,19 +154,19 @@ export function EmailDetailModal({
 
         {sendStatus && (
           <div className={`mt-4 p-4 rounded-xl border-l-4 ${
-            sendStatus.includes('✅') 
+            sendStatus.includes('successfully') 
               ? 'bg-green-500/10 border-green-500' 
               : 'bg-red-500/10'
           }`}
-            style={sendStatus.includes('✅') ? {} : { borderLeftColor: '#ef4444' }}
+            style={sendStatus.includes('successfully') ? {} : { borderLeftColor: '#ef4444' }}
           >
-            {sendStatus.includes('✅') ? (
+            {sendStatus.includes('successfully') ? (
               <div className="text-sm text-green-300 text-center">{sendStatus}</div>
             ) : (
               <div className="flex items-center justify-between">
                 <div>
                   <div className="font-semibold text-sm text-red-300 mb-1">Error Sending Email</div>
-                  <div className="text-sm text-red-200">{sendStatus.replace('❌ ', '')}</div>
+                  <div className="text-sm text-red-200">{sendStatus.replace('Error: ', '')}</div>
                 </div>
                 <button
                   onClick={onSendReply}

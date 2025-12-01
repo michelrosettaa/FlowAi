@@ -32,7 +32,7 @@ export default function ConnectEmail() {
           viewport={{ once: true }}
         >
           <p className="text-sm text-blue-100 mb-4">
-            ✉️ Incoming message:
+            Incoming message:
             <br />
             <span className="text-white font-semibold">
               “Can we reschedule our meeting?”

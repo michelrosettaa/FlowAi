@@ -10,7 +10,7 @@ export default function StepCard({ step }: Props) {
     {
       badge: "Calendar Sync",
       title: "We'll defend your focus blocks",
-      body: ["Block Deep Work 10-12", "Move meeting with Sarah", "Gym at 18:00 ✅"],
+      body: ["Block Deep Work 10-12", "Move meeting with Sarah", "Gym at 18:00"],
     },
     {
       badge: "Inbox Assist",

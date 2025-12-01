@@ -350,7 +350,7 @@ export default function CalendarWeekView({ onEventCreate, readOnly = false, refe
           borderBottom: '1px solid var(--app-border)'
         }}>
           <div className="font-semibold text-sm mb-0.5" style={{ color: 'var(--app-text)' }}>
-            📅 Local Calendar
+            Local Calendar
           </div>
           <div className="text-xs" style={{ color: 'var(--app-text-muted)' }}>
             You're using the local calendar. Events are saved to your browser session. Sign in with Google to sync with Google Calendar and access your events across devices.

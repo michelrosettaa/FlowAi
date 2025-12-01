@@ -110,7 +110,7 @@ export default function StatsPage() {
           <BarChart3 className="w-7 h-7 text-white" />
         </div>
         <h1 className="text-3xl font-bold mb-3" style={{ color: 'var(--app-text)' }}>
-          Your Analytics
+          Refraim Analytics
         </h1>
         <p className="text-base" style={{ color: 'var(--app-text-dim)' }}>
           Track your productivity trends, focus time, and achievements based on your actual activity.
@@ -143,7 +143,7 @@ export default function StatsPage() {
       {/* Insights Section */}
       <div className="premium-card p-8">
         <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--app-text)' }}>
-          📊 Your Productivity Insights
+          Your Productivity Insights
         </h2>
         <div className="space-y-3">
           <div className="flex items-start gap-3">

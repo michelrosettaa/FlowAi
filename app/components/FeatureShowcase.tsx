@@ -2,118 +2,143 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Brain, Calendar, Mail, Target, Phone, BarChart3 } from "lucide-react";
 
 const features = [
   {
-    icon: "🧠",
+    icon: Brain,
     title: "AI Daily Planner",
     desc: "Automatically builds your schedule from your tasks and syncs it with your calendar for deep focus.",
     preview: "/dashboard/ai-planner.svg",
-    gradient: "from-blue-400 to-indigo-500",
+    gradient: "from-blue-500 to-indigo-600",
+    iconBg: "bg-gradient-to-br from-blue-500 to-indigo-600",
   },
   {
-    icon: "📅",
+    icon: Calendar,
     title: "Smart Calendar Sync",
     desc: "Connect Google or Outlook and let Refraim AI plan deep work around your real meetings.",
     preview: "/dashboard/calendar-sync.svg",
-    gradient: "from-indigo-400 to-purple-500",
+    gradient: "from-indigo-500 to-purple-600",
+    iconBg: "bg-gradient-to-br from-indigo-500 to-purple-600",
   },
   {
-    icon: "✉️",
+    icon: Mail,
     title: "Email Automation",
     desc: "Drafts, summarises, and schedules your emails for you — so your focus never breaks.",
     preview: "/dashboard/email-ai.svg",
-    gradient: "from-pink-400 to-red-500",
+    gradient: "from-pink-500 to-rose-600",
+    iconBg: "bg-gradient-to-br from-pink-500 to-rose-600",
   },
   {
-    icon: "🎯",
+    icon: Target,
     title: "Focus Mode & Motivator",
     desc: "Stay accountable with an AI motivator that tracks your flow and sends encouragement throughout your day.",
     preview: "/dashboard/focus-mode.svg",
-    gradient: "from-green-400 to-emerald-500",
+    gradient: "from-emerald-500 to-green-600",
+    iconBg: "bg-gradient-to-br from-emerald-500 to-green-600",
   },
   {
-    icon: "📞",
+    icon: Phone,
     title: "AI Call Summariser",
     desc: "Instantly summarises meetings into action plans and next steps — powered by AI.",
     preview: "/dashboard/call-summary.svg",
-    gradient: "from-yellow-400 to-orange-500",
+    gradient: "from-amber-500 to-orange-600",
+    iconBg: "bg-gradient-to-br from-amber-500 to-orange-600",
   },
   {
-    icon: "📊",
+    icon: BarChart3,
     title: "Productivity Analytics",
-    desc: "See deep work vs meetings, energy trends, and your weekly progress — all visualized beautifully.",
+    desc: "See deep work vs meetings, energy trends, and your weekly progress — all visualised beautifully.",
     preview: "/dashboard/analytics.svg",
-    gradient: "from-sky-400 to-cyan-500",
+    gradient: "from-cyan-500 to-blue-600",
+    iconBg: "bg-gradient-to-br from-cyan-500 to-blue-600",
   },
 ];
 
 export default function FeatureShowcase() {
   const [active, setActive] = useState(0);
+  const IconComponent = features[active].icon;
 
   return (
     <section
       id="features"
-      className="relative z-10 flex flex-col items-center justify-center text-center py-24 px-6"
+      className="relative z-10 flex flex-col items-center justify-center text-center py-28 px-6"
     >
-      {/* === Heading === */}
-      <h2 className="text-4xl font-extrabold text-gray-900 mb-6">
-        Built for focus, powered by AI.
+      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-sm font-medium mb-6">
+        <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+        Core Features
+      </div>
+      
+      <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
+        Built for focus, powered by AI
       </h2>
-      <p className="text-gray-600 max-w-2xl mb-14">
-        Every feature in Refraim AI works together to plan, protect, and optimise your time —
-        automatically.
+      <p className="text-gray-500 max-w-2xl mb-16 text-lg">
+        Every feature in Refraim AI works together to plan, protect, and optimise your time — automatically.
       </p>
 
-      {/* === Two-column layout === */}
-      <div className="grid md:grid-cols-2 gap-16 max-w-7xl w-full items-center">
-        {/* === Feature List === */}
-        <div className="flex flex-col gap-4">
-          {features.map((feature, i) => (
-            <motion.div
-              key={i}
-              onClick={() => setActive(i)}
-              className={`cursor-pointer rounded-xl p-5 text-left border transition-all duration-300 ${
-                active === i
-                  ? "bg-blue-50 border-blue-300 shadow-lg scale-[1.02]"
-                  : "bg-white border-gray-100 hover:border-blue-200 hover:shadow-sm"
-              }`}
-              whileHover={{ scale: 1.02 }}
-            >
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <span className="text-2xl">{feature.icon}</span> {feature.title}
-              </h3>
-              <p className="text-gray-600 text-sm mt-1">{feature.desc}</p>
-            </motion.div>
-          ))}
+      <div className="grid lg:grid-cols-2 gap-12 max-w-7xl w-full items-start">
+        <div className="flex flex-col gap-3">
+          {features.map((feature, i) => {
+            const Icon = feature.icon;
+            return (
+              <motion.div
+                key={i}
+                onClick={() => setActive(i)}
+                className={`cursor-pointer rounded-2xl p-5 text-left transition-all duration-300 ${
+                  active === i
+                    ? "bg-white shadow-xl border-2 border-blue-200"
+                    : "bg-white/60 border border-gray-100 hover:bg-white hover:shadow-md"
+                }`}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`w-11 h-11 rounded-xl ${feature.iconBg} flex items-center justify-center shadow-lg`}>
+                    <Icon className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-base font-semibold text-gray-900">
+                      {feature.title}
+                    </h3>
+                    <p className="text-gray-500 text-sm mt-0.5 leading-relaxed">{feature.desc}</p>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
 
-        {/* === Feature Preview === */}
-        <div className="relative flex justify-center items-center">
-          {/* Animated gradient glow */}
+        <div className="relative flex justify-center items-center lg:sticky lg:top-24">
           <div
-            className={`absolute inset-0 blur-3xl opacity-40 bg-gradient-to-r ${features[active].gradient} rounded-full`}
+            className={`absolute inset-0 blur-[100px] opacity-30 bg-gradient-to-r ${features[active].gradient} rounded-full`}
           ></div>
 
-          {/* Animated dashboard mockup */}
           <AnimatePresence mode="wait">
             <motion.div
               key={active}
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              initial={{ opacity: 0, y: 20, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -20, scale: 0.95 }}
-              transition={{ duration: 0.6, ease: "easeInOut" }}
-              className="relative z-10"
+              exit={{ opacity: 0, y: -20, scale: 0.96 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="relative z-10 w-full"
             >
-              <motion.img
-                src={features[active].preview}
-                alt={features[active].title}
-                className="rounded-2xl shadow-2xl w-[420px] h-[280px] object-contain border border-gray-200 bg-white/80 backdrop-blur-sm transition-transform duration-500"
-                whileHover={{ scale: 1.03 }}
-              />
-              <p className="text-gray-500 text-sm mt-4 italic">
-                {features[active].title} in action
-              </p>
+              <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
+                <div className="bg-gray-50 border-b border-gray-100 px-6 py-4 flex items-center gap-3">
+                  <div className={`w-9 h-9 rounded-lg ${features[active].iconBg} flex items-center justify-center`}>
+                    <IconComponent className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="font-semibold text-gray-800">{features[active].title}</span>
+                </div>
+                <div className="p-6">
+                  <motion.img
+                    src={features[active].preview}
+                    alt={features[active].title}
+                    className="w-full h-[260px] object-contain"
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </div>
+              </div>
             </motion.div>
           </AnimatePresence>
         </div>

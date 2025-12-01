@@ -9,7 +9,7 @@ export default function MotivatorPage() {
   >([
     {
       from: "motivator",
-      text: "Hey! I'm here to help you stay focused and motivated. Tell me what's on your mind today 👇",
+      text: "Hey! I'm here to help you stay focused and motivated. Tell me what's on your mind today.",
     },
   ]);
 
@@ -122,7 +122,7 @@ export default function MotivatorPage() {
         </div>
 
         <div className="text-xs text-center mt-4" style={{ color: 'var(--app-text-muted)' }}>
-          ✨ Coming soon: voice notes & daily audio motivation
+          Coming soon: voice notes and daily audio motivation
         </div>
       </div>
     </div>

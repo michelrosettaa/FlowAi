@@ -43,7 +43,7 @@ export default function ChatWithFlow() {
   return (
     <div className="flex flex-col h-full">
       <div className="font-semibold text-gray-800 mb-2 text-base flex items-center gap-2">
-        <span className="text-blue-600 text-lg">💬</span>
+        <span className="text-blue-600 text-lg"></span>
         <span>Chat with Flow</span>
       </div>
       <p className="text-gray-600 text-[13px] mb-4 leading-relaxed">

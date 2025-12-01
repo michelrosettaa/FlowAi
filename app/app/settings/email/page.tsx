@@ -84,7 +84,7 @@ export default function EmailSettingsPage() {
         throw new Error(errorData.error || "Failed to add email account");
       }
 
-      setSuccess("✅ Email account added successfully!");
+      setSuccess("Email account added successfully!");
       setEmailAddress("");
       setPassword("");
       setSelectedProvider("");
@@ -109,7 +109,7 @@ export default function EmailSettingsPage() {
         throw new Error("Failed to delete email account");
       }
 
-      setSuccess("✅ Email account deleted successfully");
+      setSuccess("Email account deleted successfully");
       fetchData();
     } catch (err: any) {
       setError(err.message || "Failed to delete email account");
@@ -363,7 +363,7 @@ export default function EmailSettingsPage() {
         style={{ background: 'var(--app-accent-muted)', border: '1px solid var(--app-accent)' }}
       >
         <h3 className="font-semibold mb-2" style={{ color: 'var(--app-text)' }}>
-          📧 How to get an app password:
+          How to get an app password:
         </h3>
         <ul className="text-sm space-y-1" style={{ color: 'var(--app-text-muted)' }}>
           <li><strong>Gmail:</strong> Google Account → Security → 2-Step Verification → App Passwords</li>

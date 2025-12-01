@@ -106,7 +106,7 @@ export default function PlannerPreview() {
           )}
           {visibleBlocks === blocks.length && (
             <div className="text-[11px] text-green-600 text-center mt-4 font-medium">
-              ✅ You’re planned. Stay in flow.
+              You’re planned. Stay in flow.
             </div>
           )}
         </motion.div>

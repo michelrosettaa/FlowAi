@@ -164,7 +164,7 @@ export default function OnboardingPage() {
               </div>
               <div className="rounded-lg bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-300 p-3 flex flex-col justify-between h-24">
                 <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">TUE</div>
-                <div className="text-xs text-emerald-900 font-semibold">Focus Time 💡</div>
+                <div className="text-xs text-emerald-900 font-semibold">Focus Time</div>
                 <div className="text-[10px] text-emerald-600">2pm - 4pm</div>
               </div>
               <div className="rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 p-3 flex flex-col justify-between h-24">
@@ -176,7 +176,11 @@ export default function OnboardingPage() {
 
             <div className="rounded-xl bg-gradient-to-br from-slate-50 to-blue-50 border border-slate-200 p-5">
               <h4 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
-                <span className="text-lg">✨</span>
+                <span className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </span>
                 Refraim AI helps you:
               </h4>
               <ul className="text-sm text-slate-700 space-y-2">
