@@ -4,6 +4,16 @@
 Refraim AI is an AI-powered productivity platform built with Next.js, designed to help users manage tasks, schedules, and emails efficiently. It leverages OpenAI's API for intelligent planning, email assistance, and an AI Motivator feature, aiming to automate routine work and protect deep focus time. The platform integrates with Google services (Gmail, Calendar) and uses a PostgreSQL database, deployed on Replit. Its core purpose is to enhance personal and professional efficiency by providing a comprehensive suite of AI-driven tools.
 
 ## Recent Work (Dec 1, 2025)
+**Email Campaign System**:
+- Built complete automated email campaign system using Resend API
+- Professional email templates: Welcome, Weekly Analytics, Daily Reminders, Streak Alerts
+- Database schema: email_templates, email_campaigns, email_queue, email_delivery_log
+- API routes: /api/email/campaigns/* for welcome, analytics, reminder emails
+- Notification preferences page at /app/settings/notifications with toggles
+- Welcome email automatically sent when users complete onboarding
+- Test email feature allowing users to preview each email type
+- Email sender: hello@refraimai.com with professional branded templates
+
 **UI Polish & Professional Design**:
 - Removed all Apple emojis and replaced with Lucide icons for sleeker, professional appearance
 - Redesigned pricing page with professional check icons in circular containers
@@ -84,6 +94,7 @@ PostgreSQL (Neon-backed) is the primary database, managed with Drizzle ORM. The 
 -   **OpenAI API**: Core AI functionalities.
 -   **Google Calendar API**: Calendar synchronization via per-user OAuth tokens.
 -   **Universal Email Support (IMAP/SMTP)**: Direct protocol integration for various email providers.
+-   **Resend API**: Transactional and campaign email delivery (hello@refraimai.com).
 -   **PostgreSQL (Neon)**: Database backend.
 -   **Vercel Analytics**: Application analytics.
 -   **Random User API**: Demo profile images.
@@ -100,6 +111,7 @@ PostgreSQL (Neon-backed) is the primary database, managed with Drizzle ORM. The 
 -   **date-fns** + **date-fns-tz**: Timezone-aware date handling.
 -   **Lucide React**: Icon library.
 -   **react-markdown**: For rendering AI-generated content.
+-   **resend**: Transactional email API client.
 
 ### Deployment Configuration
 -   **Target Platform**: Replit.
