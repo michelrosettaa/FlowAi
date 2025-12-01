@@ -86,6 +86,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
       items: [
         { name: "Profile", path: "/app/profile", icon: <User size={18} /> },
         { name: "Email Settings", path: "/app/settings/email", icon: <Mail size={18} /> },
+        { name: "Notifications", path: "/app/settings/notifications", icon: <Settings size={18} /> },
         { name: "Help", path: "/app/help", icon: <HelpCircle size={18} /> },
       ]
     },

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth, signIn } from "@/lib/auth";
 import { neon } from "@neondatabase/serverless";
 import { cookies } from "next/headers";
+import { sendWelcomeEmail } from "@/lib/email/campaigns";
 
 export async function POST(request: NextRequest) {
   try {
@@ -35,6 +36,11 @@ export async function POST(request: NextRequest) {
     `;
 
     console.log(`[ONBOARDING API] Saved onboarding for user ${session.user.id}`);
+
+    // Send welcome email (async, don't wait for it)
+    sendWelcomeEmail(session.user.id).catch(err => {
+      console.error("[ONBOARDING API] Failed to send welcome email:", err);
+    });
 
     // Return the redirect URL for the client to use
     return NextResponse.json({ 

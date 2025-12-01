@@ -275,3 +275,73 @@ export type UsageRecord = typeof usageRecords.$inferSelect;
 export type InsertUsageRecord = typeof usageRecords.$inferInsert;
 export type EmailAccount = typeof emailAccounts.$inferSelect;
 export type InsertEmailAccount = typeof emailAccounts.$inferInsert;
+
+// Email Campaign System
+export const emailCampaigns = pgTable("email_campaigns", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  type: varchar("type").$type<"welcome" | "reminder_daily" | "reminder_weekly" | "analytics_weekly" | "notification" | "streak_alert" | "task_reminder">().notNull(),
+  name: varchar("name").notNull(),
+  subject: text("subject").notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const emailDeliveryLog = pgTable("email_delivery_log", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  campaignType: varchar("campaign_type").$type<"welcome" | "reminder_daily" | "reminder_weekly" | "analytics_weekly" | "notification" | "streak_alert" | "task_reminder">().notNull(),
+  recipientEmail: varchar("recipient_email").notNull(),
+  subject: text("subject").notNull(),
+  resendId: varchar("resend_id"),
+  status: varchar("status").$type<"sent" | "failed" | "delivered" | "bounced" | "complained">().notNull().default("sent"),
+  errorMessage: text("error_message"),
+  metadata: jsonb("metadata").default(sql`'{}'::jsonb`),
+  sentAt: timestamp("sent_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const emailPreferences = pgTable("email_preferences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id")
+    .notNull()
+    .unique()
+    .references(() => users.id, { onDelete: "cascade" }),
+  welcomeEmail: boolean("welcome_email").default(true).notNull(),
+  dailyReminders: boolean("daily_reminders").default(false).notNull(),
+  weeklyReminders: boolean("weekly_reminders").default(true).notNull(),
+  weeklyAnalytics: boolean("weekly_analytics").default(true).notNull(),
+  taskReminders: boolean("task_reminders").default(true).notNull(),
+  streakAlerts: boolean("streak_alerts").default(true).notNull(),
+  marketingEmails: boolean("marketing_emails").default(false).notNull(),
+  unsubscribedAt: timestamp("unsubscribed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const emailCampaignsRelations = relations(emailCampaigns, ({ many }) => ({
+  deliveryLogs: many(emailDeliveryLog),
+}));
+
+export const emailDeliveryLogRelations = relations(emailDeliveryLog, ({ one }) => ({
+  user: one(users, {
+    fields: [emailDeliveryLog.userId],
+    references: [users.id],
+  }),
+}));
+
+export const emailPreferencesRelations = relations(emailPreferences, ({ one }) => ({
+  user: one(users, {
+    fields: [emailPreferences.userId],
+    references: [users.id],
+  }),
+}));
+
+export type EmailCampaign = typeof emailCampaigns.$inferSelect;
+export type InsertEmailCampaign = typeof emailCampaigns.$inferInsert;
+export type EmailDeliveryLog = typeof emailDeliveryLog.$inferSelect;
+export type InsertEmailDeliveryLog = typeof emailDeliveryLog.$inferInsert;
+export type EmailPreference = typeof emailPreferences.$inferSelect;
+export type InsertEmailPreference = typeof emailPreferences.$inferInsert;
