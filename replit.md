@@ -3,18 +3,27 @@
 ## Overview
 Refraim AI is an AI-powered productivity platform built with Next.js, designed to help users manage tasks, schedules, and emails efficiently. It leverages OpenAI's API for intelligent planning, email assistance, and an AI Motivator feature, aiming to automate routine work and protect deep focus time. The platform integrates with Google services (Gmail, Calendar) and uses a PostgreSQL database, deployed on Replit. Its core purpose is to enhance personal and professional efficiency by providing a comprehensive suite of AI-driven tools.
 
-## Recent Work (Nov 30, 2025)
+## Recent Work (Dec 1, 2025)
+**UI Polish & Professional Design**:
+- Removed all Apple emojis and replaced with Lucide icons for sleeker, professional appearance
+- Redesigned pricing page with professional check icons in circular containers
+- Updated motivation messages to use text-only format
+- Fixed status message checks to use text-based detection (e.g., "successfully" instead of emoji)
+- Created comprehensive Help Centre page with expandable FAQ sections
+- Added Help link to sidebar navigation under Account section
+
+**Previous Work (Nov 30, 2025)**:
 **Authentication Flow Fixes**:
-- ✅ Fixed dashboard redirect logic for unauthenticated users
-- ✅ Fixed onboarding check to always verify via API (prevents redirect loop when JWT is stale)
-- ✅ Simplified NextAuth cookie configuration for better cross-origin compatibility
-- ✅ Cleaned up Express → Next.js routing for auth endpoints
+- Fixed dashboard redirect logic for unauthenticated users
+- Fixed onboarding check to always verify via API (prevents redirect loop when JWT is stale)
+- Simplified NextAuth cookie configuration for better cross-origin compatibility
+- Cleaned up Express to Next.js routing for auth endpoints
 
 **Production Hardening & Polish**:
-- ✅ Fixed persistent onboarding 401 error (removed Express session middleware conflicting with NextAuth)
-- ✅ Completed "AI Mentor" → "AI Motivator" rebrand across 15+ files (pages, components, APIs, marketing copy)
-- ✅ Verified analytics API uses real database data (not mocks)
-- ✅ Fixed LSP errors in server/routes.ts (corrected usage limit function names)
+- Fixed persistent onboarding 401 error (removed Express session middleware conflicting with NextAuth)
+- Completed "AI Mentor" to "AI Motivator" rebrand across 15+ files (pages, components, APIs, marketing copy)
+- Verified analytics API uses real database data (not mocks)
+- Fixed LSP errors in server/routes.ts (corrected usage limit function names)
 
 **Previous Work (Nov 16, 2025)**:
 - ✅ Removed demo/fake email page, now using real Gmail API integration
