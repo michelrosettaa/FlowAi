@@ -222,7 +222,6 @@ function BillingContent() {
                 style={{ 
                   background: isCurrent ? 'var(--app-surface-hover)' : 'var(--app-surface)',
                   border: `1px solid ${isCurrent ? 'var(--app-accent)' : 'var(--app-border)'}`,
-                  ringColor: 'var(--app-accent)'
                 }}
               >
                 <div className="mb-4">

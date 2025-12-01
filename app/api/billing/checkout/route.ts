@@ -94,6 +94,7 @@ export async function POST(req: NextRequest) {
       success_url: `${process.env.NEXTAUTH_URL}/app/billing?success=true`,
       cancel_url: `${process.env.NEXTAUTH_URL}/app/billing?cancelled=true`,
       subscription_data: {
+        trial_period_days: 7,
         metadata: {
           userId: session.user.id,
           planId: plan.id,
@@ -103,6 +104,8 @@ export async function POST(req: NextRequest) {
         userId: session.user.id,
         planId: plan.id,
       },
+      allow_promotion_codes: true,
+      billing_address_collection: 'auto',
     });
 
     return NextResponse.json({

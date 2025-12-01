@@ -4,6 +4,40 @@
 Refraim AI is an AI-powered productivity platform built with Next.js, designed to help users manage tasks, schedules, and emails efficiently. It leverages OpenAI's API for intelligent planning, email assistance, and an AI Motivator feature, aiming to automate routine work and protect deep focus time. The platform integrates with Google services (Gmail, Calendar) and uses a PostgreSQL database, deployed on Replit. Its core purpose is to enhance personal and professional efficiency by providing a comprehensive suite of AI-driven tools.
 
 ## Recent Work (Dec 1, 2025)
+**Mobile Responsiveness**:
+- Full mobile-first responsive layout with hamburger menu
+- Slide-in navigation drawer for mobile devices
+- Mobile-optimized header with notification bell
+- Touch-friendly navigation and buttons
+- Responsive theme selector (4-column grid on desktop, inline on mobile)
+
+**Stripe Subscription System**:
+- Integrated Stripe via Replit connection with stripe-replit-sync
+- Created products: Free, Pro (£9/mo), Business (£29/mo per seat)
+- 7-day free trial on Pro and Business plans
+- Apple Pay and Google Pay support via Stripe Checkout
+- Billing portal for subscription management
+- Plan enforcement with usage limits
+
+**In-App Notifications**:
+- NotificationBell component with real-time unread count
+- Notification types: streak, achievement, trial, team invite, reminder
+- Mark as read functionality (individual and bulk)
+- Notifications API: GET /api/notifications, PUT to mark read
+
+**Streak Tracking**:
+- Daily login streak tracking with milestone achievements (7, 14, 30, 60, 100, 365 days)
+- Streak reset notifications when streak breaks
+- Achievement notifications for milestones
+- useStreak hook for client-side integration
+
+**Team Management (Business Plan)**:
+- Teams API: /api/teams for team creation
+- Team members API: /api/teams/[teamId]/members for invites
+- Max 5 members per Business team
+- Admin and member roles
+- Token-based invite system with 7-day expiry
+
 **Email Campaign System**:
 - Built complete automated email campaign system using Resend API
 - Professional email templates: Welcome, Weekly Analytics, Daily Reminders, Streak Alerts
