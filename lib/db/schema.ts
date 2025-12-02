@@ -32,8 +32,10 @@ export const users = pgTable("users", {
   name: varchar("name"),
   emailVerified: timestamp("email_verified", { mode: "date" }),
   image: varchar("image"),
+  isAdmin: boolean("is_admin").default(false).notNull(),
   onboardingCompleted: boolean("onboarding_completed").default(false),
   onboardingData: jsonb("onboarding_data"),
+  lastActiveAt: timestamp("last_active_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
