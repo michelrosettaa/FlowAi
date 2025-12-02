@@ -31,9 +31,7 @@ export async function GET(req: NextRequest) {
     const planFilter = url.searchParams.get('plan') || '';
     const statusFilter = url.searchParams.get('status') || '';
 
-    const offset = (page - 1) * limit;
-
-    let query = db
+    const allUsers = await db
       .select({
         id: users.id,
         email: users.email,
@@ -51,11 +49,7 @@ export async function GET(req: NextRequest) {
       .from(users)
       .leftJoin(userSubscriptions, eq(userSubscriptions.userId, users.id))
       .leftJoin(subscriptionPlans, eq(subscriptionPlans.id, userSubscriptions.planId))
-      .orderBy(desc(users.createdAt))
-      .limit(limit)
-      .offset(offset);
-
-    const allUsers = await query;
+      .orderBy(desc(users.createdAt));
 
     let filteredUsers = allUsers;
 
@@ -76,15 +70,17 @@ export async function GET(req: NextRequest) {
       filteredUsers = filteredUsers.filter((u) => u.subscriptionStatus === statusFilter);
     }
 
-    const [totalResult] = await db.select({ count: count() }).from(users);
+    const total = filteredUsers.length;
+    const offset = (page - 1) * limit;
+    const paginatedUsers = filteredUsers.slice(offset, offset + limit);
 
     return NextResponse.json({
-      users: filteredUsers,
+      users: paginatedUsers,
       pagination: {
         page,
         limit,
-        total: totalResult?.count || 0,
-        totalPages: Math.ceil((totalResult?.count || 0) / limit),
+        total,
+        totalPages: Math.ceil(total / limit),
       },
     });
   } catch (error: any) {
