@@ -7,8 +7,8 @@ export async function GET() {
     return new Response(JSON.stringify({ user: null }), { status: 401 });
   }
 
-  return new Response(
-    JSON.stringify({ user: session.user }),
-    { status: 200 }
-  );
+  return new Response(JSON.stringify({ user: session.user }), {
+    status: 200,
+    headers: { "Content-Type": "application/json" },
+  });
 }
