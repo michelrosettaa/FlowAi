@@ -1,3 +1,13 @@
-export default function AppShell({ children }: { children: React.ReactNode }) {
-  return <div className="p-6">{children}</div>;
-}
+const { data: session } = useSession();
+
+useEffect(() => {
+  if (!session?.user) return;
+
+  fetch("/api/user/profile")
+    .then(res => res.json())
+    .then(data => {
+      if (!data.onboardingCompleted) {
+        router.push("/onboarding");
+      }
+    });
+}, [session]);
