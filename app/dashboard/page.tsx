@@ -1,19 +1,22 @@
-import { auth } from "@/auth";
+// @/app/dashboard/page.tsx
+
+import { auth } from "@/auth"; // <-- Import the new universal auth() function
 import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
-  const session = await auth();
+    // 1. Await the session using the new v5 helper
+    const session = await auth();
 
-  if (!session) {
-    redirect("/signin");
-  }
+    // 2. Redirect unauthenticated users
+    if (!session) {
+        redirect("/login"); 
+    }
 
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold">
-        Welcome {session.user?.name}
-      </h1>
-    </div>
-  );
+    // You now have the session object: session.user, session.expires, etc.
+    return (
+        <main>
+            <h1>Welcome back, {session.user?.name}!</h1>
+            {/* ... rest of your dashboard content */}
+        </main>
+    );
 }
-
