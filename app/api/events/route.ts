@@ -44,3 +44,33 @@ export async function POST(request: Request) {
         }, { status: 500 });
     }
 }
+// Example: ./app/api/events/route.ts
+
+import { db } from "@/db"; 
+import { eventsTable } from "@/db/schema";
+import { eq } from "drizzle-orm"; // Import for comparison operations
+
+export async function GET(request: Request) {
+    // 1. AUTHORIZATION CHECK
+    const session = await auth();
+    if (!session || !session.user || !session.user.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    try {
+        // 2. FETCH DATA FROM DRIZZLE
+        const events = await db.select()
+            .from(eventsTable)
+            .where(eq(eventsTable.userId, session.user.id)); // <-- Only get this user's data
+
+        // 3. SUCCESS RESPONSE
+        return NextResponse.json({ events: events }, { status: 200 });
+
+    } catch (error) {
+        console.error("Drizzle Select Error:", error);
+        return NextResponse.json({ 
+            error: "Internal Server Error", 
+            detail: "Failed to load data from the database."
+        }, { status: 500 });
+    }
+}
