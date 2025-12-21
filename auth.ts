@@ -1,21 +1,32 @@
-// ./auth.ts (Root or wherever your config lives)
+// ./auth.ts
+
 import NextAuth from "next-auth";
-// Import your providers here (Google, etc.)
-// ... import your Drizzle adapter/db setup
+// 🛑 IMPORTANT: Import your providers (Google, GitHub, etc.)
+import Google from "next-auth/providers/google"; 
+// 🛑 IMPORTANT: Import your Drizzle Adapter
+import { DrizzleAdapter } from "@auth/drizzle-adapter"; 
+// 🛑 IMPORTANT: Import your Drizzle database instance
+import { db } from "@/db"; // <--- Adjust this path to your Drizzle instance
 
-// Export the auth configuration object if you still need it for context (e.g., middleware)
-// But for the main functions, you use the object destructuring below.
+// This is your NextAuth configuration object
+const authConfig = {
+    adapter: DrizzleAdapter(db), // Use your adapter instance here
+    providers: [
+        Google({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        }),
+        // ... include any other providers
+    ],
+    // If you use custom sign-in pages, add them here
+    pages: {
+        signIn: "/login",
+    },
+    // Include any other callbacks or configurations you had previously
+};
 
-export const { auth, handlers, signIn, signOut } = NextAuth({
-    // You should still include all your existing configuration here:
-    // providers: [/* ... */],
-    // adapter: DrizzleAdapter(db),
-    // pages: { /* ... */ },
-    // session: { strategy: "jwt" }, // or "database"
-    // ...
-});
+// Export the destructured functions by passing the config object to NextAuth
+export const { auth, handlers, signIn, signOut } = NextAuth(authConfig);
 
-// Note: If you have an 'authOptions' export, you might not need it anymore,
-// but if other files are looking for it (as your warnings show), you'll need to
-// ensure you export whatever they expect, or update those files too.
-// For NextAuth v5, you usually don't export authOptions for session retrieval.
+// If other files absolutely *must* import a configuration object, you can export it too:
+export const authOptions = authConfig; // This handles the 'authOptions' warning
