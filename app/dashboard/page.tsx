@@ -1,22 +1,15 @@
-// @/app/dashboard/page.tsx
-
-import { auth } from "@/auth"; // <-- Import the new universal auth() function
+import { auth } from "@/auth"; // Correct import from your config file
 import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
-    // 1. Await the session using the new v5 helper
-    const session = await auth();
+    // 🛑 CRITICAL FIX: Use auth()
+    const session = await auth(); 
 
-    // 2. Redirect unauthenticated users
+    // Guard Clause: Redirect unauthenticated users
     if (!session) {
         redirect("/login"); 
     }
 
-    // You now have the session object: session.user, session.expires, etc.
-    return (
-        <main>
-            <h1>Welcome back, {session.user?.name}!</h1>
-            {/* ... rest of your dashboard content */}
-        </main>
-    );
+    // Now, your database queries that rely on the user session can run correctly
+    // ... rest of your dashboard component ...
 }
